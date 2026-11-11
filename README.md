@@ -34,7 +34,7 @@ insert into private.admins(user_id)
 select id from auth.users where email = '실제 관리자 이메일';
 ```
 
-5. 로컬 비공개 파일 `supabase/functions/.env.production`에 `LOGIN_HASH_SECRET=<암호학적 난수 32바이트 이상>`와 `ALLOWED_ORIGINS=https://MCK1025.github.io`를 설정합니다. Origin에는 저장소 경로를 넣지 않습니다. 파일을 커밋하지 않습니다.
+5. 로컬 비공개 파일 `supabase/functions/.env.production`에 `LOGIN_HASH_SECRET=<암호학적 난수 32바이트 이상>`와 `ALLOWED_ORIGINS=https://mck1025.github.io`를 설정합니다. Origin은 브라우저가 보내는 소문자 호스트로 쓰고 저장소 경로를 넣지 않습니다. 파일을 커밋하지 않습니다.
 6. `pnpm exec supabase secrets set --remote=<프로젝트ID> --env-file supabase/functions/.env.production --yes` 후 `pnpm exec supabase functions deploy --remote=<프로젝트ID> --use-api --yes`를 실행합니다. 세 함수의 공유 import map은 `config.toml`에 명시되어 있습니다. 플랫폼 JWT 검증과 함수 내부 `getUser/getClaims` 검증을 함께 사용합니다.
 7. 운영 미리보기에는 `.env.hosted.local`에 프로젝트 URL과 **공개 가능 키**를 설정하고 Vite `--mode hosted`를 사용합니다. 기본 `.env.local`은 로컬 테스트용으로 유지합니다. `VITE_`에는 서비스 역할 키·Secret key·DB 비밀번호를 넣지 않습니다.
 8. Realtime publication에 `event_public_state`만 들어가는지 확인합니다. 마이그레이션이 이 테이블을 등록합니다. `private` 스키마는 Data API에 노출하지 않습니다.

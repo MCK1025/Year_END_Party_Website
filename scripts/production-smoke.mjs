@@ -17,6 +17,7 @@ const env = z
   })
   .parse(parseEnv(await readFile(".env.admin.production.local", "utf8")));
 assert.equal(env.SUPABASE_URL, `https://${project}.supabase.co`);
+const pagesOrigin = new URL("https://MCK1025.github.io").origin;
 const keys = z
   .array(z.object({ name: z.string(), api_key: z.string() }))
   .parse(JSON.parse(await readFile("artifacts/local-production-keys.json", "utf8")));
@@ -111,12 +112,11 @@ try {
   );
   const preflight = await fetch(`${env.SUPABASE_URL}/functions/v1/portal`, {
     method: "OPTIONS",
-    headers: { Origin: "https://MCK1025.github.io", "Access-Control-Request-Method": "POST" },
+    headers: { Origin: pagesOrigin, "Access-Control-Request-Method": "POST" },
   });
   checked(
     "GitHub Pages CORS preflight allowed",
-    preflight.status === 204 &&
-      preflight.headers.get("access-control-allow-origin") === "https://MCK1025.github.io",
+    preflight.status === 204 && preflight.headers.get("access-control-allow-origin") === pagesOrigin,
   );
   const file = new FormData();
   file.set("file", new File([new Uint8Array([0])], "invalid.png", { type: "image/png" }));

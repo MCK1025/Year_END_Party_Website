@@ -1,0 +1,109 @@
+{
+  "url": "https://mck1025.github.io/Year_END_Party_Website/",
+  "timestamp": "2026-11-11T11:55:31.453Z",
+  "administratorLogin": true,
+  "adminTabs": 9,
+  "captures": [
+    {
+      "name": "login",
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "name": "login",
+      "width": 1280,
+      "overflow": false
+    },
+    {
+      "name": "admin-0",
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "name": "admin-0",
+      "width": 1280,
+      "overflow": false
+    },
+    {
+      "name": "admin-1",
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "name": "admin-1",
+      "width": 1280,
+      "overflow": false
+    },
+    {
+      "name": "admin-2",
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "name": "admin-2",
+      "width": 1280,
+      "overflow": false
+    },
+    {
+      "name": "admin-3",
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "name": "admin-3",
+      "width": 1280,
+      "overflow": false
+    },
+    {
+      "name": "admin-4",
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "name": "admin-4",
+      "width": 1280,
+      "overflow": false
+    },
+    {
+      "name": "admin-5",
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "name": "admin-5",
+      "width": 1280,
+      "overflow": false
+    },
+    {
+      "name": "admin-6",
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "name": "admin-6",
+      "width": 1280,
+      "overflow": false
+    },
+    {
+      "name": "admin-7",
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "name": "admin-7",
+      "width": 1280,
+      "overflow": false
+    },
+    {
+      "name": "admin-8",
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "name": "admin-8",
+      "width": 1280,
+      "overflow": false
+    }
+  ],
+  "errors": []
+}
