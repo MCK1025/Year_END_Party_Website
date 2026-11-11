@@ -2,7 +2,7 @@ import { useState } from "react";
 import { type Dashboard, issuedSchema } from "../../supabase/functions/_shared/contracts";
 import { Button, Check, Confirm, Field, Note, Panel } from "../components/ui";
 import { ApiError, api } from "../lib/api";
-import { type EmployeeRow, parseEmployees } from "../lib/csv";
+import { decodeEmployeeCsv, type EmployeeRow, parseEmployees } from "../lib/csv";
 import { downloadCsv } from "../lib/download";
 import { useTask } from "../lib/useTask";
 import { useAdmin } from "./context";
@@ -73,8 +73,9 @@ export function PeoplePanel() {
   const [reset, setReset] = useState<Employee | null>(null);
   const [search, setSearch] = useState("");
   async function read(file: File) {
+    setRows([]);
     if (file.size > 100000) throw new ApiError("CSV는 100KB 이하로 준비해주세요.");
-    const text = new TextDecoder("utf-8", { fatal: true }).decode(await file.arrayBuffer());
+    const text = decodeEmployeeCsv(new Uint8Array(await file.arrayBuffer()));
     setRows(parseEmployees(text));
     setIssued([]);
   }
@@ -83,8 +84,8 @@ export function PeoplePanel() {
       <div className="grid-two">
         <Panel title="직원 명단 가져오기">
           <p className="small">
-            UTF-8 CSV · employee_no,name,department,date_of_birth 순서로 준비해주세요. 기존 사번은
-            이름·부서·생년월일을 수정하고, 신규 직원에게만 새 코드를 발급합니다.
+            UTF-8 또는 엑셀 CSV(ANSI/CP949)를 지원합니다. employee_no,name,department,date_of_birth 순서로
+            준비해주세요. 기존 사번은 이름·부서·생년월일을 수정하고, 신규 직원에게만 새 코드를 발급합니다.
           </p>
           <a href={`${import.meta.env.BASE_URL}templates/employees.csv`} download>
             CSV 템플릿 다운로드
