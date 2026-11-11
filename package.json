@@ -1,0 +1,51 @@
+{
+  "name": "a-step-closer-2026",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "packageManager": "pnpm@10.32.1",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check src tests scripts supabase/functions vite.config.ts",
+    "format": "biome check --write src tests scripts supabase/functions vite.config.ts",
+    "test": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration --no-file-parallelism",
+    "test:e2e": "playwright test",
+    "test:load": "node scripts/load-test.mjs",
+    "local:setup": "node scripts/local-setup.mjs",
+    "doctor": "react-doctor . --verbose"
+  },
+  "dependencies": {
+    "@phosphor-icons/react": "^2.1.10",
+    "@supabase/supabase-js": "^2.108.0",
+    "@tailwindcss/vite": "latest",
+    "papaparse": "^5.5.3",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.13.0",
+    "tailwindcss": "latest",
+    "write-excel-file": "^4.1.1",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.0",
+    "@playwright/test": "^1.58.2",
+    "@types/node": "^24.10.0",
+    "@types/papaparse": "^5.5.2",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^5.1.4",
+    "lighthouse": "^13.6.0",
+    "postgres": "^3.4.8",
+    "react-doctor": "latest",
+    "react-grab": "^0.2.0",
+    "react-scan": "^0.4.3",
+    "supabase": "^3.1.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1",
+    "vitest": "^4.0.18"
+  }
+}

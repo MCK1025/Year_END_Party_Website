@@ -1,0 +1,75 @@
+{
+  "project": "dzjfjspudnttqnbctljn",
+  "timestamp": "2026-11-11T11:44:28.941Z",
+  "checks": [
+    {
+      "name": "Signup routing enabled for anonymous authentication",
+      "passed": true
+    },
+    {
+      "name": "Separate administrator authenticates",
+      "passed": true
+    },
+    {
+      "name": "Hosted Edge administrator authorization",
+      "passed": true
+    },
+    {
+      "name": "Employee anonymous Auth works while public email registration is blocked",
+      "passed": true
+    },
+    {
+      "name": "Public email signup and forged user_metadata blocked by Auth hook",
+      "passed": true
+    },
+    {
+      "name": "Unverified user denied administrator API",
+      "passed": true
+    },
+    {
+      "name": "Unverified user cannot read survey rows",
+      "passed": true
+    },
+    {
+      "name": "Unverified user cannot read public event snapshot",
+      "passed": true
+    },
+    {
+      "name": "Direct privileged RPC denied",
+      "passed": true
+    },
+    {
+      "name": "Previous prototype hint endpoint is inaccessible",
+      "passed": true
+    },
+    {
+      "name": "Unregistered employee identity rejected",
+      "passed": true
+    },
+    {
+      "name": "Unapproved browser origin rejected",
+      "passed": true
+    },
+    {
+      "name": "GitHub Pages CORS preflight allowed",
+      "passed": true
+    },
+    {
+      "name": "Unverified user denied media upload",
+      "passed": true
+    },
+    {
+      "name": "Hosted Realtime channel connects",
+      "passed": true
+    },
+    {
+      "name": "Hosted waiting-state command succeeds",
+      "passed": true
+    },
+    {
+      "name": "Hosted Postgres Changes delivers the new snapshot",
+      "passed": true
+    }
+  ],
+  "limits": "No employee fixtures, employee save/game publication, load test or physical devices on production"
+}

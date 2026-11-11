@@ -1,0 +1,53 @@
+{
+  "timestamp": "2026-11-11T01:19:38.807Z",
+  "outcomes": [
+    {
+      "name": "CSV import generates strong code once",
+      "passed": true
+    },
+    {
+      "name": "Imported employee authenticates",
+      "passed": true
+    },
+    {
+      "name": "Code rotation revokes existing employee binding",
+      "passed": true
+    },
+    {
+      "name": "Old code is rejected after rotation",
+      "passed": true
+    },
+    {
+      "name": "New code authenticates",
+      "passed": true
+    },
+    {
+      "name": "MIME spoofed SVG upload is rejected",
+      "passed": true
+    },
+    {
+      "name": "Private recap image blocked during waiting",
+      "passed": true
+    },
+    {
+      "name": "Private recap image available only after authorized release",
+      "passed": true
+    },
+    {
+      "name": "Purge removes all staff data, storage and anonymous Auth accounts",
+      "passed": true
+    },
+    {
+      "name": "Purge preserves separate administrator access",
+      "passed": true
+    }
+  ],
+  "remaining": {
+    "employees": 0,
+    "surveys": 0,
+    "nominations": 0,
+    "bindings": 0,
+    "anonymous_users": 0,
+    "files": 0
+  }
+}

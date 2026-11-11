@@ -1,0 +1,23 @@
+# Final setup and context consistency review
+
+Verdict: **PASS** for the reviewed local source and documentation snapshot (2026-11-11). No blocking setup/context inconsistency remains. This is not production deployment approval or evidence of a deployed site.
+
+## Previously blocking finding resolved
+
+- `artifacts/review-context.md` identified unsupported Turnstile setup. `.env.example:1-3` now contains only the two public Supabase settings and the developer-tools flag. `README.md:29` explicitly requires Auth CAPTCHA to remain off because the current login has no widget. This matches `src/pages/Login.tsx:19-21`, which signs in anonymously without a CAPTCHA token. No unsupported site-key requirement remains in the active setup instructions.
+
+## Consistency evidence
+
+- **Local and Pages paths:** `vite.config.ts:6` defaults the build base to `/`; `.github/workflows/pages.yml:30` supplies `/Year_END_Party_Website/` for the Pages build. The backend workflow does not set that override, matching the root preview URL in `playwright.config.ts:7,12-13`. `src/admin/PeoplePanel.tsx:89` uses Vite's `BASE_URL` for the CSV template. `README.md:54-56` states the matching repository URL and rename requirement.
+- **Public configuration:** `.env.example:1-3`, `src/lib/api.ts:5-9`, the two repository Variables in `README.md:47-52`, and `.github/workflows/pages.yml:28-31` agree. README separates browser-public settings from CLI/DB/service-role secrets. `.gitignore` excludes generated environment files and function-secret files. No secret environment values were opened for this review.
+- **Local setup:** `README.md:9-23` matches `scripts/local-setup.mjs`: Node 24, pinned pnpm, local Supabase status export, localhost guard, generated administrator, ignored environment outputs, and a separately served Edge runtime. The local seed/reset behavior is distinguished from the production migration procedure (`README.md:28`, which excludes `--include-seed`).
+- **Production setup:** the dedicated-project requirement, anonymous sign-in setting, administrator provisioning, Edge secrets, origin without repository path, migrations, private schema, and single public-state Realtime publication match source configuration (`README.md:27-43`; `supabase/config.toml:430-434`; `supabase/functions/_shared/http.ts:24-27,51`; `supabase/migrations/202611110001_schema.sql:137`). MFA is described as optional and requires enrollment before enforcement, matching `src/admin/AdminLogin.tsx` and the RLS/gateway checks.
+- **Platform JWT compatibility:** checked the current primary [Supabase authorization-header documentation](https://supabase.com/docs/guides/functions/auth-headers), updated October 22, 2026. It explicitly supports both legacy and asymmetric user JWTs with the platform check, and recommends leaving `verify_jwt` enabled for authenticated `functions.invoke` callers. Thus the active README/configuration pair is consistent with the current documented platform behavior. Hosted behavior still requires the stated deployment verification.
+- **Results are scoped honestly:** `docs/TEST-RESULTS.md:5-7` clearly identifies local Docker Supabase, synthetic data, no push, no actual Pages deployment, and pending deployed-origin/physical-device checks. The 50-client counts and latency figures match `artifacts/load-test.json`; the ten operation outcomes match `artifacts/operations-test.json`; `artifacts/visual-qa.json` records 108 captures for 27 states, no overflow flags, and no issues. The load interpretation explicitly distinguishes 50 Auth users/sockets from five fixture employees. Other runtime test claims remain the coordinating executor's evidence; they were not rerun in this read-only lane.
+- **Latest design authority:** `DESIGN.md:4-11` records the later playful-but-solemn navy/ivory/serif/muted-brass direction as overriding the attachment's original bright gameshow direction. No setup/documentation conflict with that precedence was found.
+
+## Remaining external work and review limits
+
+The user is preparing the real Supabase project. No production credentials or deployed-origin evidence is available in this review. Production connection, a successful GitHub Pages Actions deployment, hosted CORS/JWT/MFA checks, venue networking, and physical iOS/Android checks remain pending exactly as the README and test-results document state. Their absence is not concealed by this PASS.
+
+Reviewed current files directly because the application remains uncommitted; the older context-review artifact is historical evidence, superseded by this re-review for its Turnstile finding. No source/configuration edits, commits, pushes, database writes, production changes, secret dumps, or subagents were performed. Only this report was written.

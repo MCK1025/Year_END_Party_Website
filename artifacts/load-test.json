@@ -1,0 +1,13 @@
+{
+  "timestamp": "2026-11-11T01:21:31.581Z",
+  "environment": "local Docker Supabase, real Auth/Edge/Postgres Changes",
+  "concurrentClients": 50,
+  "received": 50,
+  "p50Ms": 102,
+  "p95Ms": 102,
+  "maxMs": 102,
+  "concurrentSnapshotBatchMs": 144,
+  "restoredRevision": 371,
+  "restoredHintCount": 1,
+  "unrevealedHintLeaked": false
+}

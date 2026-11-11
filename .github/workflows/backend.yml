@@ -1,0 +1,28 @@
+name: Local Supabase integration
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.32.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec supabase start > /tmp/supabase-start.log
+      - run: pnpm exec supabase status -o env > .env.supabase.local
+      - run: pnpm local:setup
+      - run: pnpm exec supabase functions serve --env-file supabase/functions/.env.local > /tmp/edge-functions.log 2>&1 &
+      - run: pnpm test:integration
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:e2e
+      - if: always()
+        run: pnpm exec supabase stop

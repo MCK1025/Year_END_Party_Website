@@ -1,0 +1,25 @@
+# Partial hosted configuration. Unspecified infrastructure properties are preserved.
+# Apply from the repository root with --workdir deploy and an explicit --remote target.
+project_id = "year-end-party-production"
+
+[auth]
+site_url = "https://MCK1025.github.io/Year_END_Party_Website/"
+additional_redirect_urls = []
+enable_signup = true
+enable_anonymous_sign_ins = true
+minimum_password_length = 12
+
+[auth.email]
+enabled = true
+enable_confirmations = true
+secure_password_change = true
+
+[auth.rate_limit]
+anonymous_users = 100
+
+[auth.captcha]
+enabled = false
+
+[auth.hook.before_user_created]
+enabled = true
+uri = "pg-functions://postgres/private/before_user_created"

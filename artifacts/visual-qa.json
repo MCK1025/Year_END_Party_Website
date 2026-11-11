@@ -1,0 +1,655 @@
+{
+  "captures": [
+    {
+      "name": "01-login",
+      "width": 320,
+      "path": "artifacts/screens/01-login-320.png",
+      "overflow": false
+    },
+    {
+      "name": "01-login",
+      "width": 375,
+      "path": "artifacts/screens/01-login-375.png",
+      "overflow": false
+    },
+    {
+      "name": "01-login",
+      "width": 768,
+      "path": "artifacts/screens/01-login-768.png",
+      "overflow": false
+    },
+    {
+      "name": "01-login",
+      "width": 1280,
+      "path": "artifacts/screens/01-login-1280.png",
+      "overflow": false
+    },
+    {
+      "name": "02-survey",
+      "width": 320,
+      "path": "artifacts/screens/02-survey-320.png",
+      "overflow": false
+    },
+    {
+      "name": "02-survey",
+      "width": 375,
+      "path": "artifacts/screens/02-survey-375.png",
+      "overflow": false
+    },
+    {
+      "name": "02-survey",
+      "width": 768,
+      "path": "artifacts/screens/02-survey-768.png",
+      "overflow": false
+    },
+    {
+      "name": "02-survey",
+      "width": 1280,
+      "path": "artifacts/screens/02-survey-1280.png",
+      "overflow": false
+    },
+    {
+      "name": "03-nominate",
+      "width": 320,
+      "path": "artifacts/screens/03-nominate-320.png",
+      "overflow": false
+    },
+    {
+      "name": "03-nominate",
+      "width": 375,
+      "path": "artifacts/screens/03-nominate-375.png",
+      "overflow": false
+    },
+    {
+      "name": "03-nominate",
+      "width": 768,
+      "path": "artifacts/screens/03-nominate-768.png",
+      "overflow": false
+    },
+    {
+      "name": "03-nominate",
+      "width": 1280,
+      "path": "artifacts/screens/03-nominate-1280.png",
+      "overflow": false
+    },
+    {
+      "name": "04-waiting",
+      "width": 320,
+      "path": "artifacts/screens/04-waiting-320.png",
+      "overflow": false
+    },
+    {
+      "name": "04-waiting",
+      "width": 375,
+      "path": "artifacts/screens/04-waiting-375.png",
+      "overflow": false
+    },
+    {
+      "name": "04-waiting",
+      "width": 768,
+      "path": "artifacts/screens/04-waiting-768.png",
+      "overflow": false
+    },
+    {
+      "name": "04-waiting",
+      "width": 1280,
+      "path": "artifacts/screens/04-waiting-1280.png",
+      "overflow": false
+    },
+    {
+      "name": "05-recap",
+      "width": 320,
+      "path": "artifacts/screens/05-recap-320.png",
+      "overflow": false
+    },
+    {
+      "name": "05-recap",
+      "width": 375,
+      "path": "artifacts/screens/05-recap-375.png",
+      "overflow": false
+    },
+    {
+      "name": "05-recap",
+      "width": 768,
+      "path": "artifacts/screens/05-recap-768.png",
+      "overflow": false
+    },
+    {
+      "name": "05-recap",
+      "width": 1280,
+      "path": "artifacts/screens/05-recap-1280.png",
+      "overflow": false
+    },
+    {
+      "name": "06-game-ready",
+      "width": 320,
+      "path": "artifacts/screens/06-game-ready-320.png",
+      "overflow": false
+    },
+    {
+      "name": "06-game-ready",
+      "width": 375,
+      "path": "artifacts/screens/06-game-ready-375.png",
+      "overflow": false
+    },
+    {
+      "name": "06-game-ready",
+      "width": 768,
+      "path": "artifacts/screens/06-game-ready-768.png",
+      "overflow": false
+    },
+    {
+      "name": "06-game-ready",
+      "width": 1280,
+      "path": "artifacts/screens/06-game-ready-1280.png",
+      "overflow": false
+    },
+    {
+      "name": "07-hint-1",
+      "width": 320,
+      "path": "artifacts/screens/07-hint-1-320.png",
+      "overflow": false
+    },
+    {
+      "name": "07-hint-1",
+      "width": 375,
+      "path": "artifacts/screens/07-hint-1-375.png",
+      "overflow": false
+    },
+    {
+      "name": "07-hint-1",
+      "width": 768,
+      "path": "artifacts/screens/07-hint-1-768.png",
+      "overflow": false
+    },
+    {
+      "name": "07-hint-1",
+      "width": 1280,
+      "path": "artifacts/screens/07-hint-1-1280.png",
+      "overflow": false
+    },
+    {
+      "name": "07-hint-2",
+      "width": 320,
+      "path": "artifacts/screens/07-hint-2-320.png",
+      "overflow": false
+    },
+    {
+      "name": "07-hint-2",
+      "width": 375,
+      "path": "artifacts/screens/07-hint-2-375.png",
+      "overflow": false
+    },
+    {
+      "name": "07-hint-2",
+      "width": 768,
+      "path": "artifacts/screens/07-hint-2-768.png",
+      "overflow": false
+    },
+    {
+      "name": "07-hint-2",
+      "width": 1280,
+      "path": "artifacts/screens/07-hint-2-1280.png",
+      "overflow": false
+    },
+    {
+      "name": "07-hint-3",
+      "width": 320,
+      "path": "artifacts/screens/07-hint-3-320.png",
+      "overflow": false
+    },
+    {
+      "name": "07-hint-3",
+      "width": 375,
+      "path": "artifacts/screens/07-hint-3-375.png",
+      "overflow": false
+    },
+    {
+      "name": "07-hint-3",
+      "width": 768,
+      "path": "artifacts/screens/07-hint-3-768.png",
+      "overflow": false
+    },
+    {
+      "name": "07-hint-3",
+      "width": 1280,
+      "path": "artifacts/screens/07-hint-3-1280.png",
+      "overflow": false
+    },
+    {
+      "name": "08-paused",
+      "width": 320,
+      "path": "artifacts/screens/08-paused-320.png",
+      "overflow": false
+    },
+    {
+      "name": "08-paused",
+      "width": 375,
+      "path": "artifacts/screens/08-paused-375.png",
+      "overflow": false
+    },
+    {
+      "name": "08-paused",
+      "width": 768,
+      "path": "artifacts/screens/08-paused-768.png",
+      "overflow": false
+    },
+    {
+      "name": "08-paused",
+      "width": 1280,
+      "path": "artifacts/screens/08-paused-1280.png",
+      "overflow": false
+    },
+    {
+      "name": "09-revealed",
+      "width": 320,
+      "path": "artifacts/screens/09-revealed-320.png",
+      "overflow": false
+    },
+    {
+      "name": "09-revealed",
+      "width": 375,
+      "path": "artifacts/screens/09-revealed-375.png",
+      "overflow": false
+    },
+    {
+      "name": "09-revealed",
+      "width": 768,
+      "path": "artifacts/screens/09-revealed-768.png",
+      "overflow": false
+    },
+    {
+      "name": "09-revealed",
+      "width": 1280,
+      "path": "artifacts/screens/09-revealed-1280.png",
+      "overflow": false
+    },
+    {
+      "name": "10-taste-question",
+      "width": 320,
+      "path": "artifacts/screens/10-taste-question-320.png",
+      "overflow": false
+    },
+    {
+      "name": "10-taste-question",
+      "width": 375,
+      "path": "artifacts/screens/10-taste-question-375.png",
+      "overflow": false
+    },
+    {
+      "name": "10-taste-question",
+      "width": 768,
+      "path": "artifacts/screens/10-taste-question-768.png",
+      "overflow": false
+    },
+    {
+      "name": "10-taste-question",
+      "width": 1280,
+      "path": "artifacts/screens/10-taste-question-1280.png",
+      "overflow": false
+    },
+    {
+      "name": "11-taste-results",
+      "width": 320,
+      "path": "artifacts/screens/11-taste-results-320.png",
+      "overflow": false
+    },
+    {
+      "name": "11-taste-results",
+      "width": 375,
+      "path": "artifacts/screens/11-taste-results-375.png",
+      "overflow": false
+    },
+    {
+      "name": "11-taste-results",
+      "width": 768,
+      "path": "artifacts/screens/11-taste-results-768.png",
+      "overflow": false
+    },
+    {
+      "name": "11-taste-results",
+      "width": 1280,
+      "path": "artifacts/screens/11-taste-results-1280.png",
+      "overflow": false
+    },
+    {
+      "name": "12-awards",
+      "width": 320,
+      "path": "artifacts/screens/12-awards-320.png",
+      "overflow": false
+    },
+    {
+      "name": "12-awards",
+      "width": 375,
+      "path": "artifacts/screens/12-awards-375.png",
+      "overflow": false
+    },
+    {
+      "name": "12-awards",
+      "width": 768,
+      "path": "artifacts/screens/12-awards-768.png",
+      "overflow": false
+    },
+    {
+      "name": "12-awards",
+      "width": 1280,
+      "path": "artifacts/screens/12-awards-1280.png",
+      "overflow": false
+    },
+    {
+      "name": "13-ending",
+      "width": 320,
+      "path": "artifacts/screens/13-ending-320.png",
+      "overflow": false
+    },
+    {
+      "name": "13-ending",
+      "width": 375,
+      "path": "artifacts/screens/13-ending-375.png",
+      "overflow": false
+    },
+    {
+      "name": "13-ending",
+      "width": 768,
+      "path": "artifacts/screens/13-ending-768.png",
+      "overflow": false
+    },
+    {
+      "name": "13-ending",
+      "width": 1280,
+      "path": "artifacts/screens/13-ending-1280.png",
+      "overflow": false
+    },
+    {
+      "name": "14-survey-closed",
+      "width": 320,
+      "path": "artifacts/screens/14-survey-closed-320.png",
+      "overflow": false
+    },
+    {
+      "name": "14-survey-closed",
+      "width": 375,
+      "path": "artifacts/screens/14-survey-closed-375.png",
+      "overflow": false
+    },
+    {
+      "name": "14-survey-closed",
+      "width": 768,
+      "path": "artifacts/screens/14-survey-closed-768.png",
+      "overflow": false
+    },
+    {
+      "name": "14-survey-closed",
+      "width": 1280,
+      "path": "artifacts/screens/14-survey-closed-1280.png",
+      "overflow": false
+    },
+    {
+      "name": "15-admin-login",
+      "width": 320,
+      "path": "artifacts/screens/15-admin-login-320.png",
+      "overflow": false
+    },
+    {
+      "name": "15-admin-login",
+      "width": 375,
+      "path": "artifacts/screens/15-admin-login-375.png",
+      "overflow": false
+    },
+    {
+      "name": "15-admin-login",
+      "width": 768,
+      "path": "artifacts/screens/15-admin-login-768.png",
+      "overflow": false
+    },
+    {
+      "name": "15-admin-login",
+      "width": 1280,
+      "path": "artifacts/screens/15-admin-login-1280.png",
+      "overflow": false
+    },
+    {
+      "name": "16-admin-0",
+      "width": 320,
+      "path": "artifacts/screens/16-admin-0-320.png",
+      "overflow": false
+    },
+    {
+      "name": "16-admin-0",
+      "width": 375,
+      "path": "artifacts/screens/16-admin-0-375.png",
+      "overflow": false
+    },
+    {
+      "name": "16-admin-0",
+      "width": 768,
+      "path": "artifacts/screens/16-admin-0-768.png",
+      "overflow": false
+    },
+    {
+      "name": "16-admin-0",
+      "width": 1280,
+      "path": "artifacts/screens/16-admin-0-1280.png",
+      "overflow": false
+    },
+    {
+      "name": "16-admin-1",
+      "width": 320,
+      "path": "artifacts/screens/16-admin-1-320.png",
+      "overflow": false
+    },
+    {
+      "name": "16-admin-1",
+      "width": 375,
+      "path": "artifacts/screens/16-admin-1-375.png",
+      "overflow": false
+    },
+    {
+      "name": "16-admin-1",
+      "width": 768,
+      "path": "artifacts/screens/16-admin-1-768.png",
+      "overflow": false
+    },
+    {
+      "name": "16-admin-1",
+      "width": 1280,
+      "path": "artifacts/screens/16-admin-1-1280.png",
+      "overflow": false
+    },
+    {
+      "name": "16-admin-2",
+      "width": 320,
+      "path": "artifacts/screens/16-admin-2-320.png",
+      "overflow": false
+    },
+    {
+      "name": "16-admin-2",
+      "width": 375,
+      "path": "artifacts/screens/16-admin-2-375.png",
+      "overflow": false
+    },
+    {
+      "name": "16-admin-2",
+      "width": 768,
+      "path": "artifacts/screens/16-admin-2-768.png",
+      "overflow": false
+    },
+    {
+      "name": "16-admin-2",
+      "width": 1280,
+      "path": "artifacts/screens/16-admin-2-1280.png",
+      "overflow": false
+    },
+    {
+      "name": "16-admin-3",
+      "width": 320,
+      "path": "artifacts/screens/16-admin-3-320.png",
+      "overflow": false
+    },
+    {
+      "name": "16-admin-3",
+      "width": 375,
+      "path": "artifacts/screens/16-admin-3-375.png",
+      "overflow": false
+    },
+    {
+      "name": "16-admin-3",
+      "width": 768,
+      "path": "artifacts/screens/16-admin-3-768.png",
+      "overflow": false
+    },
+    {
+      "name": "16-admin-3",
+      "width": 1280,
+      "path": "artifacts/screens/16-admin-3-1280.png",
+      "overflow": false
+    },
+    {
+      "name": "16-admin-4",
+      "width": 320,
+      "path": "artifacts/screens/16-admin-4-320.png",
+      "overflow": false
+    },
+    {
+      "name": "16-admin-4",
+      "width": 375,
+      "path": "artifacts/screens/16-admin-4-375.png",
+      "overflow": false
+    },
+    {
+      "name": "16-admin-4",
+      "width": 768,
+      "path": "artifacts/screens/16-admin-4-768.png",
+      "overflow": false
+    },
+    {
+      "name": "16-admin-4",
+      "width": 1280,
+      "path": "artifacts/screens/16-admin-4-1280.png",
+      "overflow": false
+    },
+    {
+      "name": "16-admin-5",
+      "width": 320,
+      "path": "artifacts/screens/16-admin-5-320.png",
+      "overflow": false
+    },
+    {
+      "name": "16-admin-5",
+      "width": 375,
+      "path": "artifacts/screens/16-admin-5-375.png",
+      "overflow": false
+    },
+    {
+      "name": "16-admin-5",
+      "width": 768,
+      "path": "artifacts/screens/16-admin-5-768.png",
+      "overflow": false
+    },
+    {
+      "name": "16-admin-5",
+      "width": 1280,
+      "path": "artifacts/screens/16-admin-5-1280.png",
+      "overflow": false
+    },
+    {
+      "name": "16-admin-6",
+      "width": 320,
+      "path": "artifacts/screens/16-admin-6-320.png",
+      "overflow": false
+    },
+    {
+      "name": "16-admin-6",
+      "width": 375,
+      "path": "artifacts/screens/16-admin-6-375.png",
+      "overflow": false
+    },
+    {
+      "name": "16-admin-6",
+      "width": 768,
+      "path": "artifacts/screens/16-admin-6-768.png",
+      "overflow": false
+    },
+    {
+      "name": "16-admin-6",
+      "width": 1280,
+      "path": "artifacts/screens/16-admin-6-1280.png",
+      "overflow": false
+    },
+    {
+      "name": "16-admin-7",
+      "width": 320,
+      "path": "artifacts/screens/16-admin-7-320.png",
+      "overflow": false
+    },
+    {
+      "name": "16-admin-7",
+      "width": 375,
+      "path": "artifacts/screens/16-admin-7-375.png",
+      "overflow": false
+    },
+    {
+      "name": "16-admin-7",
+      "width": 768,
+      "path": "artifacts/screens/16-admin-7-768.png",
+      "overflow": false
+    },
+    {
+      "name": "16-admin-7",
+      "width": 1280,
+      "path": "artifacts/screens/16-admin-7-1280.png",
+      "overflow": false
+    },
+    {
+      "name": "16-admin-8",
+      "width": 320,
+      "path": "artifacts/screens/16-admin-8-320.png",
+      "overflow": false
+    },
+    {
+      "name": "16-admin-8",
+      "width": 375,
+      "path": "artifacts/screens/16-admin-8-375.png",
+      "overflow": false
+    },
+    {
+      "name": "16-admin-8",
+      "width": 768,
+      "path": "artifacts/screens/16-admin-8-768.png",
+      "overflow": false
+    },
+    {
+      "name": "16-admin-8",
+      "width": 1280,
+      "path": "artifacts/screens/16-admin-8-1280.png",
+      "overflow": false
+    },
+    {
+      "name": "17-export-confirm",
+      "width": 320,
+      "path": "artifacts/screens/17-export-confirm-320.png",
+      "overflow": false
+    },
+    {
+      "name": "17-export-confirm",
+      "width": 375,
+      "path": "artifacts/screens/17-export-confirm-375.png",
+      "overflow": false
+    },
+    {
+      "name": "17-export-confirm",
+      "width": 768,
+      "path": "artifacts/screens/17-export-confirm-768.png",
+      "overflow": false
+    },
+    {
+      "name": "17-export-confirm",
+      "width": 1280,
+      "path": "artifacts/screens/17-export-confirm-1280.png",
+      "overflow": false
+    }
+  ],
+  "issues": [],
+  "xlsxDownload": "valid ZIP signature",
+  "pages": 27
+}

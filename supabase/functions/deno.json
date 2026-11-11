@@ -1,0 +1,7 @@
+{
+  "imports": {
+    "@supabase/supabase-js": "npm:@supabase/supabase-js@2.108.0",
+    "zod": "npm:zod@4.3.6"
+  },
+  "compilerOptions": { "strict": true, "noUncheckedIndexedAccess": true }
+}
