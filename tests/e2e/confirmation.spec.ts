@@ -9,11 +9,13 @@ test("rejects an old confirmation after another organizer advances the round", a
   const data = await dashboard();
   const survey = data.surveys.find((s) => s.consent && s.excluded.length === 0);
   if (!survey) throw new Error("Run integration fixtures first");
+  const previous = data.rounds.find((r) => r.sort_order === 88);
   await call(
     admin,
     {
       action: "round",
       payload: {
+        ...(previous ? { id: previous.id } : {}),
         employee_id: survey.employee_id,
         question_keys: ["dream", "surprise"],
         hints: ["CAS-HINT-1", "CAS-HINT-2"],

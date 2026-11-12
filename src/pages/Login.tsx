@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { bootstrapSchema, loginSchema } from "../../supabase/functions/_shared/contracts";
+import { bootstrapSchema, loginSchema, uuid } from "../../supabase/functions/_shared/contracts";
 import { Button, Field, Forward, Note } from "../components/ui";
-import { api, configured, supabase, verify } from "../lib/api";
+import { ApiError, api, configured, supabase, verify } from "../lib/api";
 import { useTask } from "../lib/useTask";
 
 export function Login() {
@@ -12,7 +12,16 @@ export function Login() {
   async function login() {
     const input = loginSchema.parse({ password });
     const existing = await supabase.auth.getUser();
-    if (existing.data.user && !existing.data.user.is_anonymous) await supabase.auth.signOut();
+    let replaceSession = Boolean(existing.data.user && !existing.data.user.is_anonymous);
+    if (existing.data.user?.is_anonymous) {
+      const binding = await supabase.rpc("current_employee");
+      if (binding.error) throw new ApiError("로그인 연결에 실패했습니다. 다시 시도해주세요.");
+      replaceSession = uuid.nullable().parse(binding.data) !== null;
+    }
+    if (replaceSession) {
+      const signedOut = await supabase.auth.signOut({ scope: "local" });
+      if (signedOut.error) throw signedOut.error;
+    }
     const { data: session } = await supabase.auth.getSession();
     if (!session.session) {
       const { error } = await supabase.auth.signInAnonymously();

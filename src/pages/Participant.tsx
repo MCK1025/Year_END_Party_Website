@@ -1,4 +1,4 @@
-import { createContext, useContext } from "react";
+import { createContext, useContext, useEffect } from "react";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import type { Bootstrap } from "../../supabase/functions/_shared/contracts";
 import { Button, Note } from "../components/ui";
@@ -16,6 +16,17 @@ export function useGuest() {
 export function Participant() {
   const { data, error, connection, refresh } = useParticipant();
   const navigate = useNavigate();
+  useEffect(() => {
+    let authId: string | undefined;
+    const { data: auth } = supabase.auth.onAuthStateChange((event, session) => {
+      const next = session?.user.id;
+      if (event === "SIGNED_OUT" || (authId && next !== authId)) {
+        navigate("/login", { replace: true });
+      }
+      authId = next;
+    });
+    return () => auth.subscription.unsubscribe();
+  }, [navigate]);
   if (!data)
     return (
       <main className="guest stack">
