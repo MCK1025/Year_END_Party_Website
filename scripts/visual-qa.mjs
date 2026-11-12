@@ -52,9 +52,7 @@ async function capture(target, name) {
 try {
   await page.goto("http://127.0.0.1:4173/#/login");
   await capture(page, "01-login");
-  await page.getByLabel("이름", { exact: true }).fill("가상직원 하나");
-  await page.getByLabel("생년월일", { exact: true }).fill("1990-01-01");
-  await page.getByLabel("개인 행사코드", { exact: true }).fill("TEST2026-A1");
+  await page.getByLabel("비밀번호", { exact: true }).fill("900101");
   await page.getByRole("button", { name: "우리의 자리로" }).click();
   await page.getByRole("link", { name: "나의 이야기" }).waitFor();
   await page.getByRole("link", { name: "나의 이야기" }).click();

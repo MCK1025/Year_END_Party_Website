@@ -1,24 +1,20 @@
 {
-  "timestamp": "2026-11-11T01:19:38.807Z",
+  "timestamp": "2026-11-12T14:30:03.253Z",
   "outcomes": [
-    {
-      "name": "CSV import generates strong code once",
-      "passed": true
-    },
     {
       "name": "Imported employee authenticates",
       "passed": true
     },
     {
-      "name": "Code rotation revokes existing employee binding",
+      "name": "Birthday change revokes existing employee binding",
       "passed": true
     },
     {
-      "name": "Old code is rejected after rotation",
+      "name": "Previous birthday password is rejected",
       "passed": true
     },
     {
-      "name": "New code authenticates",
+      "name": "Updated birthday password authenticates",
       "passed": true
     },
     {
@@ -47,6 +43,8 @@
     "surveys": 0,
     "nominations": 0,
     "bindings": 0,
+    "forest_posts": 0,
+    "forest_limits": 0,
     "anonymous_users": 0,
     "files": 0
   }

@@ -3,7 +3,7 @@ import postgres from "postgres";
 import { okSchema } from "../../supabase/functions/_shared/contracts";
 import { admin, call, command, dashboard, env, eventDate, signAdmin } from "../integration/helpers";
 
-const sql = postgres("postgresql://postgres:postgres@127.0.0.1:54322/postgres");
+const sql = postgres(env.DB_URL ?? "postgresql://postgres:postgres@127.0.0.1:54322/postgres");
 test.beforeAll(async () => {
   await signAdmin();
   await sql`update private.settings set enabled=true,survey_open=true,nomination_open=true`;
@@ -21,9 +21,7 @@ test("guest saves a story, then sees organizer reveals live through the ending",
 }) => {
   // Given: a genuine mobile browser, a separate organizer session, five synthetic employees.
   await page.goto("/#/login");
-  await page.getByLabel("이름", { exact: true }).fill("가상직원 하나");
-  await page.getByLabel("생년월일", { exact: true }).fill("1990-01-01");
-  await page.getByLabel("개인 행사코드", { exact: true }).fill("TEST2026-A1");
+  await page.getByLabel("비밀번호", { exact: true }).fill("900101");
   await page.getByRole("button", { name: "우리의 자리로" }).click();
   await expect(page.getByRole("link", { name: "나의 이야기" })).toBeVisible();
   await page.getByRole("link", { name: "나의 이야기" }).click();
@@ -33,7 +31,7 @@ test("guest saves a story, then sees organizer reveals live through the ending",
   await page.getByLabel("어릴 적 나의 꿈은?").fill("우주를 걷는 사람");
   await page.getByLabel("동료들이 아직 모르는 나의 반전은?").fill("새벽에 빵을 굽습니다");
   await page.getByLabel("올해, 오래 기억하고 싶은 순간은?").fill("함께 끝낸 첫 프로젝트");
-  await page.getByLabel("선택한 답변을 인물 힌트와 익명 취향 통계에 활용하는 데 동의합니다.").check();
+  await page.getByLabel("내 답변을 인물 힌트와 익명 취향 통계에 활용하는 데 동의합니다.").check();
   await page.getByRole("button", { name: "이야기 저장하고 다음으로" }).click();
   await expect(page.getByLabel("추천할 동료")).toBeVisible();
   const d = await dashboard();

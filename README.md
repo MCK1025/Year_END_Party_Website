@@ -16,7 +16,7 @@ pnpm local:setup
 pnpm exec supabase functions serve --env-file supabase/functions/.env.local
 ```
 
-다른 터미널에서 `pnpm dev`를 실행하고 [로컬 로그인](http://localhost:5173/#/login)을 엽니다. 가상 직원 5명은 `supabase/seed.sql`에 있습니다. 예: 이름 `가상직원 하나`, 생년월일 `1990-01-01`, 코드 `TEST2026-A1`. 모두 개발용 합성 정보입니다.
+다른 터미널에서 `pnpm dev`를 실행하고 [로컬 로그인](http://localhost:5173/#/login)을 엽니다. 가상 직원 5명은 `supabase/seed.sql`에 있습니다. 예: `가상직원 하나`는 비밀번호 `900101`만 입력합니다(생년월일 1990-01-01의 YYMMDD). 모두 개발용 합성 정보입니다. 로컬 Supabase는 Windows 예약 포트 충돌을 피하는 55421(API)/55422(DB)를 사용하고, 검증 스크립트는 `.env.test.local`의 DB_URL을 따릅니다.
 
 로컬 관리자 이메일과 무작위 비밀번호는 무시되는 `.env.test.local`에 생성됩니다. 터미널이나 GitHub에 출력하지 않습니다. `pnpm local:setup`을 다시 실행하면 로컬 관리자 비밀번호가 바뀝니다.
 

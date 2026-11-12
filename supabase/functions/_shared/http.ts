@@ -41,7 +41,10 @@ export async function rpc(
     p: { ...payload, _aal: aal },
   });
   if (error)
-    throw new HttpError(error.code === "42501" ? 403 : error.code === "40001" ? 409 : 400, error.message);
+    throw new HttpError(
+      error.code === "42501" ? 403 : error.code === "40001" || error.code === "PT409" ? 409 : 400,
+      error.message,
+    );
   return data;
 }
 export function serve(handler: (request: Request) => Promise<unknown>) {

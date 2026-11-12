@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { type Dashboard, dashboardSchema } from "../../supabase/functions/_shared/contracts";
 import { Button, Note } from "../components/ui";
 import { api, message, supabase } from "../lib/api";
+import { Forest } from "../pages/Forest";
 import { AdminLogin } from "./AdminLogin";
 import { AdminContext } from "./context";
 import { DataPanel } from "./DataPanel";
@@ -17,6 +18,7 @@ const tabs = [
   "실시간 진행",
   "사원 관리",
   "설문·추천",
+  "대나무숲",
   "질문 관리",
   "1년 회고",
   "인물 맞히기",
@@ -33,6 +35,8 @@ function Contents({ tab }: { readonly tab: Tab }) {
       return <PeoplePanel />;
     case "설문·추천":
       return <DataPanel />;
+    case "대나무숲":
+      return <Forest admin />;
     case "질문 관리":
       return <QuestionsPanel />;
     case "1년 회고":

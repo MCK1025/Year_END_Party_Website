@@ -26,7 +26,7 @@ await call(admin, "settings", {
 });
 d = await call(admin, "dashboard");
 await call(admin, "command", { command: "waiting", revision: d.state.revision });
-const fixture = { name: "가상직원 하나", date_of_birth: "1990-01-01", access_code: "TEST2026-A1" };
+const fixture = { password: "900101" };
 const clients = [];
 const readyTimes = [];
 let expectedRevision = -1;

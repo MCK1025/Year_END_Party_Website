@@ -46,6 +46,7 @@ export function Participant() {
         <nav aria-label="내 행사 메뉴" className="guest-nav">
           <NavLink to="/survey">나의 이야기</NavLink>
           <NavLink to="/nominate">고마운 동료</NavLink>
+          <NavLink to="/forest">대나무숲</NavLink>
           <NavLink to="/event">행사장</NavLink>
         </nav>
         <Outlet />

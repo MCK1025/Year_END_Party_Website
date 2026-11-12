@@ -125,9 +125,7 @@ export const issuedSchema = z.object({
 });
 export const okSchema = z.object({ ok: z.literal(true) });
 export const loginSchema = z.object({
-  name: z.string().trim().min(1).max(60),
-  date_of_birth: date,
-  access_code: z.string().trim().min(8).max(80),
+  password: z.string().regex(/^[0-9]{6}$/),
 });
 export const employeeCsvSchema = z.object({
   employee_no: short,

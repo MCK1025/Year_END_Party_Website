@@ -10,7 +10,6 @@ import {
   dashboard,
   employee,
   eventDate,
-  fixtures,
   signAdmin,
   sql,
 } from "./helpers";
@@ -162,13 +161,13 @@ describe.sequential("authorization, consent and release boundaries", () => {
     for (let i = 0; i < 5; i++) {
       const c = client();
       await c.auth.signInAnonymously();
-      await c.functions.invoke("verify-employee", { body: { ...fixtures[4], access_code: "WRONG-CODE" } });
+      await c.functions.invoke("verify-employee", { body: { password: "000000" } });
       await c.auth.signOut();
     }
     const sixth = client();
     await sixth.auth.signInAnonymously();
     // When
-    const result = await sixth.functions.invoke("verify-employee", { body: fixtures[4] });
+    const result = await sixth.functions.invoke("verify-employee", { body: { password: "000000" } });
     // Then
     expect(result.error?.context instanceof Response ? result.error.context.status : 0).toBe(429);
     await sixth.auth.signOut();

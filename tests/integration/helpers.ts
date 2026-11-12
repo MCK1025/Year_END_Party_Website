@@ -12,6 +12,7 @@ import {
 export const env = z
   .object({
     SUPABASE_URL: z.url(),
+    DB_URL: z.string().optional(),
     SUPABASE_ANON_KEY: z.string(),
     SUPABASE_SERVICE_ROLE_KEY: z.string(),
     ADMIN_EMAIL: z.string(),
@@ -24,13 +25,13 @@ export const client = () =>
   createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
-export const sql = postgres("postgresql://postgres:postgres@127.0.0.1:54322/postgres");
+export const sql = postgres(env.DB_URL ?? "postgresql://postgres:postgres@127.0.0.1:54322/postgres");
 export const fixtures = [
-  { name: "가상직원 하나", date_of_birth: "1990-01-01", access_code: "TEST2026-A1" },
-  { name: "가상직원 둘", date_of_birth: "1991-02-02", access_code: "TEST2026-B2" },
-  { name: "가상직원 셋", date_of_birth: "1992-03-03", access_code: "TEST2026-C3" },
-  { name: "가상직원 넷", date_of_birth: "1993-04-04", access_code: "TEST2026-D4" },
-  { name: "가상직원 다섯", date_of_birth: "1994-05-05", access_code: "TEST2026-E5" },
+  { name: "가상직원 하나", date_of_birth: "1990-01-01" },
+  { name: "가상직원 둘", date_of_birth: "1991-02-02" },
+  { name: "가상직원 셋", date_of_birth: "1992-03-03" },
+  { name: "가상직원 넷", date_of_birth: "1993-04-04" },
+  { name: "가상직원 다섯", date_of_birth: "1994-05-05" },
 ] as const;
 export const admin = client();
 export async function signAdmin() {
@@ -46,7 +47,9 @@ export async function employee(index: number) {
   const c = client();
   const auth = await c.auth.signInAnonymously();
   if (auth.error) throw auth.error;
-  const { error } = await c.functions.invoke("verify-employee", { body: value });
+  const { error } = await c.functions.invoke("verify-employee", {
+    body: { password: value.date_of_birth.slice(2).replaceAll("-", "") },
+  });
   if (error) {
     if (error.context instanceof Response) throw new Error(await error.context.text());
     throw error;

@@ -3,6 +3,7 @@ import { HashRouter, Link, Navigate, Route, Routes } from "react-router-dom";
 import { Showcase } from "./components/Showcase";
 import { Mark, Note } from "./components/ui";
 import { Event } from "./pages/Event";
+import { Forest } from "./pages/Forest";
 import { Login } from "./pages/Login";
 import { Nominate } from "./pages/Nominate";
 import { Participant } from "./pages/Participant";
@@ -42,6 +43,7 @@ export function App() {
             <Route element={<Participant />}>
               <Route path="/survey" element={<Survey />} />
               <Route path="/nominate" element={<Nominate />} />
+              <Route path="/forest" element={<Forest />} />
               <Route path="/event" element={<Event />} />
               {["waiting", "memories", "game/who-am-i", "game/tastes", "awards", "end"].map((path) => (
                 <Route key={path} path={`/${path}`} element={<Navigate to="/event" replace />} />

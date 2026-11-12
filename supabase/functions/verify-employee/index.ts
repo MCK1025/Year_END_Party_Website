@@ -15,7 +15,8 @@ async function digest(value: string): Promise<string> {
 serve(async (request) => {
   const { client, user } = await identity(request);
   const input = loginSchema.safeParse(await jsonBody(request));
-  if (!input.success || !user.is_anonymous) throw new HttpError(400, "등록 정보와 행사코드를 확인해주세요.");
+  if (!input.success || !user.is_anonymous)
+    throw new HttpError(400, "생년월일 6자리 비밀번호를 확인해주세요.");
   const value = input.data;
   const network =
     request.headers.get("x-real-ip") ??
@@ -23,10 +24,8 @@ serve(async (request) => {
     "unknown";
   const { data, error } = await client.rpc("verify_employee", {
     p_actor: user.id,
-    p_name: value.name,
-    p_dob: value.date_of_birth,
-    p_code: value.access_code,
-    p_identity: await digest(`${value.name}:${value.date_of_birth}`),
+    p_password: value.password,
+    p_identity: await digest(value.password),
     p_network: await digest(network),
   });
   if (error || !data?.ok)
@@ -34,7 +33,7 @@ serve(async (request) => {
       data?.retry_after ? 429 : 401,
       data?.retry_after
         ? "인증 시도가 많습니다. 15분 뒤 다시 시도해주세요."
-        : "등록 정보와 행사코드를 확인해주세요.",
+        : "생년월일 6자리 비밀번호를 확인해주세요.",
     );
   return { ok: true };
 });

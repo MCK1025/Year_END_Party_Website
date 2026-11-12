@@ -1,20 +1,20 @@
 import { readFile, writeFile } from "node:fs/promises";
 
 import postgres from "postgres";
-import { admin, call, command, makeClient } from "./qa-session.mjs";
+import { admin, call, command, env, makeClient } from "./qa-session.mjs";
 
-const sql = postgres("postgresql://postgres:postgres@127.0.0.1:54322/postgres");
+const sql = postgres(env.DB_URL ?? "postgresql://postgres:postgres@127.0.0.1:54322/postgres");
 const outcomes = [];
 const ensure = (value, name) => {
   if (!value) throw new Error(name);
   outcomes.push({ name, passed: true });
 };
-async function login(code) {
+async function login(password) {
   const c = makeClient();
   const auth = await c.auth.signInAnonymously();
   if (auth.error) throw auth.error;
   const result = await c.functions.invoke("verify-employee", {
-    body: { name: "가상 운영시험", date_of_birth: "1995-06-06", access_code: code },
+    body: { password },
   });
   return { c, result };
 }
@@ -22,7 +22,7 @@ try {
   await sql`update private.settings set enabled=true,survey_open=true,nomination_open=true`;
   await sql`delete from private.login_attempts`;
   await command("waiting");
-  const issued = await call("import", {
+  await call("import", {
     employees: [
       {
         employee_no: "TEST-OPERATIONS",
@@ -32,19 +32,25 @@ try {
       },
     ],
   });
-  const oldCode = issued.issued[0].access_code;
-  ensure(oldCode.length >= 12, "CSV import generates strong code once");
-  const before = await login(oldCode);
+  const before = await login("950606");
   ensure(!before.result.error, "Imported employee authenticates");
   let dashboard = await call("dashboard");
-  const person = dashboard.employees.find((e) => e.employee_no === "TEST-OPERATIONS");
-  const reset = await call("reset_code", { id: person.id });
+  await call("import", {
+    employees: [
+      {
+        employee_no: "TEST-OPERATIONS",
+        name: "가상 운영시험",
+        department: "가상 검증팀",
+        date_of_birth: "1995-06-07",
+      },
+    ],
+  });
   const revoked = await before.c.functions.invoke("portal", { body: { action: "bootstrap", payload: {} } });
-  ensure(Boolean(revoked.error), "Code rotation revokes existing employee binding");
-  const old = await login(oldCode);
-  ensure(Boolean(old.result.error), "Old code is rejected after rotation");
-  const current = await login(reset.issued[0].access_code);
-  ensure(!current.result.error, "New code authenticates");
+  ensure(Boolean(revoked.error), "Birthday change revokes existing employee binding");
+  const old = await login("950606");
+  ensure(Boolean(old.result.error), "Previous birthday password is rejected");
+  const current = await login("950607");
+  ensure(!current.result.error, "Updated birthday password authenticates");
   const invalid = new FormData();
   invalid.set("file", new File(["<svg>unsafe</svg>"], "photo.png", { type: "image/png" }));
   const rejected = await admin.functions.invoke("upload-media", { body: invalid });
@@ -75,12 +81,15 @@ try {
     "Private recap image available only after authorized release",
   );
   // This destructive operation is intentionally restricted by qa-session to this synthetic local project.
+  await call("forest_post", { kind: "thanks", body: "가상 익명 글 파기 검증" }, current.c);
   await call("purge", { confirmation: "개인정보 영구 삭제" });
   const remaining = await sql`select
     (select count(*)::int from private.employees) employees,
     (select count(*)::int from public.surveys) surveys,
     (select count(*)::int from public.nominations) nominations,
     (select count(*)::int from private.sessions) bindings,
+    (select count(*)::int from public.forest_posts) forest_posts,
+    (select count(*)::int from private.forest_limits) forest_limits,
     (select count(*)::int from auth.users where is_anonymous) anonymous_users,
     (select count(*)::int from storage.objects where bucket_id='event-media') files`;
   ensure(

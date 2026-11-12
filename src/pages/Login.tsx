@@ -6,13 +6,11 @@ import { api, configured, supabase, verify } from "../lib/api";
 import { useTask } from "../lib/useTask";
 
 export function Login() {
-  const [name, setName] = useState("");
-  const [dob, setDob] = useState("");
-  const [code, setCode] = useState("");
+  const [password, setPassword] = useState("");
   const task = useTask();
   const navigate = useNavigate();
   async function login() {
-    const input = loginSchema.parse({ name, date_of_birth: dob, access_code: code });
+    const input = loginSchema.parse({ password });
     const existing = await supabase.auth.getUser();
     if (existing.data.user && !existing.data.user.is_anonymous) await supabase.auth.signOut();
     const { data: session } = await supabase.auth.getSession();
@@ -74,32 +72,17 @@ export function Login() {
             }}
           >
             <Field
-              label="이름"
-              autoComplete="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="등록된 이름"
-              required
-              maxLength={60}
-            />
-            <Field
-              label="생년월일"
-              type="date"
-              autoComplete="bday"
-              value={dob}
-              onChange={(e) => setDob(e.target.value)}
-              required
-            />
-            <Field
-              label="개인 행사코드"
+              label="비밀번호"
               type="password"
-              autoComplete="off"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              hint="개별 안내받은 코드를 입력해주세요."
+              inputMode="numeric"
+              autoComplete="current-password"
+              pattern="[0-9]{6}"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              hint="생년월일 6자리(YYMMDD)를 입력해주세요. 예: 900101"
               required
-              minLength={8}
-              maxLength={80}
+              minLength={6}
+              maxLength={6}
             />
             {task.notice && <Note error={task.failed}>{task.notice}</Note>}
             <Button type="submit" busy={task.busy}>
@@ -108,9 +91,7 @@ export function Login() {
           </form>
         )}
         <div className="stack-sm">
-          <p className="small">
-            사전 등록된 직원만 입장할 수 있습니다. 입력한 정보는 본인 확인에만 사용합니다.
-          </p>
+          <p className="small">사전 등록된 직원 전용입니다. 입력한 정보는 본인 확인에만 사용합니다.</p>
           <Link className="small" to="/admin">
             행사 운영자 입장
           </Link>

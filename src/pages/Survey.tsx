@@ -12,7 +12,7 @@ export function Survey() {
   const task = useTask();
   const [answers, setAnswers] = useState(data.survey?.answers ?? {});
   const [consent, setConsent] = useState(data.survey?.consent ?? false);
-  const [excluded, setExcluded] = useState(data.survey?.excluded ?? []);
+  const excluded = data.survey?.excluded ?? [];
   const open = data.settings.survey_open;
   return (
     <div className="stack">
@@ -25,7 +25,7 @@ export function Survey() {
         </h1>
         <p className="muted">짧아도 좋아요. 오늘 대화의 작은 실마리가 됩니다.</p>
       </header>
-      {!open && <Note>설문이 마감되었습니다. 저장한 이야기는 확인할 수 있습니다.</Note>}
+      {!open && <Note>설문이 마감되었습니다. 저장한 이야기는 그대로 남아 있습니다.</Note>}
       <form
         className="stack"
         onSubmit={(event) => {
@@ -81,27 +81,18 @@ export function Survey() {
                 disabled={!open}
               />
             )}
-            <Check
-              checked={excluded.includes(q.id)}
-              onChange={(value) =>
-                setExcluded(value ? [...excluded, q.id] : excluded.filter((id) => id !== q.id))
-              }
-              disabled={!open}
-            >
-              이 답변은 공개 힌트에서 제외해주세요.
-            </Check>
           </Panel>
         ))}
-        <Panel title="공개 범위는, 내가 정해요.">
+        <Panel title="공개 활용 동의">
           <p className="small">
             답변은 행사 운영과 동료 소개에만 사용합니다. 동의한 답변도 관리자의 검수를 거친 뒤 공개합니다.
-            동의하지 않아도 행사에 참여할 수 있습니다.
+            공개 활용 동의는 선택입니다. 행사 참여에는 영향이 없습니다.
           </p>
           <p className="small">
             개인정보 삭제 예정일: {data.settings.deletion_date ?? "관리자가 안내할 예정입니다."}
           </p>
           <Check checked={consent} onChange={setConsent} disabled={!open}>
-            선택한 답변을 인물 힌트와 익명 취향 통계에 활용하는 데 동의합니다.
+            내 답변을 인물 힌트와 익명 취향 통계에 활용하는 데 동의합니다.
           </Check>
         </Panel>
         {task.notice && <Note error={task.failed}>{task.notice}</Note>}

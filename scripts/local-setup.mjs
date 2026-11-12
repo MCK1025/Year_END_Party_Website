@@ -13,7 +13,7 @@ if (!serviceKey) throw new Error("Run supabase status -o env > .env.supabase.loc
 const client = createClient(url, serviceKey, { auth: { persistSession: false } });
 const password = randomBytes(24).toString("base64url");
 const email = "organizer@party.test";
-const { data: users, error: listError } = await client.auth.admin.listUsers();
+const { data: users, error: listError } = await client.auth.admin.listUsers({ perPage: 1000 });
 if (listError) throw listError;
 let admin = users.users.find((u) => u.email === email);
 if (admin) {
@@ -33,7 +33,7 @@ await writeFile(
 );
 await writeFile(
   ".env.test.local",
-  `SUPABASE_URL=${url}\nSUPABASE_ANON_KEY=${local.ANON_KEY}\nSUPABASE_SERVICE_ROLE_KEY=${serviceKey}\nADMIN_EMAIL=${email}\nADMIN_PASSWORD=${password}\n`,
+  `DB_URL=${local.DB_URL}\nSUPABASE_URL=${url}\nSUPABASE_ANON_KEY=${local.ANON_KEY}\nSUPABASE_SERVICE_ROLE_KEY=${serviceKey}\nADMIN_EMAIL=${email}\nADMIN_PASSWORD=${password}\n`,
 );
 await writeFile(
   "supabase/functions/.env.local",

@@ -52,7 +52,7 @@ try {
   const dashboard = await admin.functions.invoke("portal", { body: { action: "dashboard", payload: {} } });
   checked(
     "Hosted Edge administrator authorization",
-    !dashboard.error && dashboard.data?.employees?.length === 0,
+    !dashboard.error && Array.isArray(dashboard.data?.employees),
   );
   const anonymous = await guest.auth.signInAnonymously();
   checked(
@@ -90,9 +90,7 @@ try {
   checked("Previous prototype hint endpoint is inaccessible", Boolean(legacy.error));
   const unknown = await guest.functions.invoke("verify-employee", {
     body: {
-      name: `운영 연결 점검 ${crypto.randomUUID()}`,
-      date_of_birth: "1990-01-01",
-      access_code: "NOT-REGISTERED-CHECK",
+      password: "000000",
     },
   });
   checked("Unregistered employee identity rejected", unknown.error?.context?.status === 401);

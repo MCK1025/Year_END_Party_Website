@@ -11,6 +11,8 @@ select count(*) from private.employees;
 select count(*) from public.surveys;
 select count(*) from public.nominations;
 select count(*) from private.sessions;
+select count(*) from public.forest_posts;
+select count(*) from private.forest_limits;
 select count(*) from auth.users where is_anonymous;
 select count(*) from storage.objects where bucket_id='event-media';
 ```

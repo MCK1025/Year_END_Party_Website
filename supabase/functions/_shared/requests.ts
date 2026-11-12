@@ -8,6 +8,7 @@ import {
   resultSchema,
   uuid,
 } from "./contracts.ts";
+import { forestKindSchema } from "./forest.ts";
 
 const short = z.string().trim().min(1).max(100);
 export const commandSchema = z.object({
@@ -53,7 +54,20 @@ export const requestSchema = z.discriminatedUnion("action", [
     action: z.literal("import"),
     payload: z.object({ employees: z.array(employeeCsvSchema).min(1).max(100) }),
   }),
-  z.object({ action: z.literal("reset_code"), payload: z.object({ id: uuid }) }),
+  z.object({ action: z.literal("create_employee"), payload: employeeCsvSchema }),
+  z.object({ action: z.literal("delete_employee"), payload: z.object({ id: uuid }) }),
+  z.object({
+    action: z.literal("forest_list"),
+    payload: z.object({ before: z.number().int().positive().safe().optional() }),
+  }),
+  z.object({
+    action: z.literal("forest_post"),
+    payload: z.object({ kind: forestKindSchema, body: z.string().trim().min(1).max(2000) }).strict(),
+  }),
+  z.object({
+    action: z.literal("forest_delete"),
+    payload: z.object({ id: z.number().int().positive().safe() }),
+  }),
   z.object({ action: z.literal("employee"), payload: personSchema }),
   z.object({
     action: z.literal("settings"),
