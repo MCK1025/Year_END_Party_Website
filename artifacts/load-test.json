@@ -1,13 +1,13 @@
 {
-  "timestamp": "2026-11-12T14:29:03.569Z",
+  "timestamp": "2026-11-12T15:58:24.060Z",
   "environment": "local Docker Supabase, real Auth/Edge/Postgres Changes",
   "concurrentClients": 50,
   "received": 50,
-  "p50Ms": 324,
-  "p95Ms": 324,
-  "maxMs": 324,
-  "concurrentSnapshotBatchMs": 137,
-  "restoredRevision": 1017,
+  "p50Ms": 77,
+  "p95Ms": 77,
+  "maxMs": 77,
+  "concurrentSnapshotBatchMs": 131,
+  "restoredRevision": 1502,
   "restoredHintCount": 1,
   "unrevealedHintLeaked": false
 }

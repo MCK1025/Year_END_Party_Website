@@ -6,10 +6,11 @@ import { admin, call, command, dashboard, env, eventDate, signAdmin } from "../i
 const sql = postgres(env.DB_URL ?? "postgresql://postgres:postgres@127.0.0.1:54322/postgres");
 test.beforeAll(async () => {
   await signAdmin();
-  await sql`update private.settings set enabled=true,survey_open=true,nomination_open=true`;
+  await sql`update private.settings set started_at=null,enabled=true,survey_open=true,nomination_open=true`;
   await command("waiting");
   await eventDate(false);
   await sql`delete from private.login_attempts`;
+  await sql`delete from public.nominations`;
 });
 test.afterAll(async () => {
   await sql.end();
@@ -73,6 +74,8 @@ test("guest saves a story, then sees organizer reveals live through the ending",
   await organizer.getByLabel("비밀번호", { exact: true }).fill(env.ADMIN_PASSWORD);
   await organizer.getByRole("button", { name: "운영 화면으로" }).click();
   await expect(organizer.getByRole("heading", { name: "우리의 저녁을 준비합니다." })).toBeVisible();
+  await organizer.getByRole("button", { name: "행사 시작 · 응답 마감" }).click();
+  await organizer.getByRole("dialog").getByRole("button", { name: "확인", exact: true }).click();
   await organizer.getByRole("button", { name: "다음 순서 · 1년의 장면들" }).click();
   await organizer.getByRole("dialog").getByRole("button", { name: "확인", exact: true }).click();
   await expect(page.getByText("함께 완성한, 우리의 첫 장면").first()).toBeVisible({ timeout: 10000 });

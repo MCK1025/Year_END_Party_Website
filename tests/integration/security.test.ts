@@ -17,7 +17,7 @@ import {
 describe.sequential("authorization, consent and release boundaries", () => {
   beforeAll(async () => {
     await signAdmin();
-    await sql`update private.settings set enabled=true,survey_open=true,nomination_open=true`;
+    await sql`update private.settings set started_at=null,enabled=true,survey_open=true,nomination_open=true`;
     await sql`delete from private.login_attempts`;
     await command("waiting");
     await eventDate(false);
@@ -139,20 +139,13 @@ describe.sequential("authorization, consent and release boundaries", () => {
     await command("hint");
     expect((await boot(c)).state.payload.hints).toEqual([hint]);
     // When
-    await call(
-      c,
-      { action: "save_survey", payload: { answers: survey.answers, consent: false, excluded: [] } },
-      okSchema,
-    );
+    // Post-start privacy withdrawal is an operator database action, not an employee edit.
+    await sql`update public.surveys set consent=false where employee_id=${me.self.id}`;
     // Then
     const d = await dashboard();
     expect(d.state.payload).toEqual({});
     expect(d.rounds.find((r) => r.id === round?.id)?.approved).toBe(false);
-    await call(
-      c,
-      { action: "save_survey", payload: { answers: survey.answers, consent: true, excluded: [] } },
-      okSchema,
-    );
+    await sql`update public.surveys set consent=true where employee_id=${me.self.id}`;
     await c.auth.signOut();
   });
   it("rate limits the identity across newly created anonymous sessions", async () => {

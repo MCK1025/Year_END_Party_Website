@@ -13,6 +13,7 @@ import { forestKindSchema } from "./forest.ts";
 const short = z.string().trim().min(1).max(100);
 export const commandSchema = z.object({
   command: z.enum([
+    "start_event",
     "pause",
     "resume",
     "waiting",
@@ -59,6 +60,20 @@ export const requestSchema = z.discriminatedUnion("action", [
   z.object({
     action: z.literal("forest_list"),
     payload: z.object({ before: z.number().int().positive().safe().optional() }),
+  }),
+  z.object({
+    action: z.literal("forest_mine"),
+    payload: z.object({ before: z.number().int().positive().safe().optional() }),
+  }),
+  z.object({
+    action: z.literal("forest_edit"),
+    payload: z
+      .object({
+        id: z.number().int().positive().safe(),
+        kind: forestKindSchema,
+        body: z.string().trim().min(1).max(2000),
+      })
+      .strict(),
   }),
   z.object({
     action: z.literal("forest_post"),

@@ -45,6 +45,7 @@ export const stateSchema = z.object({
   phase: phaseSchema,
   revision: z.number().int(),
   paused: z.boolean(),
+  editing_locked: z.boolean().default(false),
   updated_at: z.string().optional(),
   payload: z.object({
     round_id: uuid.optional(),
@@ -63,6 +64,7 @@ export const settingsSchema = z.object({
   deletion_date: z.string().nullable(),
   survey_open: z.boolean(),
   nomination_open: z.boolean(),
+  started_at: z.string().nullable().default(null),
   welcome: z.string(),
   logo_path: z.string().nullable(),
 });

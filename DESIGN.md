@@ -43,7 +43,7 @@ Spacing: 4,8,12,16,24,32,48,64,96px. Mobile gutter 24px (16 at 320px). Guest max
 - Hint: numbered editorial rule + large text, unrevealed placeholders carry no future content.
 - Chart: semantic label + count + bar; numeric text conveys all information.
 - Nav: active underline + aria-current; wrapped admin controls rather than hidden horizontal overflow.
-- Forest: shared Panel/Select/TextArea primitives; anonymous wish/thanks/regret cards show a day only, no author identity. Empty, loading, error, success, pagination and administrator delete confirmation states. Employee navigation gains a wrapped fourth item.
+- Forest: shared Panel/Select/TextArea primitives; all/own post views, cross-device own-post editing and event-start read-only states; anonymous wish/thanks/regret cards show a day only, no author identity. Empty, loading, error, success, pagination and administrator delete confirmation states. Employee navigation gains a wrapped fourth item.
 - Employee management: one-person form and CSV preview use the existing two-column grid; permanent deletion uses Confirm. Login uses one numeric six-character password field.
 - Primitive harness: /#/showcase in development only; verify all primitives at 375,768,1280 before product QA.
 

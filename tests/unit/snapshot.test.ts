@@ -4,11 +4,18 @@ import type { EventState } from "../../supabase/functions/_shared/contracts";
 
 it("retains newer revocation when an earlier bootstrap request finishes late", () => {
   // Given
-  const current: EventState = { phase: "WHO_AM_I", payload: {}, revision: 2, paused: false };
+  const current: EventState = {
+    phase: "WHO_AM_I",
+    payload: {},
+    revision: 2,
+    editing_locked: false,
+    paused: false,
+  };
   const delayed: EventState = {
     phase: "WHO_AM_I",
     payload: { hints: ["withdrawn"] },
     revision: 1,
+    editing_locked: false,
     paused: false,
   };
   // When
@@ -22,6 +29,7 @@ it("accepts current or newer persistent state when reconnecting", () => {
     phase: "END",
     payload: { message: "감사합니다" },
     revision: 3,
+    editing_locked: false,
     paused: false,
   };
   // When / Then

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { type Dashboard, okSchema } from "../../supabase/functions/_shared/contracts";
-import { Button, Check, Field, Note, Panel, TextArea } from "../components/ui";
+import { Button, Check, Note, Panel, TextArea } from "../components/ui";
 import { api } from "../lib/api";
 import { useTask } from "../lib/useTask";
 import { useAdmin } from "./context";
@@ -46,7 +46,6 @@ function ReasonReview({ nomination }: { readonly nomination: Dashboard["nominati
 }
 export function DataPanel() {
   const { data } = useAdmin();
-  const [search, setSearch] = useState("");
   const active = data.employees.filter((e) => e.active);
   const complete = active.filter((e) => data.surveys.some((s) => s.employee_id === e.id));
   const voted = active.filter((e) => data.nominations.some((n) => n.voter_id === e.id));
@@ -83,49 +82,46 @@ export function DataPanel() {
         </Panel>
       </div>
       <Panel title="직원별 원본 조회">
-        <Field label="이름·부서 검색" value={search} onChange={(e) => setSearch(e.target.value)} />
-        {data.employees
-          .filter((e) => `${e.name} ${e.department}`.includes(search))
-          .map((e) => {
-            const survey = data.surveys.find((s) => s.employee_id === e.id);
-            const nomination = data.nominations.find((n) => n.voter_id === e.id);
-            return (
-              <details className="data-row" key={e.id}>
-                <summary>
-                  {e.name} · {e.department}{" "}
-                  <span className="pill">
-                    설문 {survey ? "완료" : "미작성"} / 추천 {nomination ? "완료" : "미작성"}
-                  </span>
-                </summary>
-                {survey ? (
-                  <div className="stack-sm">
-                    <p className="small">
-                      게임 활용 {survey.consent ? "동의" : "비동의"} ·{" "}
-                      {new Date(survey.updated_at).toLocaleString("ko-KR", { timeZone: "Asia/Seoul" })}
-                    </p>
-                    {data.questions.map((q) => (
-                      <div key={q.id}>
-                        <strong>{q.prompt}</strong>
-                        <p>
-                          {survey.answers[q.id] ?? "미작성"}{" "}
-                          {survey.excluded.includes(q.id) && <span className="pill">공개 제외</span>}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="empty">저장된 설문이 없습니다.</p>
-                )}
-                {nomination && (
-                  <div className="stack-sm">
-                    <p>추천한 동료: {data.employees.find((x) => x.id === nomination.nominee_id)?.name}</p>
-                    <p>원본 이유: {nomination.reason || "미작성"}</p>
-                    <ReasonReview key={nomination.updated_at} nomination={nomination} />
-                  </div>
-                )}
-              </details>
-            );
-          })}
+        {data.employees.map((e) => {
+          const survey = data.surveys.find((s) => s.employee_id === e.id);
+          const nomination = data.nominations.find((n) => n.voter_id === e.id);
+          return (
+            <details className="data-row" key={e.id}>
+              <summary>
+                {e.name} · {e.department}{" "}
+                <span className="pill">
+                  설문 {survey ? "완료" : "미작성"} / 추천 {nomination ? "완료" : "미작성"}
+                </span>
+              </summary>
+              {survey ? (
+                <div className="stack-sm">
+                  <p className="small">
+                    게임 활용 {survey.consent ? "동의" : "비동의"} ·{" "}
+                    {new Date(survey.updated_at).toLocaleString("ko-KR", { timeZone: "Asia/Seoul" })}
+                  </p>
+                  {data.questions.map((q) => (
+                    <div key={q.id}>
+                      <strong>{q.prompt}</strong>
+                      <p>
+                        {survey.answers[q.id] ?? "미작성"}{" "}
+                        {survey.excluded.includes(q.id) && <span className="pill">공개 제외</span>}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="empty">저장된 설문이 없습니다.</p>
+              )}
+              {nomination && (
+                <div className="stack-sm">
+                  <p>추천한 동료: {data.employees.find((x) => x.id === nomination.nominee_id)?.name}</p>
+                  <p>원본 이유: {nomination.reason || "미작성"}</p>
+                  <ReasonReview key={nomination.updated_at} nomination={nomination} />
+                </div>
+              )}
+            </details>
+          );
+        })}
       </Panel>
     </div>
   );

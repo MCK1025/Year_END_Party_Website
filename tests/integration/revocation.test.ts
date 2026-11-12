@@ -5,7 +5,7 @@ import { admin, boot, call, command, dashboard, employee, eventDate, signAdmin, 
 describe.sequential("published content approval withdrawal", () => {
   beforeAll(async () => {
     await signAdmin();
-    await sql`update private.settings set enabled=true,survey_open=true,nomination_open=true`;
+    await sql`update private.settings set started_at=null,enabled=true,survey_open=true,nomination_open=true`;
     await sql`delete from private.login_attempts`;
     await command("waiting");
     await eventDate(false);
@@ -15,7 +15,7 @@ describe.sequential("published content approval withdrawal", () => {
   });
   beforeEach(async () => {
     await command("waiting");
-    await sql`update private.settings set nomination_open=true where id`;
+    await sql`update private.settings set started_at=null,nomination_open=true where id`;
   });
   it.each([false, true])("blocks withdrawn taste restoration after advancing: %s", async (advance) => {
     // Given
@@ -64,9 +64,6 @@ describe.sequential("published content approval withdrawal", () => {
   });
   it.each([false, true])("blocks withdrawn award reason restoration after advancing: %s", async (advance) => {
     // Given
-    await command("phase", { phase: "RECAP" });
-    await command("phase", { phase: "WHO_AM_I" });
-    await command("phase", { phase: "TASTES" });
     const c = await employee(0);
     const me = await boot(c);
     const target = me.directory.find((e) => e.id !== me.self.id);
@@ -77,6 +74,9 @@ describe.sequential("published content approval withdrawal", () => {
       { action: "nominate", payload: { nominee_id: target.id, reason: "PRIVATE_ORIGINAL" } },
       okSchema,
     );
+    await command("phase", { phase: "RECAP" });
+    await command("phase", { phase: "WHO_AM_I" });
+    await command("phase", { phase: "TASTES" });
     await call(
       admin,
       {

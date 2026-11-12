@@ -24,7 +24,7 @@ describe.sequential("real Supabase employee and event service", () => {
     await sql`delete from private.tastes`;
     await sql`delete from public.nominations`;
     await sql`delete from public.surveys`;
-    await sql`update private.settings set enabled=true,survey_open=true,nomination_open=true`;
+    await sql`update private.settings set started_at=null,enabled=true,survey_open=true,nomination_open=true`;
     await command("waiting");
     for (let i = 0; i < 5; i++) people.push(await employee(i));
   }, 60000);

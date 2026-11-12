@@ -22,7 +22,8 @@ test.beforeAll(async () => {
   await sql`delete from public.forest_posts`;
   await sql`delete from private.forest_limits`;
   await sql`delete from private.employees where employee_no='TEST-BROWSER-NEW'`;
-  await sql`update private.settings set enabled=true,survey_open=true where id`;
+  await sql`update private.settings set started_at=null,enabled=true,survey_open=true where id`;
+  await sql`update public.event_public_state set phase='WAITING',payload='{}',revision=revision+1 where id`;
 });
 test.afterAll(async () => {
   await sql`delete from private.employees where employee_no='TEST-BROWSER-NEW'`;

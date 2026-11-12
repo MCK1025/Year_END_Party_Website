@@ -12,7 +12,6 @@ export function PeoplePanel() {
   const { data, refresh } = useAdmin();
   const task = useTask();
   const [rows, setRows] = useState<EmployeeRow[]>([]);
-  const [search, setSearch] = useState("");
   async function read(file: File) {
     setRows([]);
     if (file.size > 100000) throw new ApiError("CSV는 100KB 이하로 준비해주세요.");
@@ -66,12 +65,9 @@ export function PeoplePanel() {
         </Panel>
       </div>
       <Panel title={`직원 ${data.employees.length}명`}>
-        <Field label="이름·부서·사번 검색" value={search} onChange={(e) => setSearch(e.target.value)} />
-        {data.employees
-          .filter((e) => `${e.name} ${e.department} ${e.employee_no}`.includes(search))
-          .map((e) => (
-            <EmployeeEditor key={e.id} employee={e} />
-          ))}
+        {data.employees.map((e) => (
+          <EmployeeEditor key={e.id} employee={e} />
+        ))}
       </Panel>
     </div>
   );

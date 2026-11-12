@@ -10,6 +10,7 @@ import { useAdmin } from "./context";
 export function SettingsPanel() {
   const { data, refresh } = useAdmin();
   const initial = data.settings;
+  const locked = !!initial.started_at || data.state.editing_locked;
   const task = useTask();
   const [date, setDate] = useState(
     initial.event_start_at
@@ -31,8 +32,8 @@ export function SettingsPanel() {
         payload: {
           event_start_at: date ? `${date}T18:00:00+09:00` : null,
           deletion_date: deletion || null,
-          survey_open: survey,
-          nomination_open: nomination,
+          survey_open: !locked && survey,
+          nomination_open: !locked && nomination,
           enabled,
           welcome,
           ending,
@@ -66,10 +67,11 @@ export function SettingsPanel() {
               value={deletion}
               onChange={(e) => setDeletion(e.target.value)}
             />
-            <Check checked={survey} onChange={setSurvey}>
+            {locked && <Note>행사가 시작되어 응답을 다시 열 수 없습니다.</Note>}
+            <Check checked={!locked && survey} onChange={setSurvey} disabled={locked}>
               설문 수정 허용
             </Check>
-            <Check checked={nomination} onChange={setNomination}>
+            <Check checked={!locked && nomination} onChange={setNomination} disabled={locked}>
               동료 추천·변경 허용
             </Check>
             <Check checked={enabled} onChange={setEnabled}>

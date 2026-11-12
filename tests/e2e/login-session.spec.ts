@@ -22,7 +22,8 @@ async function login(page: Page, password: string) {
   await page.getByRole("button", { name: "우리의 자리로" }).click();
 }
 test.beforeAll(async () => {
-  await sql`update private.settings set enabled=true,survey_open=true where id`;
+  await sql`update private.settings set started_at=null,enabled=true,survey_open=true where id`;
+  await sql`update public.event_public_state set phase='WAITING',payload='{}',revision=revision+1 where id`;
   await sql`delete from private.login_attempts`;
 });
 test.afterAll(async () => {

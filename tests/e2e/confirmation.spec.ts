@@ -1,8 +1,11 @@
 import { expect, test } from "@playwright/test";
 import { okSchema } from "../../supabase/functions/_shared/contracts";
-import { admin, call, command, dashboard, env, signAdmin } from "../integration/helpers";
+import { admin, call, command, dashboard, env, eventDate, signAdmin } from "../integration/helpers";
 
-test.beforeAll(signAdmin);
+test.beforeAll(async () => {
+  await signAdmin();
+  await eventDate(false);
+});
 test("rejects an old confirmation after another organizer advances the round", async ({ page }) => {
   // Given: a confirmation opened against a specific published revision.
   await command("waiting");

@@ -16,13 +16,20 @@ const next: Partial<Record<Phase, Phase>> = {
   TASTES: "AWARDS",
   AWARDS: "END",
 };
-const initial: EventState = { phase: "WHO_AM_I", payload: {}, paused: false, revision: 0 };
+const initial: EventState = {
+  phase: "WHO_AM_I",
+  payload: {},
+  paused: false,
+  editing_locked: false,
+  revision: 0,
+};
 export function ProgressPanel({ rehearsal = false }: { readonly rehearsal?: boolean }) {
   const { data, refresh } = useAdmin();
   const task = useTask();
   const state = rehearsal ? (data.rehearsal ?? initial) : data.state;
   const [pending, setPending] = useState<(PendingCommand & { readonly revision: number }) | null>(null);
   const following = next[state.phase];
+  const started = !!data.settings.started_at || state.editing_locked;
   const confirm = (value: PendingCommand) => setPending({ ...value, revision: state.revision });
   async function send(partial: CommandInput, revision = state.revision) {
     await api(
@@ -92,9 +99,25 @@ export function ProgressPanel({ rehearsal = false }: { readonly rehearsal?: bool
               대기·초기화
             </Button>
           </div>
+          {!rehearsal &&
+            (started ? (
+              <Note>행사가 시작되었습니다. 직원의 설문·추천·대나무숲 작성과 수정은 마감되었습니다.</Note>
+            ) : (
+              <Button
+                disabled={task.busy}
+                onClick={() =>
+                  confirm({
+                    label: "행사를 시작하고 응답을 마감할까요?",
+                    command: { command: "start_event" },
+                  })
+                }
+              >
+                행사 시작 · 응답 마감
+              </Button>
+            ))}
           {!rehearsal && following && (
             <Button
-              disabled={task.busy || state.paused}
+              disabled={task.busy || state.paused || !started}
               onClick={() =>
                 confirm({
                   label: `${phaseNames[following]} 단계를 공개할까요?`,
@@ -138,7 +161,9 @@ export function ProgressPanel({ rehearsal = false }: { readonly rehearsal?: bool
           onClose={() => setPending(null)}
           action={() => task.run(() => send(pending.command, pending.revision), "진행 상태를 반영했습니다.")}
         >
-          공개된 정보는 직원 휴대폰에 바로 표시됩니다. 이미 본 내용은 되돌려도 기억에서 지울 수 없습니다.
+          {pending.command.command === "start_event"
+            ? "설문·추천·대나무숲 작성과 수정이 즉시 마감됩니다. 일시 정지·대기실 복귀·되돌리기를 해도 응답은 다시 열리지 않습니다. 콘텐츠 공개는 행사일 오후 6시 이후 다음 순서로 진행합니다."
+            : "공개된 정보는 직원 휴대폰에 바로 표시됩니다. 이미 본 내용은 되돌려도 기억에서 지울 수 없습니다."}
         </Confirm>
       )}
     </div>

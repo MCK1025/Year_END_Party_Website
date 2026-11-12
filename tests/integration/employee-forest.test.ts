@@ -14,7 +14,7 @@ describe.sequential("employee lifecycle and anonymous forest", () => {
     await signAdmin();
     await sql`delete from private.employees where employee_no like 'TEST-LIFECYCLE%'`;
     await sql`delete from private.login_attempts`;
-    await sql`update private.settings set enabled=true where id`;
+    await sql`update private.settings set started_at=null,enabled=true where id`;
   });
   afterAll(async () => {
     await sql`delete from private.employees where employee_no like 'TEST-LIFECYCLE%'`;

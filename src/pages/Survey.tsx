@@ -13,7 +13,7 @@ export function Survey() {
   const [answers, setAnswers] = useState(data.survey?.answers ?? {});
   const [consent, setConsent] = useState(data.survey?.consent ?? false);
   const excluded = data.survey?.excluded ?? [];
-  const open = data.settings.survey_open;
+  const open = data.settings.survey_open && !data.state.editing_locked && !data.settings.started_at;
   return (
     <div className="stack">
       <header className="page-heading">

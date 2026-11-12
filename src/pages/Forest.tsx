@@ -1,33 +1,46 @@
 import { useCallback, useEffect, useState } from "react";
 import { okSchema } from "../../supabase/functions/_shared/contracts";
-import {
-  type ForestPost,
-  forestKindSchema,
-  forestKinds,
-  forestListSchema,
-} from "../../supabase/functions/_shared/forest";
-import { Button, Confirm, Note, Panel, Select, TextArea } from "../components/ui";
+import { type ForestPost, forestKinds, forestListSchema } from "../../supabase/functions/_shared/forest";
+import { ForestForm } from "../components/ForestForm";
+import { Button, Confirm, Note, Panel } from "../components/ui";
 import { api, message } from "../lib/api";
 import { useTask } from "../lib/useTask";
+import { useGuest } from "./Participant";
 
 export function Forest({ admin = false }: { readonly admin?: boolean }) {
+  return admin ? <ForestBoard admin locked={false} /> : <EmployeeForest />;
+}
+function EmployeeForest() {
+  const { data } = useGuest();
+  return <ForestBoard admin={false} locked={data.state.editing_locked || !!data.settings.started_at} />;
+}
+function ForestBoard({ admin, locked }: { readonly admin: boolean; readonly locked: boolean }) {
   const [posts, setPosts] = useState<ForestPost[]>([]);
-  const [body, setBody] = useState("");
-  const [kind, setKind] = useState<ForestPost["kind"]>("wish");
+  const [mine, setMine] = useState<ForestPost[]>([]);
+  const [tab, setTab] = useState<"all" | "mine">("all");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
-  const [more, setMore] = useState(false);
+  const [more, setMore] = useState({ all: false, mine: false });
+  const [editing, setEditing] = useState<number | null>(null);
   const [deleting, setDeleting] = useState<ForestPost | null>(null);
   const task = useTask();
   const refresh = useCallback(async () => {
-    const data = await api({ action: "forest_list", payload: {} }, forestListSchema);
-    setPosts(data);
-    setMore(data.length === 20);
+    const [all, own] = await Promise.all([
+      api({ action: "forest_list", payload: {} }, forestListSchema),
+      admin ? Promise.resolve([]) : api({ action: "forest_mine", payload: {} }, forestListSchema),
+    ]);
+    setPosts(all);
+    setMine(own);
+    setMore({ all: all.length === 20, mine: own.length === 20 });
     setError("");
-  }, []);
+    return own.length;
+  }, [admin]);
   useEffect(() => {
     let live = true;
     void refresh()
+      .then((count) => {
+        if (live && count > 0) setTab("mine");
+      })
       .catch((e: unknown) => {
         if (live) setError(message(e));
       })
@@ -38,6 +51,7 @@ export function Forest({ admin = false }: { readonly admin?: boolean }) {
       live = false;
     };
   }, [refresh]);
+  const shown = tab === "mine" ? mine : posts;
   return (
     <div className="stack">
       <header className="page-heading">
@@ -48,76 +62,105 @@ export function Forest({ admin = false }: { readonly admin?: boolean }) {
       {!admin && (
         <Panel title="여기서는, 이름을 내려놓아요.">
           <p className="small">
-            글에는 이름·소속·직원 계정을 저장하지 않습니다. 관리자도 작성자 정보가 없는 글만 봅니다. 본문에
-            본인이나 동료의 이름 등 신원을 드러내는 정보는 적지 말아주세요.
+            직원들과 관리자에게 작성자는 표시되지 않습니다. 다른 기기에서도 내 글을 관리하도록 비공개 소유자
+            연결을 보관합니다. 본문에는 본인이나 동료를 알아볼 만한 정보를 적지 말아주세요.
           </p>
-          <form
-            className="stack-sm"
-            onSubmit={(e) => {
-              e.preventDefault();
-              void task.run(async () => {
-                await api({ action: "forest_post", payload: { kind, body } }, okSchema);
-                setBody("");
+          {locked ? (
+            <Note>행사가 시작되어 작성과 수정이 마감되었습니다. 보낸 글은 계속 확인 가능합니다.</Note>
+          ) : (
+            <ForestForm
+              locked={locked}
+              saved={async () => {
                 await refresh();
-              }, "이름 없이, 마음이 도착했습니다.");
-            }}
-          >
-            <Select
-              label="어떤 마음인가요?"
-              value={kind}
-              onChange={(value) => setKind(forestKindSchema.parse(value))}
-            >
-              {Object.entries(forestKinds).map(([key, label]) => (
-                <option value={key} key={key}>
-                  {label}
-                </option>
-              ))}
-            </Select>
-            <TextArea
-              label="혜성식품에게 전하고 싶은 말"
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
-              required
-              maxLength={2000}
+                setTab("mine");
+              }}
             />
-            <p className="small">
-              {body.length} / 2,000자 · <span className="keep-phrase">하루 10회까지 남길 수 있어요.</span>{" "}
-              글은 직원들과 함께 읽으며, 타인을 비방하거나 개인정보가 담긴 글은 관리자가 삭제합니다.
-            </p>
-            <Button type="submit" busy={task.busy} disabled={!body.trim()}>
-              익명으로 마음 남기기
-            </Button>
-          </form>
+          )}
         </Panel>
       )}
       {admin && (
-        <Note>작성자 정보는 수집하지 않습니다. 개인정보나 비방이 담긴 글은 관리자가 삭제합니다.</Note>
+        <Note>
+          이 화면과 조회 응답에는 작성자 정보가 표시되지 않습니다. 개인정보나 비방이 담긴 글은 삭제해주세요.
+        </Note>
       )}
       {task.notice && <Note error={task.failed}>{task.notice}</Note>}
       <div className="actions">
-        <h2>숲에 도착한 마음</h2>
+        <h2>{tab === "mine" ? "내가 보낸 마음" : "숲에 도착한 마음"}</h2>
         <Button
           variant="secondary"
           busy={task.busy}
-          onClick={() => void task.run(refresh, "새 글을 확인했습니다.")}
+          onClick={() =>
+            void task.run(async () => {
+              await refresh();
+            }, "새 글을 확인했습니다.")
+          }
         >
           새 글 확인
         </Button>
       </div>
+      {!admin && (
+        <div className="actions">
+          <Button
+            variant={tab === "all" ? "primary" : "secondary"}
+            aria-pressed={tab === "all"}
+            onClick={() => {
+              setTab("all");
+              setEditing(null);
+            }}
+          >
+            모두의 마음
+          </Button>
+          <Button
+            variant={tab === "mine" ? "primary" : "secondary"}
+            aria-pressed={tab === "mine"}
+            onClick={() => {
+              setTab("mine");
+              setEditing(null);
+            }}
+          >
+            내가 보낸 마음
+          </Button>
+        </div>
+      )}
       {error && <Note error>{error}</Note>}
       {loading ? (
         <Note>숲의 이야기를 불러오는 중입니다.</Note>
-      ) : posts.length === 0 && !error ? (
+      ) : shown.length === 0 && !error ? (
         <Panel>
-          <p className="empty">아직 조용한 숲이에요. 첫 마음을 남겨주세요.</p>
+          <p className="empty">
+            {tab === "mine" ? "아직 보낸 마음이 없습니다." : "아직 조용한 숲이에요. 첫 마음을 남겨주세요."}
+          </p>
         </Panel>
       ) : null}
-      {posts.map((post) => (
+      {tab === "mine" && mine.length > 0 && (
+        <Note>이미 마음을 남기셨습니다. 아래에서 보낸 글을 확인해보세요.</Note>
+      )}
+      {shown.map((post) => (
         <Panel key={post.id}>
           <p className="overline">
-            익명 · {forestKinds[post.kind]} · {post.day}
+            {tab === "mine" ? "내가 보낸 마음" : "익명"} · {forestKinds[post.kind]} ·{" "}
+            <span className="keep-phrase">{post.day}</span>
           </p>
-          <p style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{post.body}</p>
+          {editing === post.id && !locked ? (
+            <ForestForm
+              post={post}
+              locked={locked}
+              saved={async () => {
+                await refresh();
+                setEditing(null);
+              }}
+              cancel={() => setEditing(null)}
+            />
+          ) : (
+            <>
+              <p style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{post.body}</p>
+              {!admin && tab === "mine" && !locked && (
+                <Button variant="secondary" onClick={() => setEditing(post.id)}>
+                  내 글 수정하기
+                </Button>
+              )}
+            </>
+          )}
           {admin && (
             <Button variant="danger" onClick={() => setDeleting(post)}>
               글 삭제
@@ -125,20 +168,21 @@ export function Forest({ admin = false }: { readonly admin?: boolean }) {
           )}
         </Panel>
       ))}
-      {more && (
+      {more[tab] && (
         <Button
           variant="secondary"
           busy={task.busy}
           onClick={() =>
             void task.run(async () => {
-              const last = posts.at(-1);
+              const last = shown.at(-1);
               if (!last) return;
               const older = await api(
-                { action: "forest_list", payload: { before: last.id } },
+                { action: tab === "mine" ? "forest_mine" : "forest_list", payload: { before: last.id } },
                 forestListSchema,
               );
-              setPosts((current) => [...current, ...older]);
-              setMore(older.length === 20);
+              if (tab === "mine") setMine((current) => [...current, ...older]);
+              else setPosts((current) => [...current, ...older]);
+              setMore((current) => ({ ...current, [tab]: older.length === 20 }));
             }, "이전 마음을 더 불러왔습니다.")
           }
         >

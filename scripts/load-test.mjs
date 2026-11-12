@@ -1,11 +1,15 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { parseEnv } from "node:util";
 import { createClient } from "@supabase/supabase-js";
+import postgres from "postgres";
 
 const env = parseEnv(await readFile(".env.test.local", "utf8"));
 const url = env.SUPABASE_URL;
 if (!url || !/^(127\.0\.0\.1|localhost)$/.test(new URL(url).hostname))
   throw new Error("Local load test only");
+const sql = postgres(env.DB_URL ?? "postgresql://postgres:postgres@127.0.0.1:55422/postgres");
+await sql`update private.settings set started_at=null where id`;
+await sql.end();
 const make = () =>
   createClient(url, env.SUPABASE_ANON_KEY, { auth: { persistSession: false, autoRefreshToken: false } });
 const admin = make();
