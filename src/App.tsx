@@ -10,6 +10,7 @@ import { Participant } from "./pages/Participant";
 import { Survey } from "./pages/Survey";
 
 const Admin = lazy(() => import("./admin/Admin").then((m) => ({ default: m.Admin })));
+const Tree = lazy(() => import("./pages/Tree").then((m) => ({ default: m.Tree })));
 export function App() {
   return (
     <HashRouter>
@@ -44,6 +45,7 @@ export function App() {
               <Route path="/survey" element={<Survey />} />
               <Route path="/nominate" element={<Nominate />} />
               <Route path="/forest" element={<Forest />} />
+              <Route path="/tree" element={<Tree />} />
               <Route path="/event" element={<Event />} />
               {["waiting", "memories", "game/who-am-i", "game/tastes", "awards", "end"].map((path) => (
                 <Route key={path} path={`/${path}`} element={<Navigate to="/event" replace />} />

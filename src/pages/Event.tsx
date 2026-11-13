@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { EventView } from "../components/EventView";
 import { PrivateImage } from "../components/PrivateImage";
 import { RecapCards } from "../components/RecapCards";
@@ -12,6 +13,13 @@ export function Event() {
   return (
     <div className="stack">
       {state.paused && <Note>잠시 쉬어갑니다. 진행이 재개되면 화면이 자동으로 바뀝니다.</Note>}
+      {state.tree_open && (
+        <Panel title="우리의 마음 트리가 열렸어요.">
+          <Link className="button primary" to="/tree">
+            쪽지 읽으러 가기
+          </Link>
+        </Panel>
+      )}
       {waiting ? (
         <>
           <section className="event-cover">

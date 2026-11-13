@@ -9,6 +9,7 @@ it("retains newer revocation when an earlier bootstrap request finishes late", (
     payload: {},
     revision: 2,
     editing_locked: false,
+    tree_open: false,
     paused: false,
   };
   const delayed: EventState = {
@@ -16,6 +17,7 @@ it("retains newer revocation when an earlier bootstrap request finishes late", (
     payload: { hints: ["withdrawn"] },
     revision: 1,
     editing_locked: false,
+    tree_open: false,
     paused: false,
   };
   // When
@@ -30,6 +32,7 @@ it("accepts current or newer persistent state when reconnecting", () => {
     payload: { message: "감사합니다" },
     revision: 3,
     editing_locked: false,
+    tree_open: false,
     paused: false,
   };
   // When / Then

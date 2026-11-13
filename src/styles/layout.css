@@ -6,6 +6,9 @@
   gap: var(--s4);
   border-bottom: 1px solid var(--line);
 }
+#content {
+  min-height: 100svh;
+}
 .brand {
   display: flex;
   align-items: center;

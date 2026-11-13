@@ -43,7 +43,7 @@ test("birthday-only login, survey consent and anonymous message persist across s
   await expect(page.getByRole("checkbox")).toHaveCount(1);
   await capture(page, "survey");
   await page.getByRole("link", { name: "대나무숲", exact: true }).click();
-  await expect(page.getByText("아직 조용한 숲이에요. 첫 마음을 남겨주세요.")).toBeVisible();
+  await expect(page.getByText("아직 보낸 마음이 없습니다.")).toBeVisible();
   await capture(page, "forest-empty");
   // When: a verified employee submits a message and a separate employee reads it.
   await page.getByLabel("어떤 마음인가요?").selectOption("thanks");
@@ -59,9 +59,9 @@ test("birthday-only login, survey consent and anonymous message persist across s
   await second.getByRole("button", { name: "우리의 자리로" }).click();
   await second.getByRole("link", { name: "대나무숲", exact: true }).click();
   // Then: refresh restores the shared anonymous post without exposing an author.
-  await expect(second.getByText("가상 대나무숲 검증: 함께해 주셔서 고맙습니다.")).toBeVisible();
+  await expect(second.getByText("가상 대나무숲 검증: 함께해 주셔서 고맙습니다.")).toHaveCount(0);
   await second.reload();
-  await expect(second.getByText("가상 대나무숲 검증: 함께해 주셔서 고맙습니다.")).toBeVisible();
+  await expect(second.getByText("가상 대나무숲 검증: 함께해 주셔서 고맙습니다.")).toHaveCount(0);
   await other.close();
 });
 test("administrator adds and permanently deletes one employee through confirmation", async ({ page }) => {

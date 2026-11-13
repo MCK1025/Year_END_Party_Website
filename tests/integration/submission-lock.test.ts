@@ -98,9 +98,13 @@ describe.sequential("private post ownership and durable event submission lock", 
     for (const request of [
       { action: "forest_post", payload: { kind: "wish", body: "소유권 검증 마감 후" } },
       { action: "forest_edit", payload: { id: post.id, kind: "wish", body: "소유권 검증 마감 수정" } },
+      { action: "forest_delete", payload: { id: post.id } },
       {
         action: "nominate",
-        payload: { nominee_id: current.directory.find((p) => p.id !== current.self.id)?.id, reason: "마감" },
+        payload: {
+          nominee_id: current.directory.find((p) => p.id !== current.self.id)?.id,
+          reason: "행사 마감 이후의 변경 시도",
+        },
       },
       {
         action: "save_survey",

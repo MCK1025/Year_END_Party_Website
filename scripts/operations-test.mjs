@@ -82,6 +82,9 @@ try {
     "Private recap image available only after authorized release",
   );
   // This destructive operation is intentionally restricted by qa-session to this synthetic local project.
+  await command("tree_open", { reviewed: true });
+  const [published] = await sql`select count(*)::int count from public.forest_tree_notes`;
+  ensure(published.count > 0, "Reviewed tree snapshot exists before purge");
   await call("purge", { confirmation: "개인정보 영구 삭제" });
   const remaining = await sql`select
     (select count(*)::int from private.employees) employees,
@@ -90,6 +93,7 @@ try {
     (select count(*)::int from private.sessions) bindings,
     (select count(*)::int from public.forest_posts) forest_posts,
     (select count(*)::int from private.forest_owners) forest_owners,
+    (select count(*)::int from public.forest_tree_notes) tree_notes,
     (select count(*)::int from private.forest_limits) forest_limits,
     (select count(*)::int from auth.users where is_anonymous) anonymous_users,
     (select count(*)::int from storage.objects where bucket_id='event-media') files`;

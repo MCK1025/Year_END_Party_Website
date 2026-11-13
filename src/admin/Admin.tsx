@@ -13,12 +13,14 @@ import { RecapsPanel } from "./RecapsPanel";
 import { RoundsPanel } from "./RoundsPanel";
 import { SettingsPanel } from "./SettingsPanel";
 import { TastesPanel } from "./TastesPanel";
+import { TreePanel } from "./TreePanel";
 
 const tabs = [
   "실시간 진행",
   "사원 관리",
   "설문·추천",
   "대나무숲",
+  "마음 트리",
   "질문 관리",
   "1년 회고",
   "인물 맞히기",
@@ -37,6 +39,8 @@ function Contents({ tab }: { readonly tab: Tab }) {
       return <DataPanel />;
     case "대나무숲":
       return <Forest admin />;
+    case "마음 트리":
+      return <TreePanel />;
     case "질문 관리":
       return <QuestionsPanel />;
     case "1년 회고":

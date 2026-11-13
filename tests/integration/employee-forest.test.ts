@@ -70,7 +70,7 @@ describe.sequential("employee lifecycle and anonymous forest", () => {
     // When
     await call(c, { action: "forest_post", payload: { kind: "thanks", body } }, okSchema);
     const posts = await call(
-      other,
+      admin,
       { action: "forest_list", payload: {} },
       z.array(z.record(z.string(), z.unknown())),
     );
@@ -85,6 +85,7 @@ describe.sequential("employee lifecycle and anonymous forest", () => {
       "kind",
     ]);
     expect(columns.map((c) => c.column_name)).toEqual(["body", "day", "id", "kind"]);
+    expect((await other.from("forest_posts").select("*").eq("body", body)).data).toEqual([]);
     await sql`delete from public.forest_posts where body=${body}`;
     await c.auth.signOut();
     await other.auth.signOut();

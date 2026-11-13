@@ -14,6 +14,8 @@ const short = z.string().trim().min(1).max(100);
 export const commandSchema = z.object({
   command: z.enum([
     "start_event",
+    "tree_open",
+    "tree_close",
     "pause",
     "resume",
     "waiting",
@@ -29,6 +31,7 @@ export const commandSchema = z.object({
   ]),
   revision: z.number().int().min(0),
   rehearsal: z.boolean().default(false),
+  reviewed: z.boolean().optional(),
   phase: phaseSchema.optional(),
   round_id: uuid.optional(),
   taste_id: uuid.optional(),
@@ -48,7 +51,14 @@ export const requestSchema = z.discriminatedUnion("action", [
   }),
   z.object({
     action: z.literal("nominate"),
-    payload: z.object({ nominee_id: uuid, reason: z.string().trim().max(300) }),
+    payload: z.object({
+      nominee_id: uuid,
+      reason: z
+        .string()
+        .trim()
+        .max(300)
+        .refine((value) => Array.from(value).length >= 10, "추천 이유를 10자 이상 작성해주세요."),
+    }),
   }),
   z.object({ action: z.literal("command"), payload: commandSchema }),
   z.object({
@@ -63,6 +73,10 @@ export const requestSchema = z.discriminatedUnion("action", [
   }),
   z.object({
     action: z.literal("forest_mine"),
+    payload: z.object({ before: z.number().int().positive().safe().optional() }),
+  }),
+  z.object({
+    action: z.literal("forest_tree"),
     payload: z.object({ before: z.number().int().positive().safe().optional() }),
   }),
   z.object({

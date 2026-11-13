@@ -1,5 +1,5 @@
-import { createContext, useContext, useEffect } from "react";
-import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
+import { createContext, useContext, useEffect, useRef } from "react";
+import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import type { Bootstrap } from "../../supabase/functions/_shared/contracts";
 import { Button, Note } from "../components/ui";
 import { supabase } from "../lib/api";
@@ -16,6 +16,14 @@ export function useGuest() {
 export function Participant() {
   const { data, error, connection, refresh } = useParticipant();
   const navigate = useNavigate();
+  const location = useLocation();
+  const treeSeen = useRef(false);
+  const treeOpen = data?.state.tree_open ?? false;
+  useEffect(() => {
+    if (treeOpen && !treeSeen.current) navigate("/tree");
+    if (!treeOpen && treeSeen.current && location.pathname === "/tree") navigate("/event", { replace: true });
+    treeSeen.current = treeOpen;
+  }, [treeOpen, navigate, location.pathname]);
   useEffect(() => {
     let authId: string | undefined;
     const { data: auth } = supabase.auth.onAuthStateChange((event, session) => {
@@ -59,6 +67,7 @@ export function Participant() {
           <NavLink to="/nominate">고마운 동료</NavLink>
           <NavLink to="/forest">대나무숲</NavLink>
           <NavLink to="/event">행사장</NavLink>
+          {treeOpen && <NavLink to="/tree">마음 트리</NavLink>}
         </nav>
         <Outlet />
         <div style={{ marginTop: "var(--s12)" }}>

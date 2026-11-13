@@ -21,6 +21,7 @@ const initial: EventState = {
   payload: {},
   paused: false,
   editing_locked: false,
+  tree_open: false,
   revision: 0,
 };
 export function ProgressPanel({ rehearsal = false }: { readonly rehearsal?: boolean }) {

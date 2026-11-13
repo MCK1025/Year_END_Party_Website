@@ -48,7 +48,7 @@ test("returning submissions, cross-device forest editing and live event lock", a
   const alternate = data.employees.find((e) => e.employee_no === "TEST-003");
   if (!colleague || !alternate) throw new Error("Missing local fixtures");
   await page.getByLabel("추천할 동료").selectOption(colleague.id);
-  await page.getByLabel("고마운 이유 한 줄 (선택)").fill("가상 감사 원본");
+  await page.getByLabel("고마운 이유 (10자 이상)").fill("가상 감사 원본을 남겨봅니다");
   await page.getByRole("button", { name: "마음을 전하고 행사장으로" }).click();
   await page.waitForURL("**/#/event");
   await page.getByRole("link", { name: "고마운 동료", exact: true }).click();
@@ -56,10 +56,10 @@ test("returning submissions, cross-device forest editing and live event lock", a
   await capture(page, "nominate-saved");
   await page.getByRole("button", { name: "추천 수정하기" }).click();
   await page.getByLabel("추천할 동료").selectOption(alternate.id);
-  await page.getByLabel("고마운 이유 한 줄 (선택)").fill("가상 감사 수정");
+  await page.getByLabel("고마운 이유 (10자 이상)").fill("가상 감사 수정 내용을 남깁니다");
   await capture(page, "nominate-edit");
   await page.getByRole("button", { name: "추천 수정 저장" }).click();
-  await expect(page.getByText("가상 감사 수정", { exact: true })).toBeVisible();
+  await expect(page.getByText("가상 감사 수정 내용을 남깁니다", { exact: true })).toBeVisible();
   await page.reload();
   await expect(page.getByRole("heading", { name: "이미 추천하였습니다." })).toBeVisible();
   expect((await dashboard()).nominations).toHaveLength(1);
@@ -85,8 +85,8 @@ test("returning submissions, cross-device forest editing and live event lock", a
   await expect(second.getByText("가상 다른 기기에서 수정한 마음", { exact: true })).toBeVisible();
   await second.reload();
   await expect(second.getByText("가상 다른 기기에서 수정한 마음", { exact: true })).toBeVisible();
-  await second.getByRole("button", { name: "모두의 마음" }).click();
-  await capture(second, "forest-all");
+
+  await capture(second, "forest-own-device");
   // Then: the organizer starts the event and every open device receives a durable read-only lock.
   const organizer = await browser.newPage();
   await organizer.goto("/#/admin");
@@ -99,7 +99,7 @@ test("returning submissions, cross-device forest editing and live event lock", a
   await capture(organizer, "admin-start-confirm");
   await organizer.getByRole("dialog").getByRole("button", { name: "확인", exact: true }).click();
   await expect(
-    page.getByText("행사가 시작되어 작성과 수정이 마감되었습니다. 보낸 글은 계속 확인 가능합니다."),
+    page.getByText("행사가 시작되어 작성·수정·삭제가 마감되었습니다. 보낸 글은 계속 확인 가능합니다."),
   ).toBeVisible({ timeout: 10000 });
   await expect(second.getByRole("button", { name: "익명으로 마음 남기기" })).toHaveCount(0);
   await capture(page, "forest-locked");

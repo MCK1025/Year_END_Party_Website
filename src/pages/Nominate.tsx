@@ -17,6 +17,7 @@ export function Nominate() {
   const open = data.settings.nomination_open && !data.state.editing_locked && !data.settings.started_at;
   const submitted = data.nomination;
   const nominee = people.find((e) => e.id === submitted?.nominee_id);
+  const reasonLength = Array.from(reason.trim()).length;
   return (
     <div className="stack">
       <header className="page-heading">
@@ -74,18 +75,23 @@ export function Nominate() {
               ))}
             </Select>
             <TextArea
-              label="고마운 이유 한 줄 (선택)"
+              label="고마운 이유 (10자 이상)"
               value={reason}
+              required
+              minLength={10}
               maxLength={300}
               onChange={(e) => setReason(e.target.value)}
               disabled={!open || task.busy}
             />
+            <p className="small" aria-live="polite">
+              {reasonLength} / 300자 · 추천 이유를 10자 이상 작성해주세요.
+            </p>
             <p className="small">
               한 사람당 최종 추천 한 표가 반영됩니다. 마감 전까지 바꿀 수 있으며, 이유는 검수 후 익명으로
               소개할 수 있습니다.
             </p>
             {task.notice && <Note error={task.failed}>{task.notice}</Note>}
-            <Button type="submit" busy={task.busy} disabled={!selected || !open}>
+            <Button type="submit" busy={task.busy} disabled={!selected || !open || reasonLength < 10}>
               {submitted ? "추천 수정 저장" : "마음을 전하고 행사장으로"}
             </Button>
             {submitted && (

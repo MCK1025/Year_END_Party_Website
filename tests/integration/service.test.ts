@@ -98,17 +98,23 @@ describe.sequential("real Supabase employee and event service", () => {
     if (!c || !other || !third) throw new Error("fixtures");
     const self = (await boot(c)).self.id;
     const invalid = await c.functions.invoke("portal", {
-      body: { action: "nominate", payload: { nominee_id: self, reason: "" } },
+      body: { action: "nominate", payload: { nominee_id: self, reason: "나 자신을 추천하려는 가상 이유" } },
     });
     await call(
       c,
-      { action: "nominate", payload: { nominee_id: (await boot(other)).self.id, reason: "감사합니다" } },
+      {
+        action: "nominate",
+        payload: { nominee_id: (await boot(other)).self.id, reason: "늘 먼저 도와주셔서 감사합니다" },
+      },
       okSchema,
     );
     // When
     await call(
       c,
-      { action: "nominate", payload: { nominee_id: (await boot(third)).self.id, reason: "늘 고마운 동료" } },
+      {
+        action: "nominate",
+        payload: { nominee_id: (await boot(third)).self.id, reason: "늘 고마운 동료라서 추천합니다" },
+      },
       okSchema,
     );
     // Then

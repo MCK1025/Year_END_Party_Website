@@ -33,6 +33,7 @@ Display scale clamp(36px,5vw,64px); heading 28/36px; section 22px; body 16px/1.7
 
 ## 4. Spacing & Layout
 Spacing: 4,8,12,16,24,32,48,64,96px. Mobile gutter 24px (16 at 320px). Guest max-width 680px; invitation 1100px; admin 1240px. 768px breakpoint switches invitation to 2 columns and admin grids to 2 columns. Card radius 8px; field/button 4px. Border 1px. No heavy shadows.
+The content shell reserves at least 100svh so the footer stays below the initial viewport while authenticated routes load; content height can grow naturally.
 
 ## 5. Reusable Components & States
 - Button: navy primary, outlined secondary, red text danger; hover lightens; visible 2px focus outline; busy label + disabled; minimum 48px height.
@@ -50,8 +51,17 @@ Spacing: 4,8,12,16,24,32,48,64,96px. Mobile gutter 24px (16 at 320px). Guest max
 ## 6. Motion
 Only stateful hint entrance and button press: 180ms opacity/translateY(4px), ease-out. No decorative looping motion. prefers-reduced-motion disables animation. Focus feedback is immediate.
 
+### Christmas message tree extension (2026-11-13)
+- Preserve the invitation's solemn editorial tone. A dimensional fir, warm pin lights and folded paper notes are the focal object, on a midnight-green stage. Added stage tokens: tree-night #102b28, tree-deep #153e33, tree-leaf #2c6551, tree-light #578b68, tree-trunk #72573c, tree-warm #ead2a0, note-rose #ead6ca, note-sage #dce5d5. Existing ivory/brass are the primary note materials.
+- TreeScene is a reusable WebGL scene/effect consumer. The graphics service owns renderer, camera, resize, visibility, reduced-motion, context-loss fallback and disposal; independent TreeEffect and SnowEffect can be mounted by other pages without a backend service. Three.js loads only on the tree route. No remote textures/models.
+- Tree stage uses a fixed 10:13 proportion, at most 12 DOM note buttons per branch/page, minimum 48px targets and real keyboard navigation. Buttons use paper folds and string pins; the 3D tree stays decorative. All notes remain accessible when WebGL is unavailable through an SVG fir silhouette and the same DOM controls.
+- Notes open a native focus-managed dialog with readable wrapping, category/date and anonymous body; no author identity. Dialog uses existing 180ms opacity/translate entrance, honoring reduced motion. Consulted beui center-morph-modal for focus/enter/exit mechanism; retain native dialog rather than adding a motion dependency. Fir/snow is a novel effect, not a catalog interaction.
+- Snow gently drifts; lights breathe subtly, notes remain stationary. Provide an explicit effects pause; offscreen/background scenes stop, reduced-motion renders a still frame. Context loss falls back without hiding notes. Renderer DPR is capped at 1.5 and no shadows/post-processing are used on phones.
+- Staff forest contains only own posts, including edit/delete before event start; entire collection is admin-only until explicit reviewed tree publication after event start and the 18:00 KST gate. Admin can close the tree and restore the previous event screen. Public display is an overlay of the current event phase, preserving the underlying game progress.
+
 ## 7. Depth
 Warm paper canvas, ivory islands separated by fine warm rules; navy invitation panel has an inset border and a subtle brass orbit. No glass, gradients or hard offset shadows. User's solemn direction takes precedence over earlier expressive references.
 
 ## 8. Accessibility & Debt
 WCAG AA contrast, 48px touch areas, labels, alert/status regions, keyboard navigation, dialog focus, no color-only meaning, no autoplay audio. 320px without horizontal overflow; admin tables use stacked cards. Private site intentionally noindexed. Real physical-device and deployed-origin checks require the user's production project; record them as unverified until actually performed.
+- Accepted performance debt: the optional WebGL tree measured Lighthouse mobile 85 with 4x CPU throttling versus desktop 100; accessible DOM notes/SVG paint before GPU preparation. Physical-device frame/battery measurements remain unverified. Noindex intentionally lowers the SEO audit score for this private event.

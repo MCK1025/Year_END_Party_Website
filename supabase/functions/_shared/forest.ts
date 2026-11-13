@@ -8,6 +8,7 @@ export const forestPostSchema = z.object({
   day: z.iso.date(),
 });
 export const forestListSchema = z.array(forestPostSchema);
+export const forestTreeSchema = z.object({ notes: forestListSchema, total: z.number().int().nonnegative() });
 export type ForestPost = z.infer<typeof forestPostSchema>;
 export const forestKinds = {
   wish: "바라는 점",

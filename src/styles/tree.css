@@ -1,0 +1,218 @@
+.message-tree {
+  background: var(--tree-night);
+  color: var(--ivory);
+  border: 1px solid var(--tree-leaf);
+  border-radius: var(--radius);
+  padding: var(--s6) var(--s4);
+  overflow: hidden;
+}
+.tree-caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s2);
+  color: var(--tree-warm);
+  font-size: 13px;
+}
+.tree-caption .overline {
+  color: var(--tree-warm);
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+.tree-stage {
+  position: relative;
+  aspect-ratio: 10 / 13;
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+  isolation: isolate;
+}
+.tree-scene,
+.tree-canvas,
+.tree-fallback {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.tree-canvas.is-fallback {
+  visibility: hidden;
+}
+.fir-trunk {
+  fill: var(--tree-trunk);
+}
+.fir-leaf {
+  fill: var(--tree-leaf);
+}
+.fir-deep {
+  fill: var(--tree-deep);
+}
+.fir-star {
+  fill: var(--tree-warm);
+}
+.tree-note {
+  position: absolute;
+  z-index: 2;
+  width: 52px;
+  height: 56px;
+  transform: translate(-50%, -50%);
+  border: 1px solid var(--brass);
+  border-radius: 1px;
+  background: var(--ivory);
+  color: var(--ink);
+  cursor: pointer;
+  box-shadow: 0 4px 8px color-mix(in srgb, var(--tree-night) 45%, transparent);
+  transition:
+    scale 180ms ease-out,
+    rotate 180ms ease-out;
+}
+.tree-note.wish {
+  background: var(--note-sage);
+}
+.tree-note.regret {
+  background: var(--note-rose);
+}
+.tree-note:hover,
+.tree-note:focus-visible {
+  scale: 1.08;
+  rotate: 0deg !important;
+  z-index: 3;
+}
+.tree-note:focus-visible {
+  outline-color: var(--tree-warm);
+  outline-offset: 4px;
+}
+.note-number {
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 22px;
+}
+.note-pin {
+  position: absolute;
+  width: 1px;
+  height: 15px;
+  background: var(--tree-warm);
+  top: -16px;
+  left: 50%;
+}
+.note-pin::after {
+  content: "";
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--gold-ink);
+  bottom: -3px;
+  left: -2px;
+}
+.note-fold {
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  width: 10px;
+  height: 10px;
+  border-style: solid;
+  border-width: 5px;
+  border-color: var(--brass) var(--tree-night) var(--tree-night) var(--brass);
+}
+.tree-year {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  font:
+    italic 48px Georgia,
+    serif;
+  color: var(--tree-warm);
+  opacity: 0.8;
+}
+.tree-empty {
+  position: absolute;
+  top: 45%;
+  width: 100%;
+  text-align: center;
+  color: var(--ivory);
+  font-family: var(--display);
+}
+.tree-instruction {
+  text-align: center;
+  font-size: 13px;
+  color: var(--on-dark);
+  display: grid;
+  justify-items: center;
+  gap: var(--s4);
+  margin-top: var(--s6);
+}
+.tree-instruction .button {
+  color: var(--ivory);
+  border-color: var(--tree-light);
+  background: transparent;
+}
+.tree-instruction .button:hover {
+  background: var(--tree-deep);
+}
+.tree-pagination {
+  justify-content: center;
+}
+.tree-note-dialog {
+  margin: auto;
+  color: var(--ink);
+  background: var(--ivory);
+  border: 1px solid var(--brass);
+  border-radius: var(--radius-small);
+  width: min(520px, calc(100% - 48px));
+  max-height: calc(100dvh - 48px);
+  padding: var(--s8);
+  overflow-y: auto;
+  animation: note-arrive 180ms ease-out;
+}
+.tree-note-dialog.wish {
+  background: var(--note-sage);
+}
+.tree-note-dialog.regret {
+  background: var(--note-rose);
+}
+.tree-note-dialog::backdrop {
+  background: color-mix(in srgb, var(--tree-night) 80%, transparent);
+}
+.tree-note-body {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-family: var(--display);
+  font-size: 20px;
+  line-height: 1.9;
+}
+@keyframes note-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (max-width: 375px) {
+  .message-tree {
+    padding-inline: var(--s2);
+  }
+  .tree-caption {
+    flex-wrap: wrap;
+  }
+  .tree-note {
+    width: 48px;
+    height: 52px;
+  }
+  .tree-note-dialog {
+    padding: var(--s6);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tree-note,
+  .tree-note-dialog {
+    transition: none;
+    animation: none;
+  }
+}

@@ -46,6 +46,7 @@ export const stateSchema = z.object({
   revision: z.number().int(),
   paused: z.boolean(),
   editing_locked: z.boolean().default(false),
+  tree_open: z.boolean().default(false),
   updated_at: z.string().optional(),
   payload: z.object({
     round_id: uuid.optional(),

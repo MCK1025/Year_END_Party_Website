@@ -40,7 +40,7 @@ test("guest saves a story, then sees organizer reveals live through the ending",
   const self = d.employees.find((e) => e.employee_no === "TEST-001");
   if (!colleague || !self) throw new Error("Missing local fixtures");
   await page.getByLabel("추천할 동료").selectOption(colleague.id);
-  await page.getByLabel("고마운 이유 한 줄 (선택)").fill("늘 먼저 손을 내밀어 준 동료");
+  await page.getByLabel("고마운 이유 (10자 이상)").fill("늘 먼저 손을 내밀어 준 동료");
   await page.getByRole("button", { name: "마음을 전하고 행사장으로" }).click();
   await expect(page.getByText("당신의 이야기가 잘 도착했습니다.")).toBeVisible();
   await page.reload();
