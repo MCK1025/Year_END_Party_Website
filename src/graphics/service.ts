@@ -52,6 +52,7 @@ export function createGraphicsSession(
     camera.right = -camera.left;
     camera.updateProjectionMatrix();
     renderer.setSize(width, height, false);
+    for (const effect of effects) effect.update(elapsed);
     sync();
   });
   const intersection = new IntersectionObserver(([entry]) => {

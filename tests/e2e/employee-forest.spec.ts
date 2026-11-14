@@ -1,5 +1,6 @@
 import { expect, type Page, test } from "@playwright/test";
 import { admin, env, signAdmin, sql } from "../integration/helpers";
+import { openLogin } from "./invitation-helper";
 
 async function capture(page: Page, state: string) {
   for (const width of [320, 375, 768, 1280]) {
@@ -34,7 +35,7 @@ test("birthday-only login, survey consent and anonymous message persist across s
   browser,
 }) => {
   // Given: the employee has just one password field and no issued-code/name fields.
-  await page.goto("/#/login");
+  await openLogin(page);
   await expect(page.locator("form input")).toHaveCount(1);
   await capture(page, "login");
   await page.getByLabel("비밀번호", { exact: true }).fill("900101");
@@ -54,7 +55,7 @@ test("birthday-only login, survey consent and anonymous message persist across s
   await capture(page, "forest-posted");
   const other = await browser.newContext();
   const second = await other.newPage();
-  await second.goto("/#/login");
+  await openLogin(second);
   await second.getByLabel("비밀번호", { exact: true }).fill("910202");
   await second.getByRole("button", { name: "우리의 자리로" }).click();
   await second.getByRole("link", { name: "대나무숲", exact: true }).click();

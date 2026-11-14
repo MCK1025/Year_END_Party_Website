@@ -5,7 +5,7 @@ import { Button, Field, Forward, Note } from "../components/ui";
 import { ApiError, api, configured, supabase, verify } from "../lib/api";
 import { useTask } from "../lib/useTask";
 
-export function Login() {
+export function Login({ fromInvitation = false }: { readonly fromInvitation?: boolean }) {
   const [password, setPassword] = useState("");
   const task = useTask();
   const navigate = useNavigate();
@@ -32,7 +32,7 @@ export function Login() {
     navigate(data.survey ? "/event" : "/survey");
   }
   return (
-    <main className="invitation">
+    <main className={fromInvitation ? "invitation login-arrival" : "invitation"}>
       <section className="invitation-cover" aria-label="2026 연말 초대장">
         <div className="orbit" aria-hidden="true" />
         <div>
@@ -100,6 +100,9 @@ export function Login() {
           </form>
         )}
         <div className="stack-sm">
+          <Link className="small" to="/invite">
+            초대장 다시 보기
+          </Link>
           <p className="small">사전 등록된 직원 전용입니다. 입력한 정보는 본인 확인에만 사용합니다.</p>
           <Link className="small" to="/admin">
             행사 운영자 입장

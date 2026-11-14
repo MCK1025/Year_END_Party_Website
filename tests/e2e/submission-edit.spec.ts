@@ -1,6 +1,7 @@
 import { expect, type Page, test } from "@playwright/test";
 import postgres from "postgres";
 import { command, dashboard, env, signAdmin } from "../integration/helpers";
+import { openLogin } from "./invitation-helper";
 
 const sql = postgres(env.DB_URL ?? "postgresql://postgres:postgres@127.0.0.1:55422/postgres");
 async function capture(page: Page, state: string) {
@@ -19,7 +20,7 @@ async function capture(page: Page, state: string) {
   }
 }
 async function login(page: Page) {
-  await page.goto("/#/login");
+  await openLogin(page);
   await page.getByLabel("비밀번호", { exact: true }).fill("900101");
   await page.getByRole("button", { name: "우리의 자리로" }).click();
   await expect(page.getByRole("link", { name: "나의 이야기", exact: true })).toBeVisible();

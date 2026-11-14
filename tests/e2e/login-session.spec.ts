@@ -1,6 +1,7 @@
 import { expect, type Page, test } from "@playwright/test";
 import postgres from "postgres";
 import { env } from "../integration/helpers";
+import { openLogin } from "./invitation-helper";
 
 const sql = postgres(env.DB_URL ?? "postgresql://postgres:postgres@127.0.0.1:54322/postgres");
 
@@ -17,7 +18,7 @@ async function capture(page: Page, state: string) {
   }
 }
 async function login(page: Page, password: string) {
-  await page.goto("/#/login");
+  await openLogin(page);
   await page.getByLabel("비밀번호", { exact: true }).fill(password);
   await page.getByRole("button", { name: "우리의 자리로" }).click();
 }
@@ -37,7 +38,7 @@ test("allows a different employee after reopening login in the same browser", as
   await login(other, "910202");
   await expect(other.getByText("가상직원 둘 님", { exact: true })).toBeVisible();
   await fresh.close();
-  await page.goto("/#/login");
+  await openLogin(page);
   await capture(page, "login");
   await login(page, "900101");
   await expect(page.getByText("가상직원 하나 님", { exact: true })).toBeVisible();

@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 import postgres from "postgres";
 import { okSchema } from "../../supabase/functions/_shared/contracts";
 import { admin, call, command, dashboard, env, eventDate, signAdmin } from "../integration/helpers";
+import { openLogin } from "./invitation-helper";
 
 const sql = postgres(env.DB_URL ?? "postgresql://postgres:postgres@127.0.0.1:54322/postgres");
 test.beforeAll(async () => {
@@ -21,7 +22,7 @@ test("guest saves a story, then sees organizer reveals live through the ending",
   browser,
 }) => {
   // Given: a genuine mobile browser, a separate organizer session, five synthetic employees.
-  await page.goto("/#/login");
+  await openLogin(page);
   await page.getByLabel("비밀번호", { exact: true }).fill("900101");
   await page.getByRole("button", { name: "우리의 자리로" }).click();
   await expect(page.getByRole("link", { name: "나의 이야기" })).toBeVisible();

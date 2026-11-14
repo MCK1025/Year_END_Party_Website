@@ -29,7 +29,7 @@ export function Participant() {
     const { data: auth } = supabase.auth.onAuthStateChange((event, session) => {
       const next = session?.user.id;
       if (event === "SIGNED_OUT" || (authId && next !== authId)) {
-        navigate("/login", { replace: true });
+        navigate("/login", { replace: true, state: { invitationPassed: true } });
       }
       authId = next;
     });
@@ -42,7 +42,7 @@ export function Participant() {
         {error ? (
           <>
             <Note error>{error}</Note>
-            <Link to="/login" className="button primary">
+            <Link to="/login" state={{ invitationPassed: true }} className="button primary">
               다시 본인 확인하기
             </Link>
             <Button variant="secondary" onClick={() => void refresh()}>
@@ -74,7 +74,9 @@ export function Participant() {
           <Button
             variant="secondary"
             onClick={() => {
-              void supabase.auth.signOut().then(() => navigate("/login"));
+              void supabase.auth
+                .signOut()
+                .then(() => navigate("/login", { state: { invitationPassed: true } }));
             }}
           >
             로그아웃

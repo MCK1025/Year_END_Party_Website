@@ -60,6 +60,12 @@ Only stateful hint entrance and button press: 180ms opacity/translateY(4px), eas
 - Staff forest contains only own posts, including edit/delete before event start; entire collection is admin-only until explicit reviewed tree publication after event start and the 18:00 KST gate. Admin can close the tree and restore the previous event screen. Public display is an overlay of the current event phase, preserving the underlying game progress.
 
 ## 7. Depth
+
+### Invitation arrival (2026-11-14)
+- Preserve the exact event theme. One matte navy envelope arrives over the paper background, opens on its top hinge, and releases an ivory letter. The letter becomes real HTML at rest; its DOM bounds own the graphics anchor, including at large text sizes.
+- Reuse all existing colors, serif/system font stacks, 4px spacing scale and Button. Letter width at most 480px, heading 30–40px, mobile padding 24px (16px at 320), stage padding 48px above/96px below. Content grows and scrolls. Only a fine orbit, italic year and folded paper carry ornament.
+- Arrival/settle/open/unfold ends at 1.2/1.5/2.2/3 seconds of active graphics time; departure takes 1 second. Reading pauses rendering. Preparation over 2 seconds, reduced motion or GPU failure yields the same static HTML invitation. Departure has a 1.5 second navigation safety timer.
+- `/invite` is replayable. First root/login visits show it once per tab; entry records only a UI flag. Admin and protected routes retain their own flows. No API, personal data, fonts, imagery or network assets are added for the invitation.
 Warm paper canvas, ivory islands separated by fine warm rules; navy invitation panel has an inset border and a subtle brass orbit. No glass, gradients or hard offset shadows. User's solemn direction takes precedence over earlier expressive references.
 
 ## 8. Accessibility & Debt

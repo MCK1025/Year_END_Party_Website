@@ -2,6 +2,7 @@ import { expect, type Page, test } from "@playwright/test";
 import postgres from "postgres";
 import { okSchema } from "../../supabase/functions/_shared/contracts";
 import { admin, call, command, dashboard, employee, env, eventDate, signAdmin } from "../integration/helpers";
+import { openLogin } from "./invitation-helper";
 
 const sql = postgres(env.DB_URL ?? "postgresql://postgres:postgres@127.0.0.1:55422/postgres");
 async function capture(page: Page, name: string) {
@@ -59,7 +60,7 @@ test("owner deletion, ten-character recommendation, reviewed WebGL tree, note zo
   test.setTimeout(180000);
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto("/#/login");
+  await openLogin(page);
   await page.getByLabel("비밀번호", { exact: true }).fill("900101");
   await page.getByRole("button", { name: "우리의 자리로" }).click();
   await page.getByRole("link", { name: "고마운 동료", exact: true }).click();
