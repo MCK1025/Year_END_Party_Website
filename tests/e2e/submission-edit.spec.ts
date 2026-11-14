@@ -78,7 +78,7 @@ test("returning submissions, cross-device forest editing and live event lock", a
   await expect(second.getByRole("button", { name: "내 글 수정하기" })).toBeVisible();
   await second.getByRole("button", { name: "내 글 수정하기" }).click();
   const editing = second
-    .locator("section")
+    .locator("form")
     .filter({ has: second.getByRole("button", { name: "내 글 수정 저장" }) });
   await editing.getByLabel("혜성식품에게 전하고 싶은 말").fill("가상 다른 기기에서 수정한 마음");
   await capture(second, "forest-edit");

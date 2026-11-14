@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { okSchema } from "../../supabase/functions/_shared/contracts";
+import { useBookDraft } from "../components/book/drafts";
+import { useSavedNavigation } from "../components/book/useSavedNavigation";
 import { Button, Note, Panel, Select, TextArea } from "../components/ui";
 import { api } from "../lib/api";
 import { useTask } from "../lib/useTask";
@@ -9,10 +9,10 @@ import { useGuest } from "./Participant";
 export function Nominate() {
   const { data, refresh } = useGuest();
   const task = useTask();
-  const navigate = useNavigate();
-  const [editing, setEditing] = useState(false);
-  const [selected, setSelected] = useState(data.nomination?.nominee_id ?? "");
-  const [reason, setReason] = useState(data.nomination?.reason ?? "");
+  const navigate = useSavedNavigation();
+  const [editing, setEditing] = useBookDraft("nomEditing", false);
+  const [selected, setSelected, forgetSelected] = useBookDraft("selected", data.nomination?.nominee_id ?? "");
+  const [reason, setReason, forgetReason] = useBookDraft("reason", data.nomination?.reason ?? "");
   const people = data.directory.filter((e) => e.id !== data.self.id);
   const open = data.settings.nomination_open && !data.state.editing_locked && !data.settings.started_at;
   const submitted = data.nomination;
@@ -29,10 +29,10 @@ export function Nominate() {
         <p className="muted">든든했던 순간을 떠올려 한 명의 동료를 추천해주세요.</p>
       </header>
       {!open && <Note>추천이 마감되었습니다. 제출한 내용은 확인만 가능합니다.</Note>}
-      {submitted && !editing ? (
+      {submitted && (!editing || !open) ? (
         <Panel title="이미 추천하였습니다.">
           <p>{nominee ? `${nominee.name} · ${nominee.department}` : "추천한 동료"}</p>
-          <p style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>
+          <p className="story-text" style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>
             {submitted.reason || "추천 이유를 남기지 않았습니다."}
           </p>
           {open && (
@@ -59,6 +59,8 @@ export function Nominate() {
                 async () => {
                   await api({ action: "nominate", payload: { nominee_id: selected, reason } }, okSchema);
                   await refresh();
+                  forgetSelected();
+                  forgetReason();
                   setEditing(false);
                   if (!submitted) navigate("/event");
                 },

@@ -33,7 +33,7 @@ export function RecapCards() {
         <Panel key={card.id}>
           <p className="overline">MOMENT {String(i + 1).padStart(2, "0")}</p>
           {card.asset_path && <PrivateImage path={card.asset_path} alt={card.caption} />}
-          <p>{card.caption}</p>
+          <p className="story-text">{card.caption}</p>
         </Panel>
       ))}
     </>

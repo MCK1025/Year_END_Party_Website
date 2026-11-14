@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { okSchema } from "../../supabase/functions/_shared/contracts";
+import { useBookDraft } from "../components/book/drafts";
+import { useSavedNavigation } from "../components/book/useSavedNavigation";
 import { Button, Check, Note, Panel, Select, TextArea } from "../components/ui";
 import { api } from "../lib/api";
 import { useTask } from "../lib/useTask";
@@ -8,12 +8,14 @@ import { useGuest } from "./Participant";
 
 export function Survey() {
   const { data, refresh } = useGuest();
-  const navigate = useNavigate();
+  const navigate = useSavedNavigation();
   const task = useTask();
-  const [answers, setAnswers] = useState(data.survey?.answers ?? {});
-  const [consent, setConsent] = useState(data.survey?.consent ?? false);
+  const [draftAnswers, setAnswers, forgetAnswers] = useBookDraft("answers", data.survey?.answers ?? {});
+  const [draftConsent, setConsent, forgetConsent] = useBookDraft("consent", data.survey?.consent ?? false);
   const excluded = data.survey?.excluded ?? [];
   const open = data.settings.survey_open && !data.state.editing_locked && !data.settings.started_at;
+  const answers = open ? draftAnswers : (data.survey?.answers ?? {});
+  const consent = open ? draftConsent : (data.survey?.consent ?? false);
   return (
     <div className="stack">
       <header className="page-heading">
@@ -27,12 +29,14 @@ export function Survey() {
       </header>
       {!open && <Note>설문이 마감되었습니다. 저장한 이야기는 그대로 남아 있습니다.</Note>}
       <form
-        className="stack"
+        className="stack survey-entries"
         onSubmit={(event) => {
           event.preventDefault();
           void task.run(async () => {
             await api({ action: "save_survey", payload: { answers, consent, excluded } }, okSchema);
             await refresh();
+            forgetAnswers();
+            forgetConsent();
             navigate("/nominate");
           });
         }}
@@ -52,7 +56,7 @@ export function Survey() {
                         : ""
                   }
                   onChange={(v) => setAnswers({ ...answers, [q.id]: v === "기타" ? "기타: " : v })}
-                  disabled={!open}
+                  disabled={!open || task.busy}
                 >
                   <option value="">선택해주세요</option>
                   {q.choices.map((c) => (
@@ -68,7 +72,7 @@ export function Survey() {
                     value={answers[q.id] ?? ""}
                     onChange={(e) => setAnswers({ ...answers, [q.id]: e.target.value })}
                     required
-                    disabled={!open}
+                    disabled={!open || task.busy}
                   />
                 )}
               </>
@@ -78,7 +82,7 @@ export function Survey() {
                 value={answers[q.id] ?? ""}
                 onChange={(e) => setAnswers({ ...answers, [q.id]: e.target.value })}
                 required
-                disabled={!open}
+                disabled={!open || task.busy}
               />
             )}
           </Panel>
@@ -91,12 +95,12 @@ export function Survey() {
           <p className="small">
             개인정보 삭제 예정일: {data.settings.deletion_date ?? "관리자가 안내할 예정입니다."}
           </p>
-          <Check checked={consent} onChange={setConsent} disabled={!open}>
+          <Check checked={consent} onChange={setConsent} disabled={!open || task.busy}>
             내 답변을 인물 힌트와 익명 취향 통계에 활용하는 데 동의합니다.
           </Check>
         </Panel>
         {task.notice && <Note error={task.failed}>{task.notice}</Note>}
-        <Button type="submit" busy={task.busy} disabled={!open}>
+        <Button type="submit" busy={task.busy} disabled={!open || task.busy}>
           이야기 저장하고 다음으로
         </Button>
       </form>

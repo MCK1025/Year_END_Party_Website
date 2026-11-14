@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { BookSettings } from "../components/book/preferences";
 import { InvitationFallback } from "../components/invitation/InvitationFallback";
 import { InvitationScene } from "../components/invitation/InvitationScene";
 import { Button } from "../components/ui";
@@ -65,6 +66,7 @@ export function Invitation() {
     <main className="invite-page" data-phase={phase} data-renderer={mode}>
       <header className="invite-top">
         <span className="small">한 걸음 더 가까이 · 2026</span>
+        <BookSettings />
         <Button variant="secondary" onClick={finish}>
           {invitationCopy.skip}
         </Button>

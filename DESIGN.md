@@ -71,3 +71,11 @@ Warm paper canvas, ivory islands separated by fine warm rules; navy invitation p
 ## 8. Accessibility & Debt
 WCAG AA contrast, 48px touch areas, labels, alert/status regions, keyboard navigation, dialog focus, no color-only meaning, no autoplay audio. 320px without horizontal overflow; admin tables use stacked cards. Private site intentionally noindexed. Real physical-device and deployed-origin checks require the user's production project; record them as unverified until actually performed.
 - Accepted performance debt: the optional WebGL tree measured Lighthouse mobile 85 with 4x CPU throttling versus desktop 100; accessible DOM notes/SVG paint before GPU preparation. Physical-device frame/battery measurements remain unverified. Noindex intentionally lowers the SEO audit score for this private event.
+
+## Employee notebook · 2026-11-14
+
+직원 화면은 종이 초대장에 이어지는 연말 기록장으로 구성한다. 850px 미만은 목차 아래에 본문 한 장, 넓은 화면은 왼쪽 목차와 오른쪽 본문 한 장을 표시한다. 따뜻한 종이색과 아이보리, 왼쪽 제본선, 하단 쪽 번호, 질문 사이의 가는 선을 사용한다. 공책 줄은 자유 입력에만 사용한다.
+
+이 절이 직원용 명조 제목과 외부 글꼴 추가에 대한 이전 지침을 대체한다. 제목·질문·자유 입력·힌트·편지는 흑연색 Nanum Pen Script Regular 400, 식별 정보와 조작·동의·오류·관리자는 시스템 서체로 표시한다. 앱의 기본 글씨 설정은 같은 내용을 시스템 서체로 바꾼다. 폰트는 프로젝트 안에 재배포한 공식 WOFF2 파일에서 로드한다.
+
+앞뒤 장은 실제 링크와 접근 가능한 HTML을 사용한다. 책등을 기준으로 도는 장식 종이는 480ms 동안만 보인다. OS 저감이나 효과 끄기, 권한·행사 전환과 히스토리 복구는 즉시 반영한다. 세부 파일·측정·한계는 [공책 UI 검증 기록](docs/NOTEBOOK-UI.md)에 있다.

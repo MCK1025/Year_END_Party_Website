@@ -8,19 +8,27 @@ export function useParticipant() {
   const [error, setError] = useState("");
   const [connection, setConnection] = useState("연결 중");
   const generation = useRef(0);
-  const refresh = useCallback(async () => {
+  const load = useCallback(async (afterSave: boolean) => {
     const request = ++generation.current;
     try {
       const next = await api({ action: "bootstrap", payload: {} }, bootstrapSchema);
-      if (request !== generation.current) return;
+      if (request !== generation.current) {
+        return;
+      }
       setData((old) => ({ ...next, state: latestState(old?.state, next.state) }));
       setError("");
     } catch (error) {
-      if (request !== generation.current) return;
+      if (request !== generation.current) {
+        if (afterSave) throw error;
+        return;
+      }
       if (error instanceof ApiError && (error.status === 401 || error.status === 403)) setData(null);
       setError(message(error));
+      if (afterSave) throw error;
     }
   }, []);
+  const refresh = useCallback(() => load(false), [load]);
+  const refreshAfterSave = useCallback(() => load(true), [load]);
   useEffect(() => {
     void refresh();
     const channel = supabase
@@ -52,5 +60,5 @@ export function useParticipant() {
       document.removeEventListener("visibilitychange", recover);
     };
   }, [refresh]);
-  return { data, error, connection, refresh };
+  return { data, error, connection, refresh, refreshAfterSave };
 }

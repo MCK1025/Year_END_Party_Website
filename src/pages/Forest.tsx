@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { okSchema } from "../../supabase/functions/_shared/contracts";
 import { type ForestPost, forestKinds, forestListSchema } from "../../supabase/functions/_shared/forest";
+import { useBookDraft } from "../components/book/drafts";
 import { ForestForm } from "../components/ForestForm";
 import { Button, Confirm, Note, Panel } from "../components/ui";
 import { api, message } from "../lib/api";
@@ -19,7 +20,7 @@ function ForestBoard({ admin, locked }: { readonly admin: boolean; readonly lock
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [more, setMore] = useState(false);
-  const [editing, setEditing] = useState<number | null>(null);
+  const [editing, setEditing] = useBookDraft("forestEditing", null);
   const [deleting, setDeleting] = useState<ForestPost | null>(null);
   const task = useTask();
   const action = admin ? "forest_list" : "forest_mine";
@@ -108,7 +109,9 @@ function ForestBoard({ admin, locked }: { readonly admin: boolean; readonly lock
             />
           ) : (
             <>
-              <p style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{post.body}</p>
+              <p className="story-text" style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>
+                {post.body}
+              </p>
               {!admin && !locked && (
                 <div className="actions">
                   <Button variant="secondary" onClick={() => setEditing(post.id)}>

@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
 import { HashRouter, Link, Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { BookPreferences, BookSettings } from "./components/book/preferences";
 import { InvitationEntry } from "./components/invitation/InvitationEntry";
 import { Showcase } from "./components/Showcase";
 import { Mark, Note } from "./components/ui";
@@ -15,7 +16,9 @@ const Tree = lazy(() => import("./pages/Tree").then((m) => ({ default: m.Tree })
 export function App() {
   return (
     <HashRouter>
-      <AppShell />
+      <BookPreferences>
+        <AppShell />
+      </BookPreferences>
     </HashRouter>
   );
 }
@@ -39,7 +42,11 @@ function AppShell() {
           <Link to="/login" state={{ invitationPassed: true }} className="brand">
             <Mark />한 걸음 더 가까이
           </Link>
-          <span className="overline">2026 · 함께의 기록</span>
+          {location.pathname === "/admin" ? (
+            <span className="overline">2026 · 함께의 기록</span>
+          ) : (
+            <BookSettings />
+          )}
         </header>
       )}
       <div id="content" tabIndex={-1}>

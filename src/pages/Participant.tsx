@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useRef } from "react";
-import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import type { Bootstrap } from "../../supabase/functions/_shared/contracts";
+import { BookLayout } from "../components/book/BookLayout";
+import { EmployeeDrafts } from "../components/book/drafts";
 import { Button, Note } from "../components/ui";
 import { supabase } from "../lib/api";
 import { useParticipant } from "../lib/useParticipant";
@@ -14,7 +16,7 @@ export function useGuest() {
   return value;
 }
 export function Participant() {
-  const { data, error, connection, refresh } = useParticipant();
+  const { data, error, connection, refresh, refreshAfterSave } = useParticipant();
   const navigate = useNavigate();
   const location = useLocation();
   const treeSeen = useRef(false);
@@ -55,34 +57,33 @@ export function Participant() {
       </main>
     );
   return (
-    <Context.Provider value={{ data, refresh }}>
-      <main className="guest">
-        <div className="actions" style={{ marginBottom: "var(--s6)", justifyContent: "space-between" }}>
-          <span className="status">{connection}</span>
-          <span className="small">{data.self.name} 님</span>
-        </div>
-        {error && <Note error>{error}</Note>}
-        <nav aria-label="내 행사 메뉴" className="guest-nav">
-          <NavLink to="/survey">나의 이야기</NavLink>
-          <NavLink to="/nominate">고마운 동료</NavLink>
-          <NavLink to="/forest">대나무숲</NavLink>
-          <NavLink to="/event">행사장</NavLink>
-          {treeOpen && <NavLink to="/tree">마음 트리</NavLink>}
-        </nav>
-        <Outlet />
-        <div style={{ marginTop: "var(--s12)" }}>
-          <Button
-            variant="secondary"
-            onClick={() => {
-              void supabase.auth
-                .signOut()
-                .then(() => navigate("/login", { state: { invitationPassed: true } }));
-            }}
-          >
-            로그아웃
-          </Button>
-        </div>
-      </main>
+    <Context.Provider value={{ data, refresh: refreshAfterSave }}>
+      <EmployeeDrafts key={data.self.id}>
+        <BookLayout
+          treeOpen={treeOpen}
+          revision={data.state.revision}
+          status={
+            <>
+              <span className="status">{connection}</span>
+              <span className="small">{data.self.name} 님</span>
+
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  void supabase.auth
+                    .signOut()
+                    .then(() => navigate("/login", { state: { invitationPassed: true } }));
+                }}
+              >
+                로그아웃
+              </Button>
+            </>
+          }
+        >
+          {error && <Note error>{error}</Note>}
+          <Outlet />
+        </BookLayout>
+      </EmployeeDrafts>
     </Context.Provider>
   );
 }

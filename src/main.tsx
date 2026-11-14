@@ -6,6 +6,7 @@ import "./styles/components.css";
 import "./styles/layout.css";
 import "./styles/tree.css";
 import "./styles/invitation.css";
+import "./styles/book.css";
 
 if (import.meta.env.DEV && import.meta.env.VITE_DISABLE_REACT_DEVTOOLS !== "1") {
   void import("react-grab");

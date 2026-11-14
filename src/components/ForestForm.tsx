@@ -1,8 +1,8 @@
-import { useState } from "react";
 import { okSchema } from "../../supabase/functions/_shared/contracts";
 import { type ForestPost, forestKindSchema, forestKinds } from "../../supabase/functions/_shared/forest";
 import { api } from "../lib/api";
 import { useTask } from "../lib/useTask";
+import { useBookDraft } from "./book/drafts";
 import { Button, Note, Select, TextArea } from "./ui";
 
 export function ForestForm({
@@ -16,8 +16,8 @@ export function ForestForm({
   readonly saved: () => Promise<void>;
   readonly cancel?: () => void;
 }) {
-  const [body, setBody] = useState(post?.body ?? "");
-  const [kind, setKind] = useState<ForestPost["kind"]>(post?.kind ?? "wish");
+  const [body, setBody, forgetBody] = useBookDraft(`body:${post?.id ?? "new"}`, post?.body ?? "");
+  const [kind, setKind, forgetKind] = useBookDraft(`kind:${post?.id ?? "new"}`, post?.kind ?? "wish");
   const task = useTask();
   return (
     <form
@@ -32,8 +32,10 @@ export function ForestForm({
                 : { action: "forest_post", payload: { kind, body } },
               okSchema,
             );
-            setBody("");
             await saved();
+            setBody("");
+            forgetBody();
+            forgetKind();
           },
           post ? "마음을 수정했습니다." : "이름 없이, 마음이 도착했습니다.",
         );
@@ -68,7 +70,15 @@ export function ForestForm({
           {post ? "내 글 수정 저장" : "익명으로 마음 남기기"}
         </Button>
         {cancel && (
-          <Button variant="secondary" disabled={task.busy} onClick={cancel}>
+          <Button
+            variant="secondary"
+            disabled={task.busy}
+            onClick={() => {
+              forgetBody();
+              forgetKind();
+              cancel();
+            }}
+          >
             수정 취소
           </Button>
         )}
