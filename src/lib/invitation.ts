@@ -13,8 +13,8 @@ export const invitationMotion = {
   open: 2.2,
   read: 3,
   departure: 1,
-  preparationTimeout: 2000,
-  departureTimeout: 1500,
+  preparationTimeout: 3000,
+  departureTimeout: 2500,
 } as const;
 export type InvitationPhase =
   | "preparing"
