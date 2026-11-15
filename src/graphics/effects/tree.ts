@@ -14,7 +14,7 @@ import { disposeObject } from "../dispose";
 import { graphicsPalette as color } from "../palette";
 import type { EffectFactory } from "../types";
 
-export const treeEffect: EffectFactory = ({ scene }) => {
+export const treeEffect: EffectFactory = ({ scene, camera }) => {
   const root = new Group();
   const ambient = new AmbientLight(color.ivory, 2);
   const key = new DirectionalLight(color.warm, 3.5);
@@ -28,7 +28,7 @@ export const treeEffect: EffectFactory = ({ scene }) => {
   const branchLight = new MeshStandardMaterial({ color: color.light, roughness: 1, flatShading: true });
   for (let i = 0; i < 6; i++) {
     const tier = new Mesh(tierGeometry, i % 2 ? leaf : deep);
-    tier.scale.set(0.43 + i * 0.215, 1.15 + i * 0.03, 0.43 + i * 0.215);
+    tier.scale.set(0.52 + i * 0.26, 1.15 + i * 0.03, 0.43 + i * 0.215);
     tier.position.y = 1.36 - i * 0.54;
     tier.rotation.y = i * 0.42;
     root.add(tier);
@@ -93,6 +93,8 @@ export const treeEffect: EffectFactory = ({ scene }) => {
   scene.add(root);
   return {
     update(time) {
+      root.scale.x = camera.right / 2;
+      crown.scale.y = root.scale.x;
       lamps.forEach((lamp, i) => {
         lamp.emissiveIntensity = 1.3 + Math.sin(time * 0.7 + i) * 0.3;
       });

@@ -3,6 +3,7 @@ import { forestTreeSchema } from "../../../supabase/functions/_shared/forest";
 import { api, message } from "../../lib/api";
 import { Button, Note } from "../ui";
 import { MessageTree } from "./MessageTree";
+import { storiesPerTree } from "./ornaments";
 
 export function TreeCollection() {
   const [data, setData] = useState<ReturnType<typeof forestTreeSchema.parse> | null>(null);
@@ -14,9 +15,24 @@ export function TreeCollection() {
     const request = ++generation.current;
     setError("");
     setData(null);
-    void api({ action: "forest_tree", payload: before === undefined ? {} : { before } }, forestTreeSchema)
+    async function loadTree() {
+      let cursor = before;
+      const notes: ReturnType<typeof forestTreeSchema.parse>["notes"] = [];
+      while (true) {
+        const batch = await api(
+          { action: "forest_tree", payload: cursor === undefined ? {} : { before: cursor } },
+          forestTreeSchema,
+        );
+        if (generation.current !== request) return null;
+        notes.push(...batch.notes.slice(0, storiesPerTree - notes.length));
+        if (notes.length === storiesPerTree || batch.notes.length < 12 || notes.length >= batch.total)
+          return { notes, total: batch.total };
+        cursor = batch.notes.at(-1)?.id;
+      }
+    }
+    void loadTree()
       .then((result) => {
-        if (generation.current === request) setData(result);
+        if (result && generation.current === request) setData(result);
       })
       .catch((e: unknown) => {
         if (generation.current === request) setError(message(e));
@@ -40,20 +56,20 @@ export function TreeCollection() {
           <div className="actions tree-pagination">
             {cursors.length > 1 && (
               <Button variant="secondary" onClick={() => setCursors((current) => current.slice(0, -1))}>
-                이전 쪽지들
+                이전 이야기들
               </Button>
             )}
-            {cursors.length * 12 < data.total && data.notes.length > 0 && (
+            {cursors.length * storiesPerTree < data.total && data.notes.length > 0 && (
               <Button
                 variant="secondary"
                 onClick={() => setCursors((current) => [...current, data.notes.at(-1)?.id])}
               >
-                다음 쪽지들
+                다음 이야기들
               </Button>
             )}
-            {data.total > 12 && (
+            {data.total > storiesPerTree && (
               <p className="small">
-                {cursors.length} / {Math.ceil(data.total / 12)}번째 가지
+                {cursors.length} / {Math.ceil(data.total / storiesPerTree)}번째 가지
               </p>
             )}
           </div>

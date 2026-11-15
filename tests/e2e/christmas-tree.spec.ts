@@ -40,7 +40,7 @@ test.beforeAll(async () => {
   await sql`delete from private.forest_limits`;
   await sql`delete from private.login_attempts`;
   await sql`delete from public.nominations`;
-  await sql`insert into public.forest_posts(kind,body) select case when n%3=0 then 'regret' when n%3=1 then 'thanks' else 'wish' end,'가상 트리의 마음 '||n||': 함께한 오늘이 참 고맙습니다. 내년에도 서로에게 든든한 동료가 되어주세요.' from generate_series(1,15) n`;
+  await sql`insert into public.forest_posts(kind,body) select case when n%3=0 then 'regret' when n%3=1 then 'thanks' else 'wish' end,'가상 트리의 마음 '||n||': 함께한 오늘이 참 고맙습니다. 내년에도 서로에게 든든한 동료가 되어주세요.' from generate_series(1,33) n`;
   const c = await employee(0);
   await call(
     c,
@@ -73,7 +73,7 @@ test("owner deletion, ten-character recommendation, reviewed WebGL tree, note zo
   await page.getByLabel("고마운 이유 (10자 이상)").fill("1234567890");
   await expect(page.getByRole("button", { name: "마음을 전하고 행사장으로" })).toBeEnabled();
   await capture(page, "reason-valid");
-  await page.getByRole("link", { name: "대나무숲", exact: true }).click();
+  await page.getByRole("link", { name: "이야기 트리", exact: true }).click();
   await expect(page.getByText("가상 내가 보낸 삭제할 글", { exact: true })).toBeVisible();
   await expect(page.getByText(/가상 트리의 마음/)).toHaveCount(0);
   await expect(page.getByRole("button", { name: "모두의 마음" })).toHaveCount(0);
@@ -91,9 +91,9 @@ test("owner deletion, ten-character recommendation, reviewed WebGL tree, note zo
   await organizer.getByLabel("관리자 이메일").fill(env.ADMIN_EMAIL);
   await organizer.getByLabel("비밀번호", { exact: true }).fill(env.ADMIN_PASSWORD);
   await organizer.getByRole("button", { name: "운영 화면으로" }).click();
-  await organizer.getByRole("button", { name: "마음 트리", exact: true }).click();
+  await organizer.getByRole("button", { name: "공개 트리", exact: true }).click();
   await expect(organizer.getByRole("button", { name: "검수한 전체 글로 트리 공개" })).toBeDisabled();
-  await expect(organizer.getByRole("button", { name: /쪽지 .* 열기/ })).toHaveCount(12);
+  await expect(organizer.getByRole("button", { name: /이야기 .* 열기/ })).toHaveCount(30);
   await expect(organizer.locator(".tree-scene")).toHaveAttribute("data-renderer", "webgl", {
     timeout: 15000,
   });
@@ -111,7 +111,7 @@ test("owner deletion, ten-character recommendation, reviewed WebGL tree, note zo
   await capture(organizer, "admin-publish-confirm");
   await organizer.getByRole("dialog").getByRole("button", { name: "확인", exact: true }).click();
   await page.waitForURL("**/#/tree", { timeout: 15000 });
-  await expect(page.getByRole("button", { name: /쪽지 .* 열기/ })).toHaveCount(12);
+  await expect(page.getByRole("button", { name: /이야기 .* 열기/ })).toHaveCount(30);
   await expect(page.locator(".tree-scene")).toHaveAttribute("data-renderer", "webgl", { timeout: 15000 });
   const graphics = await page.locator("canvas").evaluate((canvas) => {
     if (!(canvas instanceof HTMLCanvasElement)) throw new Error("Expected canvas");
@@ -155,23 +155,55 @@ test("owner deletion, ten-character recommendation, reviewed WebGL tree, note zo
   });
   expect(reusable).toBe(true);
   await capture(page, "tree-published");
+  const ornaments = page.locator(".tree-ornament");
+  for (const width of [320, 390]) {
+    await page.setViewportSize({ width, height: 844 });
+    const checks = await ornaments.evaluateAll((buttons) => {
+      const rects = buttons.map((b) => b.getBoundingClientRect());
+      return {
+        variants: new Set(
+          buttons.map((b) => {
+            const art = getComputedStyle(b.querySelector(".ornament-art") ?? b);
+            return art.backgroundPosition + art.filter;
+          }),
+        ).size,
+        variedHeights: new Set(rects.map((rect) => Math.round(rect.top))).size >= 24,
+        variedTilts:
+          new Set(
+            buttons.map((button) => getComputedStyle(button.querySelector(".ornament-art") ?? button).rotate),
+          ).size >= 6,
+        overlap: rects.some((a, i) =>
+          rects
+            .slice(i + 1)
+            .some((b) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top),
+        ),
+      };
+    });
+    expect(checks).toEqual({ variants: 30, variedHeights: true, variedTilts: true, overlap: false });
+  }
+  await page.getByRole("button", { name: /이야기 30 열기/ }).click();
+  await expect(page.getByRole("dialog")).toContainText("가상 트리의 마음 4:");
+  await page.getByRole("button", { name: "트리로 돌아가기" }).click();
   await page.getByRole("button", { name: "효과 멈추기" }).click();
   await capture(page, "tree-paused");
   await expectStillCanvas(page);
-  await page.getByRole("button", { name: /쪽지 01 열기/ }).click();
-  await expect(page.getByRole("dialog")).toContainText("가상 트리의 마음 15");
+  await page.getByRole("button", { name: /이야기 01 열기/ }).click();
+  await expect(page.getByRole("dialog")).toContainText("가상 트리의 마음 33");
   await capture(page, "note-expanded");
   await page.mouse.click(3, 3);
   await expect(page.getByRole("dialog")).toHaveCount(0);
-  await expect(page.getByRole("button", { name: /쪽지 01 열기/ })).toBeFocused();
-  await page.getByRole("button", { name: /쪽지 02 열기/ }).click();
+  await expect(page.getByRole("button", { name: /이야기 01 열기/ })).toBeFocused();
+  await page.getByRole("button", { name: /이야기 02 열기/ }).click();
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog")).toHaveCount(0);
-  await page.getByRole("button", { name: "다음 쪽지들" }).click();
-  await expect(page.getByRole("button", { name: /쪽지 .* 열기/ })).toHaveCount(3);
+  await page.getByRole("button", { name: "다음 이야기들" }).click();
+  await expect(page.getByRole("button", { name: /이야기 .* 열기/ })).toHaveCount(3);
+  await page.getByRole("button", { name: /이야기 31 열기/ }).click();
+  await expect(page.getByRole("dialog")).toContainText("가상 트리의 마음 3:");
+  await page.getByRole("button", { name: "트리로 돌아가기" }).click();
   await capture(page, "tree-next-branch");
   await page.reload();
-  await expect(page.getByRole("button", { name: /쪽지 .* 열기/ })).toHaveCount(12);
+  await expect(page.getByRole("button", { name: /이야기 .* 열기/ })).toHaveCount(30);
   await page.emulateMedia({ reducedMotion: "reduce" });
   await capture(page, "tree-reduced-motion");
   await expectStillCanvas(page);
@@ -181,13 +213,13 @@ test("owner deletion, ten-character recommendation, reviewed WebGL tree, note zo
   });
   await expect(page.locator(".tree-scene")).toHaveAttribute("data-renderer", "fallback");
   await capture(page, "tree-fallback");
-  await page.getByRole("button", { name: /쪽지 01 열기/ }).click();
+  await page.getByRole("button", { name: /이야기 01 열기/ }).click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await page.getByRole("button", { name: "트리로 돌아가기" }).click();
   await organizer.getByRole("button", { name: "트리 공개 종료" }).click();
   await organizer.getByRole("dialog").getByRole("button", { name: "확인", exact: true }).click();
   await page.waitForURL("**/#/event", { timeout: 15000 });
-  await expect(page.getByRole("link", { name: "마음 트리", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "공개 트리", exact: true })).toHaveCount(0);
   expect(errors).toEqual([]);
   await organizer.close();
 });

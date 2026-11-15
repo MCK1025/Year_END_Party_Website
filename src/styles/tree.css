@@ -52,70 +52,81 @@
 .fir-star {
   fill: var(--tree-warm);
 }
-.tree-note {
+.fir-crown {
+  position: absolute;
+  left: 50%;
+  top: 10%;
+  width: 13%;
+  transform: translate(-50%, -50%);
+}
+.tree-stage {
+  min-height: 462px;
+}
+.tree-stage-full {
+  aspect-ratio: auto;
+  height: 900px;
+}
+.tree-ornament {
   position: absolute;
   z-index: 2;
-  width: 52px;
-  height: 56px;
+  width: 48px;
+  height: 48px;
   transform: translate(-50%, -50%);
-  border: 1px solid var(--brass);
-  border-radius: 1px;
-  background: var(--ivory);
-  color: var(--ink);
+  border: 0;
+  background: transparent;
+  padding: 0;
   cursor: pointer;
-  box-shadow: 0 4px 8px color-mix(in srgb, var(--tree-night) 45%, transparent);
-  transition:
-    scale 180ms ease-out,
-    rotate 180ms ease-out;
 }
-.tree-note.wish {
-  background: var(--note-sage);
+.ornament-twig {
+  position: absolute;
+  top: -27px;
+  left: calc(50% - 2px);
+  width: 38px;
+  height: 36px;
+  transform-origin: 2px center;
+  pointer-events: none;
+  fill: none;
+  stroke-linecap: round;
 }
-.tree-note.regret {
-  background: var(--note-rose);
+.sprig-stem,
+.sprig-needles {
+  stroke: var(--tree-light);
+  stroke-width: 1.5px;
 }
-.tree-note:hover,
-.tree-note:focus-visible {
+.ornament-cord {
+  stroke: var(--tree-warm);
+  stroke-width: 1px;
+}
+.ornament-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-image: url("../assets/tree/story-ornaments.webp");
+  background-size: 300% 200%;
+  background-repeat: no-repeat;
+  transform-origin: 50% 8%;
+  transition: scale 180ms ease-out;
+}
+.tree-ornament:hover .ornament-art,
+.tree-ornament:focus-visible .ornament-art {
   scale: 1.08;
-  rotate: 0deg !important;
+}
+.tree-ornament:focus-visible {
+  outline: 2px solid var(--tree-warm);
+  outline-offset: 2px;
+  border-radius: 6px;
   z-index: 3;
 }
-.tree-note:focus-visible {
-  outline-color: var(--tree-warm);
-  outline-offset: 4px;
-}
-.note-number {
-  font-family: Georgia, serif;
-  font-style: italic;
-  font-size: 22px;
-}
-.note-pin {
+.ornament-number {
   position: absolute;
-  width: 1px;
-  height: 15px;
-  background: var(--tree-warm);
-  top: -16px;
-  left: 50%;
-}
-.note-pin::after {
-  content: "";
-  position: absolute;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--gold-ink);
-  bottom: -3px;
-  left: -2px;
-}
-.note-fold {
-  position: absolute;
-  right: -1px;
-  bottom: -1px;
-  width: 10px;
-  height: 10px;
-  border-style: solid;
-  border-width: 5px;
-  border-color: var(--brass) var(--tree-night) var(--tree-night) var(--brass);
+  bottom: 0;
+  right: 0;
+  background: var(--tree-night);
+  color: var(--ivory);
+  border-radius: 7px;
+  padding: 0 3px;
+  font: 600 10px / 14px var(--body);
+  font-variant-numeric: tabular-nums;
 }
 .tree-year {
   position: absolute;
@@ -201,16 +212,12 @@
   .tree-caption {
     flex-wrap: wrap;
   }
-  .tree-note {
-    width: 48px;
-    height: 52px;
-  }
   .tree-note-dialog {
     padding: var(--s6);
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .tree-note,
+  .ornament-art,
   .tree-note-dialog {
     transition: none;
     animation: none;

@@ -19,8 +19,8 @@ const tabs = [
   "실시간 진행",
   "사원 관리",
   "설문·추천",
-  "대나무숲",
-  "마음 트리",
+  "이야기 트리",
+  "공개 트리",
   "질문 관리",
   "1년 회고",
   "인물 맞히기",
@@ -37,9 +37,9 @@ function Contents({ tab }: { readonly tab: Tab }) {
       return <PeoplePanel />;
     case "설문·추천":
       return <DataPanel />;
-    case "대나무숲":
+    case "이야기 트리":
       return <Forest admin />;
-    case "마음 트리":
+    case "공개 트리":
       return <TreePanel />;
     case "질문 관리":
       return <QuestionsPanel />;

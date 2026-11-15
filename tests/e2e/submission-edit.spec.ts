@@ -65,7 +65,7 @@ test("returning submissions, cross-device forest editing and live event lock", a
   await expect(page.getByRole("heading", { name: "이미 추천하였습니다." })).toBeVisible();
   expect((await dashboard()).nominations).toHaveLength(1);
   // When: the same employee signs in on another device, their anonymous post is editable there.
-  await page.getByRole("link", { name: "대나무숲", exact: true }).click();
+  await page.getByRole("link", { name: "이야기 트리", exact: true }).click();
   await capture(page, "forest-empty");
   await page.getByLabel("혜성식품에게 전하고 싶은 말").fill("가상 내 글 원본");
   await page.getByRole("button", { name: "익명으로 마음 남기기" }).click();
@@ -74,7 +74,7 @@ test("returning submissions, cross-device forest editing and live event lock", a
   const device = await browser.newContext();
   const second = await device.newPage();
   await login(second);
-  await second.getByRole("link", { name: "대나무숲", exact: true }).click();
+  await second.getByRole("link", { name: "이야기 트리", exact: true }).click();
   await expect(second.getByRole("button", { name: "내 글 수정하기" })).toBeVisible();
   await second.getByRole("button", { name: "내 글 수정하기" }).click();
   const editing = second
@@ -126,7 +126,7 @@ test("returning submissions, cross-device forest editing and live event lock", a
   await person.getByRole("button", { name: "직원 삭제", exact: true }).click();
   await capture(organizer, "admin-employee-delete-confirm");
   await organizer.getByRole("dialog").getByRole("button", { name: "취소", exact: true }).click();
-  await organizer.getByRole("button", { name: "대나무숲", exact: true }).click();
+  await organizer.getByRole("button", { name: "이야기 트리", exact: true }).click();
   await expect(organizer.getByText("가상 다른 기기에서 수정한 마음", { exact: true })).toBeVisible();
   await capture(organizer, "admin-forest");
   await device.close();

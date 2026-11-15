@@ -14,9 +14,9 @@ export function Event() {
     <div className="stack">
       {state.paused && <Note>잠시 쉬어갑니다. 진행이 재개되면 화면이 자동으로 바뀝니다.</Note>}
       {state.tree_open && (
-        <Panel title="우리의 마음 트리가 열렸어요.">
+        <Panel title="이야기 트리가 열렸어요.">
           <Link className="button primary" to="/tree" state={{ bookFrom: "/event" }}>
-            쪽지 읽으러 가기
+            이야기 읽으러 가기
           </Link>
         </Panel>
       )}

@@ -9,9 +9,9 @@ import { BeforeBookMove } from "./useSavedNavigation";
 const chapters = [
   { path: "/survey", name: "나의 이야기" },
   { path: "/nominate", name: "고마운 동료" },
-  { path: "/forest", name: "대나무숲" },
+  { path: "/forest", name: "이야기 트리" },
   { path: "/event", name: "행사장" },
-  { path: "/tree", name: "마음 트리" },
+  { path: "/tree", name: "공개 트리" },
 ] as const;
 export function BookLayout({
   children,

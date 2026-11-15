@@ -80,7 +80,7 @@ test("font asset renders Korean, private forest edits survive navigation, hints 
   await mkdir("artifacts/screens/notebook", { recursive: true });
   await writeFile("artifacts/screens/notebook/rendered-font.json", JSON.stringify(fonts, null, 2));
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.getByRole("link", { name: "대나무숲", exact: true }).click();
+  await page.getByRole("link", { name: "이야기 트리", exact: true }).click();
   await expect(body.first()).toHaveValue("보내기 전의 마음");
   await expect(body.last()).toHaveValue("수정 중인 글");
   await expect(page.locator(".curl-stage")).toHaveCount(0);

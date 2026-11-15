@@ -102,7 +102,7 @@ export function ProgressPanel({ rehearsal = false }: { readonly rehearsal?: bool
           </div>
           {!rehearsal &&
             (started ? (
-              <Note>행사가 시작되었습니다. 직원의 설문·추천·대나무숲 작성과 수정은 마감되었습니다.</Note>
+              <Note>행사가 시작되었습니다. 직원의 설문·추천·이야기 트리 작성과 수정은 마감되었습니다.</Note>
             ) : (
               <Button
                 disabled={task.busy}
@@ -163,7 +163,7 @@ export function ProgressPanel({ rehearsal = false }: { readonly rehearsal?: bool
           action={() => task.run(() => send(pending.command, pending.revision), "진행 상태를 반영했습니다.")}
         >
           {pending.command.command === "start_event"
-            ? "설문·추천·대나무숲 작성과 수정이 즉시 마감됩니다. 일시 정지·대기실 복귀·되돌리기를 해도 응답은 다시 열리지 않습니다. 콘텐츠 공개는 행사일 오후 6시 이후 다음 순서로 진행합니다."
+            ? "설문·추천·이야기 트리 작성과 수정이 즉시 마감됩니다. 일시 정지·대기실 복귀·되돌리기를 해도 응답은 다시 열리지 않습니다. 콘텐츠 공개는 행사일 오후 6시 이후 다음 순서로 진행합니다."
             : "공개된 정보는 직원 휴대폰에 바로 표시됩니다. 이미 본 내용은 되돌려도 기억에서 지울 수 없습니다."}
         </Confirm>
       )}
