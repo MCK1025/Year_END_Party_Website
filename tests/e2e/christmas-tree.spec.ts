@@ -87,11 +87,14 @@ test("owner deletion, ten-character recommendation, reviewed WebGL tree, note zo
   await expect(page.getByText("아직 보낸 마음이 없습니다.")).toBeVisible();
   await capture(page, "forest-deleted");
   const organizer = await browser.newPage();
-  await organizer.goto("/#/admin");
+  await organizer.goto("/#/admin?tab=tree");
   await organizer.getByLabel("관리자 이메일").fill(env.ADMIN_EMAIL);
   await organizer.getByLabel("비밀번호", { exact: true }).fill(env.ADMIN_PASSWORD);
   await organizer.getByRole("button", { name: "운영 화면으로" }).click();
-  await organizer.getByRole("button", { name: "공개 트리", exact: true }).click();
+  await expect(organizer.getByRole("button", { name: "공개 트리", exact: true })).toHaveAttribute(
+    "aria-current",
+    "page",
+  );
   await expect(organizer.getByRole("button", { name: "검수한 전체 글로 트리 공개" })).toBeDisabled();
   await expect(organizer.getByRole("button", { name: /이야기 .* 열기/ })).toHaveCount(30);
   await expect(organizer.locator(".tree-scene")).toHaveAttribute("data-renderer", "webgl", {

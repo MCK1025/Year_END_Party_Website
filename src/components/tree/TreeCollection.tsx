@@ -5,16 +5,20 @@ import { Button, Note } from "../ui";
 import { MessageTree } from "./MessageTree";
 import { storiesPerTree } from "./ornaments";
 
-export function TreeCollection() {
-  const [data, setData] = useState<ReturnType<typeof forestTreeSchema.parse> | null>(null);
+const firstPage: readonly (number | undefined)[] = [undefined];
+export function TreeCollection({ revision }: { readonly revision: number }) {
+  const [loaded, setLoaded] = useState<
+    (ReturnType<typeof forestTreeSchema.parse> & { revision: number; before: number | undefined }) | null
+  >(null);
   const [error, setError] = useState("");
-  const [cursors, setCursors] = useState<readonly (number | undefined)[]>([undefined]);
+  const [pagination, setPagination] = useState({ revision, cursors: firstPage });
+  const cursors = pagination.revision === revision ? pagination.cursors : firstPage;
   const generation = useRef(0);
   const before = cursors.at(-1);
+  const data = loaded && loaded.revision === revision && loaded.before === before ? loaded : null;
   useEffect(() => {
     const request = ++generation.current;
     setError("");
-    setData(null);
     async function loadTree() {
       let cursor = before;
       const notes: ReturnType<typeof forestTreeSchema.parse>["notes"] = [];
@@ -32,7 +36,7 @@ export function TreeCollection() {
     }
     void loadTree()
       .then((result) => {
-        if (result && generation.current === request) setData(result);
+        if (result && generation.current === request) setLoaded({ ...result, revision, before });
       })
       .catch((e: unknown) => {
         if (generation.current === request) setError(message(e));
@@ -40,40 +44,43 @@ export function TreeCollection() {
     return () => {
       generation.current++;
     };
-  }, [before]);
+  }, [before, revision]);
   return (
     <div className="stack">
+      <MessageTree notes={data?.notes ?? []} total={data?.total ?? null} page={cursors.length - 1} />
       {error ? (
         <Note error>{error}</Note>
-      ) : !data ? (
-        <Note>가지마다 마음을 걸고 있습니다.</Note>
       ) : (
-        <>
-          <MessageTree notes={data.notes} total={data.total} page={cursors.length - 1} />
-          {data.notes.length === 0 && cursors.length > 1 && (
-            <Note>이 가지의 글이 삭제되었습니다. 이전 가지로 돌아가주세요.</Note>
-          )}
-          <div className="actions tree-pagination">
-            {cursors.length > 1 && (
-              <Button variant="secondary" onClick={() => setCursors((current) => current.slice(0, -1))}>
-                이전 이야기들
-              </Button>
+        data && (
+          <>
+            {data.notes.length === 0 && cursors.length > 1 && (
+              <Note>이 가지의 글이 삭제되었습니다. 이전 가지로 돌아가주세요.</Note>
             )}
-            {cursors.length * storiesPerTree < data.total && data.notes.length > 0 && (
-              <Button
-                variant="secondary"
-                onClick={() => setCursors((current) => [...current, data.notes.at(-1)?.id])}
-              >
-                다음 이야기들
-              </Button>
-            )}
-            {data.total > storiesPerTree && (
-              <p className="small">
-                {cursors.length} / {Math.ceil(data.total / storiesPerTree)}번째 가지
-              </p>
-            )}
-          </div>
-        </>
+            <div className="actions tree-pagination">
+              {cursors.length > 1 && (
+                <Button
+                  variant="secondary"
+                  onClick={() => setPagination({ revision, cursors: cursors.slice(0, -1) })}
+                >
+                  이전 이야기들
+                </Button>
+              )}
+              {cursors.length * storiesPerTree < data.total && data.notes.length > 0 && (
+                <Button
+                  variant="secondary"
+                  onClick={() => setPagination({ revision, cursors: [...cursors, data.notes.at(-1)?.id] })}
+                >
+                  다음 이야기들
+                </Button>
+              )}
+              {data.total > storiesPerTree && (
+                <p className="small">
+                  {cursors.length} / {Math.ceil(data.total / storiesPerTree)}번째 가지
+                </p>
+              )}
+            </div>
+          </>
+        )
       )}
     </div>
   );

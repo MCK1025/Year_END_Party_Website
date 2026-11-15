@@ -4,14 +4,14 @@
 
 - `service.ts`: 캔버스별 렌더러·카메라·리사이즈·프레임 루프·가시성·동작 줄이기·컨텍스트 손실·종료를 관리합니다. 기기 픽셀 비율은 최대 1.5입니다. 숨겨진 탭/화면 밖에서는 프레임 루프가 멈춥니다.
 - `types.ts`: 효과 플러그인(`EffectFactory` → `update`/`dispose`)과 세션 계약입니다.
-- `effects/tree.ts`, `effects/snow.ts`: 독립 효과입니다. 카메라는 화면 비율에 맞게 조정되며 눈은 카메라 범위 전체에 배치됩니다.
-- `christmas.ts`: 트리와 눈을 조합하는 소비자입니다. 트리 전용 세로 범위만 여기서 지정합니다.
+- `effects/tree.ts`, `effects/snow.ts`: 전구와 낙설을 각각 WebGL 한 번의 그리기 호출로 표시합니다. 눈 크기와 속도는 CSS 픽셀 기준이며, 두 효과는 같은 활성 시간을 사용합니다.
+- `christmas.ts`: 두 효과와 초기 정지 상태를 공용 서비스에 전달합니다. 정적인 종이 전나무·전선·쌓인 눈은 `components/tree/PaperFir.tsx`에 있으며 그래픽 초기화 전후에 같은 위치를 유지합니다.
 - `palette.ts`: `DESIGN.md`/CSS와 일치하는 WebGL 색상 토큰입니다.
 
 다른 페이지에서 눈만 사용하려면 페이지가 보일 때 동적으로 서비스를 불러오고, 컴포넌트 해제 시 반드시 세션을 종료합니다.
 
 ```ts
-const session = createGraphicsSession(canvas, [snowEffect], showStaticFallback);
+const session = createGraphicsSession(canvas, [snowfall(canvas)], showStaticFallback);
 await session.ready; // GPU 셰이더를 비동기로 준비한 뒤 장식 캔버스를 표시
 session.setPaused(true); // 페이지의 효과 멈춤 버튼
 session.dispose(); // 컴포넌트 해제 시; 중복 호출에도 안전

@@ -1,6 +1,9 @@
-import { snowEffect } from "./effects/snow";
-import { treeEffect } from "./effects/tree";
+import { snowfall } from "./effects/snow";
+import { treeLights } from "./effects/tree";
 import { createGraphicsSession } from "./service";
 
-export const createChristmasScene = (canvas: HTMLCanvasElement, failed: () => void) =>
-  createGraphicsSession(canvas, [treeEffect, snowEffect], failed, 5.2);
+export const createChristmasScene = (
+  canvas: HTMLCanvasElement,
+  failed: () => void,
+  initiallyPaused = false,
+) => createGraphicsSession(canvas, [treeLights(canvas), snowfall(canvas)], failed, 5.2, { initiallyPaused });

@@ -61,7 +61,16 @@ const sizes = [0.94, 0.82, 1, 0.88, 0.78, 0.97, 0.86];
 const cords = [9, 16, 7, 12, 18, 10, 14];
 
 export function ornament(index: number, count: number) {
-  const spots = count <= small.length ? small : full;
+  const spots =
+    count === 3
+      ? [
+          [49, 22],
+          [39, 53],
+          [30, 77],
+        ]
+      : count <= small.length
+        ? small
+        : full;
   const slot = count === 1 ? 3 : Math.round((index * (spots.length - 1)) / (count - 1));
   const [x, y] = spots[slot] ?? [50, 50];
   const style = index % designs.length;

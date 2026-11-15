@@ -30,7 +30,7 @@
 }
 .tree-scene,
 .tree-canvas,
-.tree-fallback {
+.paper-fir {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -40,24 +40,31 @@
 .tree-canvas.is-fallback {
   visibility: hidden;
 }
-.fir-trunk {
-  fill: var(--tree-trunk);
+.tree-scene {
+  left: 50%;
+  width: 100cqi;
+  transform: translateX(-50%);
 }
-.fir-leaf {
-  fill: var(--tree-leaf);
+.paper-fir {
+  left: 50%;
+  width: min(100%, 440px);
+  transform: translateX(-50%);
 }
-.fir-deep {
-  fill: var(--tree-deep);
-}
-.fir-star {
-  fill: var(--tree-warm);
-}
-.fir-crown {
+.paper-star {
   position: absolute;
   left: 50%;
-  top: 10%;
-  width: 13%;
+  top: 9.23%;
+  width: min(22.5%, 99px);
+  aspect-ratio: 1;
   transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.tree-stage:not(.tree-stage-full) :is(.sprig-stem, .sprig-needles) {
+  display: none;
+}
+.message-tree {
+  container-type: inline-size;
+  background: radial-gradient(ellipse at 50% 59%, #213d31, var(--tree-night) 69%);
 }
 .tree-stage {
   min-height: 462px;
@@ -137,7 +144,8 @@
     italic 48px Georgia,
     serif;
   color: var(--tree-warm);
-  opacity: 0.8;
+  line-height: 1;
+  margin: 0;
 }
 .tree-empty {
   position: absolute;

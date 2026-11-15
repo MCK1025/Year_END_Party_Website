@@ -10,24 +10,26 @@ export function MessageTree({
   page = 0,
 }: {
   readonly notes: readonly ForestPost[];
-  readonly total: number;
+  readonly total: number | null;
   readonly page?: number;
 }) {
-  const [selected, setSelected] = useState<ForestPost | null>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const selected = notes.find((note) => note.id === selectedId);
   const [paused, setPaused] = useState(false);
+  const [staticScene, setStaticScene] = useState(false);
   const ornaments = notes.map((note, index) => ({ ...ornament(index, notes.length), note }));
   useEffect(() => {
-    setSelected((current) => (current ? (notes.find((note) => note.id === current.id) ?? null) : null));
-  }, [notes]);
+    if (!selected) setSelectedId(null);
+  }, [selected]);
   return (
     <>
       <section className="message-tree" aria-label="마음이 달린 크리스마스 트리">
         <div className="tree-caption">
           <span className="overline">OUR WISHING TREE</span>
-          <span>{total}개의 이야기</span>
+          <span>{total === null ? "가지마다 마음을 걸고 있습니다." : `${total}개의 이야기`}</span>
         </div>
         <div className={notes.length > 12 ? "tree-stage tree-stage-full" : "tree-stage"}>
-          <TreeScene paused={paused} />
+          <TreeScene paused={paused} onStatic={setStaticScene} />
           {ornaments.map((art, index) => {
             const { note } = art;
             const number = String(page * storiesPerTree + index + 1).padStart(2, "0");
@@ -41,7 +43,7 @@ export function MessageTree({
                   top: `${art.y}%`,
                 }}
                 aria-label={`이야기 ${number} 열기 · ${art.label} · ${forestKinds[note.kind]}`}
-                onClick={() => setSelected(note)}
+                onClick={() => setSelectedId(note.id)}
               >
                 <svg
                   className="ornament-twig"
@@ -75,7 +77,7 @@ export function MessageTree({
               </button>
             );
           })}
-          {notes.length === 0 && (
+          {total === 0 && (
             <p className="tree-empty">
               올해의 마음이
               <br />이 가지에 머물 거예요.
@@ -91,12 +93,17 @@ export function MessageTree({
             <br />
             작은 마음 하나가, 조금 더 가까이.
           </p>
-          <Button variant="secondary" onClick={() => setPaused((value) => !value)} aria-pressed={paused}>
-            {paused ? "효과 재생" : "효과 멈추기"}
+          <Button
+            variant="secondary"
+            disabled={staticScene}
+            onClick={() => setPaused((value) => !value)}
+            aria-pressed={staticScene || paused}
+          >
+            {staticScene ? "정적 트리" : paused ? "효과 재생" : "효과 멈추기"}
           </Button>
         </div>
       </section>
-      {selected && <NoteDialog note={selected} close={() => setSelected(null)} />}
+      {selected && <NoteDialog note={selected} close={() => setSelectedId(null)} />}
     </>
   );
 }

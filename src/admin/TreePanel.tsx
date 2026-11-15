@@ -48,7 +48,7 @@ export function TreePanel() {
         </Button>
         {task.notice && <Note error={task.failed}>{task.notice}</Note>}
       </Panel>
-      <TreeCollection key={data.state.revision} />
+      <TreeCollection revision={data.state.revision} />
       {pending && (
         <Confirm
           title={

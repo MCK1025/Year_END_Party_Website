@@ -1,21 +1,34 @@
 import { useEffect, useRef, useState } from "react";
 import type { GraphicsSession } from "../../graphics/types";
+import { PaperFir } from "./PaperFir";
 
-export function TreeScene({ paused }: { readonly paused: boolean }) {
+export function TreeScene({
+  paused,
+  onStatic,
+}: {
+  readonly paused: boolean;
+  readonly onStatic: (value: boolean) => void;
+}) {
   const canvas = useRef<HTMLCanvasElement>(null);
+  const pauseRequested = useRef(paused);
   const session = useRef<GraphicsSession | null>(null);
   const [status, setStatus] = useState<"loading" | "webgl" | "fallback">("loading");
+  useEffect(() => onStatic(status === "fallback"), [onStatic, status]);
   useEffect(() => {
     let live = true;
     void import("../../graphics/christmas")
       .then(async ({ createChristmasScene }) => {
         if (!live || !canvas.current) return;
         try {
-          const created = createChristmasScene(canvas.current, () => {
-            if (live) setStatus("fallback");
-            session.current?.dispose();
-            session.current = null;
-          });
+          const created = createChristmasScene(
+            canvas.current,
+            () => {
+              if (live) setStatus("fallback");
+              session.current?.dispose();
+              session.current = null;
+            },
+            pauseRequested.current,
+          );
           session.current = created;
           await created.ready;
           if (live && session.current === created) setStatus("webgl");
@@ -38,31 +51,12 @@ export function TreeScene({ paused }: { readonly paused: boolean }) {
     };
   }, []);
   useEffect(() => {
-    if (status === "webgl") session.current?.setPaused(paused);
-  }, [paused, status]);
+    pauseRequested.current = paused;
+    session.current?.setPaused(paused);
+  }, [paused]);
   return (
     <div className="tree-scene" aria-hidden="true" data-renderer={status}>
-      {status !== "webgl" && (
-        <svg preserveAspectRatio="none" viewBox="0 0 400 520" className="tree-fallback" focusable="false">
-          <title>크리스마스 트리 장식</title>
-          <path className="fir-trunk" d="M184 410h32v66h-32z" />
-          {[0, 1, 2, 3, 4, 5].map((i) => (
-            <path
-              key={i}
-              className={i % 2 ? "fir-leaf" : "fir-deep"}
-              d={`M200 ${62 + i * 47} L${155 - i * 23} ${185 + i * 50} Q200 ${203 + i * 50} ${245 + i * 23} ${185 + i * 50} Z`}
-            />
-          ))}
-          {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
-            <circle className="fir-star" key={i} cx={125 + ((i * 47) % 150)} cy={170 + i * 34} r="3" />
-          ))}
-        </svg>
-      )}
-      {status !== "webgl" && (
-        <svg className="fir-crown" viewBox="174 24 52 52" focusable="false" aria-hidden="true">
-          <path className="fir-star" d="m200 26 7 16 18 2-13 12 3 18-15-9-15 9 3-18-13-12 18-2z" />
-        </svg>
-      )}
+      <PaperFir staticEffects={status !== "webgl"} />
       <canvas ref={canvas} className={status === "webgl" ? "tree-canvas" : "tree-canvas is-fallback"} />
     </div>
   );

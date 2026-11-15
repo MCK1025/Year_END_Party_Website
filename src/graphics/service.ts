@@ -4,9 +4,10 @@ import type { EffectFactory, GraphicsSession } from "./types";
 
 export type GraphicsFailure = "WEBGL_CONTEXT_LOST" | "RENDER_ERROR" | "SHADER_PREPARATION_FAILED";
 type Playback = {
-  readonly firstFrame: () => void;
-  readonly activity: (reason: string) => void;
-  readonly compile: () => void;
+  readonly firstFrame?: () => void;
+  readonly activity?: (reason: string) => void;
+  readonly compile?: () => void;
+  readonly initiallyPaused?: boolean;
   readonly ephemeralCanvas?: boolean;
 };
 export function createGraphicsSession(
@@ -46,7 +47,7 @@ export function createGraphicsSession(
     renderer.dispose();
     throw error;
   }
-  let paused = false,
+  let paused = playback?.initiallyPaused ?? false,
     visible = false,
     stopped = false,
     disposed = false,
@@ -74,7 +75,7 @@ export function createGraphicsSession(
       draw();
       if (!stopped && !rendered) {
         rendered = true;
-        playback?.firstFrame();
+        playback?.firstFrame?.();
       }
     } catch {
       fail("RENDER_ERROR");
@@ -98,7 +99,7 @@ export function createGraphicsSession(
     if (reason !== activity) {
       activity = reason;
       previous = null;
-      playback?.activity(reason);
+      playback?.activity?.(reason);
     }
     renderer.setAnimationLoop(reason === "ACTIVE" ? animate : null);
     if (compiled && reason === "PAUSED") {
@@ -148,7 +149,7 @@ export function createGraphicsSession(
   const ready = Promise.resolve()
     .then(() => {
       if (disposed || stopped) return;
-      playback?.compile();
+      playback?.compile?.();
       return renderer.compileAsync(scene, camera);
     })
     .then(() => {

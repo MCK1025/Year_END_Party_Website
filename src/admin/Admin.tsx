@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { type Dashboard, dashboardSchema } from "../../supabase/functions/_shared/contracts";
 import { Button, Note } from "../components/ui";
 import { api, message, supabase } from "../lib/api";
@@ -61,7 +62,9 @@ export function Admin() {
   const [data, setData] = useState<Dashboard | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<Tab>("실시간 진행");
+  const [params, setParams] = useSearchParams();
+  const requestedTab = params.get("tab");
+  const tab = requestedTab === "tree" ? "공개 트리" : (tabs.find((t) => t === requestedTab) ?? "실시간 진행");
   const refresh = useCallback(async () => {
     const next = await api({ action: "dashboard", payload: {} }, dashboardSchema);
     setData(next);
@@ -141,7 +144,11 @@ export function Admin() {
               type="button"
               key={t}
               aria-current={tab === t ? "page" : undefined}
-              onClick={() => setTab(t)}
+              onClick={() =>
+                setParams(t === "실시간 진행" ? {} : { tab: t === "공개 트리" ? "tree" : t }, {
+                  replace: true,
+                })
+              }
             >
               {t}
             </button>

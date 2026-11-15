@@ -18,7 +18,7 @@ export function Tree() {
         <p className="muted">이름 대신 마음을 달았어요. 하나씩, 천천히 읽어주세요.</p>
       </header>
       {data.state.paused && <Note>진행은 잠시 쉬어갑니다. 이야기는 계속 읽어도 좋아요.</Note>}
-      <TreeCollection key={data.state.revision} />
+      <TreeCollection revision={data.state.revision} />
     </div>
   );
 }
