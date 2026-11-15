@@ -78,7 +78,16 @@ test("guest saves a story, then sees organizer reveals live through the ending",
   await organizer.getByRole("button", { name: "행사 시작 · 응답 마감" }).click();
   await organizer.getByRole("dialog").getByRole("button", { name: "확인", exact: true }).click();
   await organizer.getByRole("button", { name: "다음 순서 · 1년의 장면들" }).click();
+  await organizer.locator(".progress-preview").evaluate((preview) => {
+    const observer = new MutationObserver(() => {
+      if (!preview.getAnimations().some((animation) => animation.id === "live-page-turn")) return;
+      preview.dataset.testTurnObserved = "yes";
+      observer.disconnect();
+    });
+    observer.observe(preview, { childList: true, subtree: true, characterData: true });
+  });
   await organizer.getByRole("dialog").getByRole("button", { name: "확인", exact: true }).click();
+  await expect(organizer.locator(".progress-preview")).toHaveAttribute("data-test-turn-observed", "yes");
   await expect(page.getByText("함께 완성한, 우리의 첫 장면").first()).toBeVisible({ timeout: 10000 });
   await organizer.getByRole("button", { name: "다음 순서 · 이 사람, 누구일까요?" }).click();
   await organizer.getByRole("dialog").getByRole("button", { name: "확인", exact: true }).click();

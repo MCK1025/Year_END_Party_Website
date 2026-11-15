@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { type EventState, type Phase, stateSchema } from "../../supabase/functions/_shared/contracts";
 import { commandSchema } from "../../supabase/functions/_shared/requests";
+import { useLivePageTurn } from "../components/book/useLivePageTurn";
 import { EventView, phaseNames } from "../components/EventView";
 import { Button, Confirm, Note, Panel } from "../components/ui";
 import { api } from "../lib/api";
@@ -28,6 +29,8 @@ export function ProgressPanel({ rehearsal = false }: { readonly rehearsal?: bool
   const { data, refresh } = useAdmin();
   const task = useTask();
   const state = rehearsal ? (data.rehearsal ?? initial) : data.state;
+  const preview = useRef<HTMLDivElement>(null);
+  useLivePageTurn(preview, state);
   const [pending, setPending] = useState<(PendingCommand & { readonly revision: number }) | null>(null);
   const following = next[state.phase];
   const started = !!data.settings.started_at || state.editing_locked;
@@ -150,7 +153,7 @@ export function ProgressPanel({ rehearsal = false }: { readonly rehearsal?: bool
           {task.notice && <Note error={task.failed}>{task.notice}</Note>}
         </Panel>
         <Panel title="직원 화면 미리보기">
-          <div className="progress-preview">
+          <div className="progress-preview" ref={preview}>
             <EventView state={state} />
           </div>
         </Panel>

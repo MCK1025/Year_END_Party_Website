@@ -4,7 +4,7 @@ const id = "11111111-1111-4111-8111-111111111111";
 const person = { id, name: "가상 직원", department: "시험", active: true };
 export async function fixture(
   page: Page,
-  updates = { revision: 1, paused: false },
+  updates: { revision: number; paused: boolean; hints?: string[] } = { revision: 1, paused: false },
   options: { extraQuestions?: number; choice?: boolean } = {},
 ) {
   let rejectRefresh = false;
@@ -57,7 +57,11 @@ export async function fixture(
               phase: "WHO_AM_I",
               revision: updates.revision,
               paused: updates.paused,
-              payload: { round_id: id, round_index: 1, hints: ["어릴 때는 별을 세는 사람이 되고 싶었어요."] },
+              payload: {
+                round_id: id,
+                round_index: 1,
+                hints: updates.hints ?? ["어릴 때는 별을 세는 사람이 되고 싶었어요."],
+              },
             },
           }
         : action === "forest_mine"

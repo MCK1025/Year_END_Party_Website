@@ -1,9 +1,11 @@
 import { type MouseEvent, type ReactNode, useLayoutEffect, useRef } from "react";
 import { Link, NavLink, useLocation, useNavigationType } from "react-router-dom";
+import type { EventState } from "../../../supabase/functions/_shared/contracts";
 import { motionMedia, motionPolicy, safeRoute } from "../../lib/motion";
 import { traceMotion } from "../../lib/motionDebug";
 import { freezeTurn } from "./bookTurn";
 import { useBookView } from "./preferences";
+import { useLivePageTurn } from "./useLivePageTurn";
 import { BeforeBookMove } from "./useSavedNavigation";
 
 const chapters = [
@@ -16,13 +18,13 @@ const chapters = [
 export function BookLayout({
   children,
   treeOpen,
-  revision,
+  event,
   status,
   scene,
 }: {
   readonly children: ReactNode;
   readonly treeOpen: boolean;
-  readonly revision: number;
+  readonly event: EventState;
   readonly status: ReactNode;
   readonly scene: string;
 }) {
@@ -32,6 +34,8 @@ export function BookLayout({
   const pages = treeOpen ? chapters : chapters.slice(0, -1);
   const index = pages.findIndex((p) => p.path === pathname);
   const paper = useRef<HTMLElement>(null);
+  const revision = event.revision;
+  const liveTurn = useLivePageTurn(paper, pathname === "/event" ? event : null);
   const turn = useRef<ReturnType<typeof freezeTurn>>(null);
   const destination = useRef("");
   const previous = useRef({ pathname, key, scene, still, plain, revision });
@@ -39,6 +43,7 @@ export function BookLayout({
   const composing = useRef(false);
   const pendingIme = useRef<HTMLAnchorElement | null>(null);
   function prepare(to: string) {
+    liveTurn.current?.cancel();
     turn.current?.end("ROUTE_SUPERSEDED");
     if (!paper.current || to === pathname || !pages.some((p) => p.path === to)) return;
     const trace = traceMotion("book");

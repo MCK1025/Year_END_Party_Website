@@ -61,7 +61,7 @@ export function Participant() {
       <EmployeeDrafts key={data.self.id}>
         <BookLayout
           treeOpen={treeOpen}
-          revision={data.state.revision}
+          event={data.state}
           scene={JSON.stringify([
             data.state.phase,
             data.state.paused,
