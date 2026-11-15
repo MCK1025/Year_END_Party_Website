@@ -19,6 +19,7 @@ export function Survey() {
   return (
     <div className="stack">
       <header className="page-heading">
+        <span aria-hidden="true" className="paper-sticker sticker-gift" />
         <p className="overline">Prologue · 나를 소개하는 여섯 문장</p>
         <h1>
           아직 들려주지 않은
@@ -43,6 +44,7 @@ export function Survey() {
       >
         {data.questions.map((q, index) => (
           <Panel key={q.id}>
+            {index === 0 && <span aria-hidden="true" className="paper-sticker sticker-rudolph" />}
             <p className="overline">QUESTION {String(index + 1).padStart(2, "0")}</p>
             {q.choices.length ? (
               <>
@@ -87,7 +89,11 @@ export function Survey() {
             )}
           </Panel>
         ))}
-        <Panel title="공개 활용 동의">
+        <Panel>
+          <div className="sticker-caption">
+            <h2>공개 활용 동의</h2>
+            <span aria-hidden="true" className="paper-sticker sticker-tree-snowman" />
+          </div>
           <p className="small">
             답변은 행사 운영과 동료 소개에만 사용합니다. 동의한 답변도 관리자의 검수를 거친 뒤 공개합니다.
             공개 활용 동의는 선택입니다. 행사 참여에는 영향이 없습니다.

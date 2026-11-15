@@ -86,7 +86,7 @@ test("late capture cannot resurrect a hidden or superseded page; hidden values s
   await expect(page.getByLabel("추천할 동료")).toBeEnabled();
   await expect(page.locator(".book-frame canvas")).toHaveCount(0);
 });
-test("viewport, zoom, writing baselines and chapters remain usable at six widths", async ({ page }) => {
+test("unruled paper, stickers and inputs remain usable at six widths and large type", async ({ page }) => {
   await fixture(page);
   await page.goto("/#/survey");
   const text = page.getByLabel("어릴 적 나의 꿈은?");
@@ -95,13 +95,14 @@ test("viewport, zoom, writing baselines and chapters remain usable at six widths
     await page.setViewportSize({ width, height: 844 });
     const metrics = await text.evaluate((el) => ({
       overflow: document.documentElement.scrollWidth > innerWidth,
-      step: getComputedStyle(el).lineHeight,
-      tile: getComputedStyle(el).backgroundSize,
+      answerBackground: getComputedStyle(el).backgroundImage,
+      paperBackground: getComputedStyle(el.closest(".book-surface") ?? el).backgroundImage,
       left: el.getBoundingClientRect().left,
       binding: document.querySelector(".book-binding")?.getBoundingClientRect().right ?? 0,
     }));
     expect(metrics.overflow).toBe(false);
-    expect(metrics.tile).toContain(metrics.step);
+    expect(metrics.answerBackground).toBe("none");
+    expect(metrics.paperBackground).toBe("none");
     expect(metrics.left).toBeGreaterThan(metrics.binding);
     if ([320, 390, 1280].includes(width)) {
       await text.evaluate((el) => el.closest(".book-frame")?.scrollIntoView({ block: "start" }));

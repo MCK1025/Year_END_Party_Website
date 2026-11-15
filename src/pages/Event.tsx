@@ -71,6 +71,7 @@ export function Event() {
       {!waiting && data.settings.logo_path && (
         <PrivateImage path={data.settings.logo_path} alt="회사 로고" logo />
       )}
+      <span aria-hidden="true" className="paper-sticker sticker-gift" />
     </div>
   );
 }

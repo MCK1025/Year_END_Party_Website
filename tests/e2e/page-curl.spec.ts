@@ -29,7 +29,7 @@ async function fillStory(page: Page) {
 for (const mode of ["webgl", "dom"] as const) {
   test(`both directions carry real paper through five frames (${mode})`, async ({ page, browserName }) => {
     const folder = browserName === "chromium" ? evidence : `${evidence}/${browserName}`;
-    await page.setViewportSize({ width: 850, height: 1050 });
+    await page.setViewportSize({ width: 850, height: 1280 });
     // The animation clock is controlled exclusively in this Playwright document.
     await page.addInitScript((fallback) => {
       if (fallback) {
@@ -58,6 +58,8 @@ for (const mode of ["webgl", "dom"] as const) {
     await fillStory(page);
     await page.screenshot({ path: `${folder}/original-story.png` });
     for (const direction of ["forward", "backward"]) {
+      const stickerArea =
+        direction === "forward" ? await page.locator(".book-surface .sticker-gift").boundingBox() : null;
       const checkArea =
         direction === "forward"
           ? await page.getByRole("checkbox", { name: /내 답변을/ }).boundingBox()
@@ -97,6 +99,20 @@ for (const mode of ["webgl", "dom"] as const) {
       const after = await page.screenshot();
       // Compare rendered pixels, including the newly uncovered right side of the page.
       expect(await paperDifference(page, liveBefore, start, area)).toBeLessThan(7);
+      if (stickerArea) {
+        const ink = await markPixels(page, liveBefore, stickerArea, false);
+        expect(ink).toBeGreaterThan(stickerArea.width * stickerArea.height * 0.13);
+        expect(await markPixels(page, start, stickerArea, false)).toBeGreaterThan(ink * 0.8);
+        if (mode === "webgl")
+          expect(await paperDifference(page, start, middle, stickerArea)).toBeGreaterThan(9);
+      }
+      if (direction === "backward") {
+        const returned = await page.locator(".book-surface .sticker-gift").boundingBox();
+        if (!returned) throw Error("Missing gift on the returning page");
+        const ink = await markPixels(page, after, returned, false);
+        expect(ink).toBeGreaterThan(returned.width * returned.height * 0.13);
+        expect(await markPixels(page, end, returned, false)).toBeGreaterThan(ink * 0.8);
+      }
       if (select) {
         const arrow = {
           x: select.x + select.width - 23,

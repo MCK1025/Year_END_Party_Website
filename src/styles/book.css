@@ -313,15 +313,13 @@
 .book-settings .motion-diagnostics textarea {
   width: 100%;
 }
-/* The metal stays on the cover. Only the opaque ruled stock enters a transition. */
+/* The metal stays on the cover. The paper and its stickers share one turning surface. */
 .notebook {
   --stock: var(--ivory);
-  --rule: #e0e3da;
-  --rule-step: 2.375rem;
+  --sticker-heading: clamp(79px, 24.5vw, 110px);
+  --writing-leading: 2.375rem;
   --binding-width: clamp(23px, 5vw, 34px);
   --paper-inset: clamp(14px, 3vw, 36px);
-  --punch-line: calc(var(--binding-width) + 5px);
-  --margin-rule: #e3d6c8;
   border: 1px solid #cfcabd;
   border-radius: 5px 12px 12px 5px;
   background: var(--stock);
@@ -354,18 +352,6 @@
   min-height: 100svh;
   padding: clamp(24px, 4vw, 42px) var(--paper-inset) 2rem calc(var(--binding-width) + var(--paper-inset));
   background-color: var(--stock);
-  background-image:
-    linear-gradient(
-      90deg,
-      transparent var(--punch-line),
-      var(--margin-rule) var(--punch-line) calc(var(--punch-line) + 1px),
-      transparent 0
-    ),
-    repeating-linear-gradient(
-      to bottom,
-      transparent 0 calc(var(--rule-step) - 1px),
-      var(--rule) calc(var(--rule-step) - 1px) var(--rule-step)
-    );
 }
 .book-binding {
   position: absolute;
@@ -385,17 +371,11 @@
 }
 .book-surface .field textarea,
 .employee-view[data-script="pen"] .book-surface .field textarea {
-  line-height: var(--rule-step);
+  line-height: var(--writing-leading);
   padding: 0.22rem 0.4rem 0.5rem;
-  background:
-    repeating-linear-gradient(
-      to bottom,
-      transparent 0 calc(var(--rule-step) - 1px),
-      #c8cec1 calc(var(--rule-step) - 1px) var(--rule-step)
-    )
-    0 -0.1rem / 100% var(--rule-step) local var(--stock);
-  border: 1px solid transparent;
-  border-radius: 0;
+  background: #fffcf6;
+  border: 1px solid #c6b99f;
+  border-radius: var(--radius-small);
 }
 .book-surface .field textarea:focus-visible {
   outline-offset: 1px;
@@ -449,4 +429,64 @@
   .book-index nav {
     gap: 0 7px;
   }
+}
+
+.paper-sticker {
+  display: block;
+  width: var(--sticker-heading);
+  aspect-ratio: 1;
+  background: center / contain no-repeat;
+  pointer-events: none;
+  user-select: none;
+}
+.sticker-gift {
+  background-image: url("../assets/notebook/gift.webp");
+}
+.sticker-rudolph {
+  background-image: url("../assets/notebook/rudolph.webp");
+}
+.sticker-tree-snowman {
+  background-image: url("../assets/notebook/tree-snowman.webp");
+}
+.page-heading:has(> .paper-sticker) {
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: var(--s2);
+}
+.page-heading:has(> .paper-sticker) > :is(.overline, .muted) {
+  grid-column: 1 / -1;
+}
+.page-heading:has(> .paper-sticker) > h1 {
+  grid-area: 2 / 1;
+  align-self: center;
+}
+.page-heading > .paper-sticker {
+  grid-area: 2 / 2;
+  align-self: center;
+}
+.survey-entries .panel:has(> .sticker-rudolph) {
+  position: relative;
+}
+.survey-entries .panel > .sticker-rudolph {
+  position: absolute;
+  right: 0.45rem;
+  top: var(--s6);
+  width: clamp(68px, 22vw, 92px);
+}
+.survey-entries .panel:has(> .sticker-rudolph) > .field:first-of-type > span {
+  min-height: 3rem;
+  padding-inline-end: clamp(76px, 25vw, 104px);
+  width: 100%;
+}
+.sticker-caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s3);
+}
+.sticker-caption .paper-sticker {
+  width: clamp(87px, 25.7vw, 112px);
+  flex-shrink: 0;
+}
+.book-surface > .stack > .paper-sticker {
+  justify-self: end;
 }

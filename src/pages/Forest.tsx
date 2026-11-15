@@ -46,6 +46,7 @@ function ForestBoard({ admin, locked }: { readonly admin: boolean; readonly lock
   return (
     <div className="stack" aria-busy={loading}>
       <header className="page-heading">
+        {!admin && <span aria-hidden="true" className="paper-sticker sticker-tree-snowman" />}
         <p className="overline">Our quiet forest · 이름 없이 전하는 마음</p>
         <h1>혜성식품 대나무숲</h1>
         <p className="muted">바라는 마음도, 고마운 마음도, 조금 아쉬웠던 마음도.</p>

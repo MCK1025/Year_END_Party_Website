@@ -8,6 +8,7 @@ export function Tree() {
   return (
     <div className="stack">
       <header className="page-heading">
+        <span aria-hidden="true" className="paper-sticker sticker-tree-snowman" />
         <p className="overline">A season of little wishes</p>
         <h1>
           마음이 모여,

@@ -21,6 +21,7 @@ export function Nominate() {
   return (
     <div className="stack">
       <header className="page-heading">
+        <span aria-hidden="true" className="paper-sticker sticker-rudolph" />
         <p className="overline">A quiet thank you</p>
         <h1>
           올해, 고마웠던

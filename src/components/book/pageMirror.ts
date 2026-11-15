@@ -68,8 +68,6 @@ function control(el: HTMLTextAreaElement | HTMLSelectElement | HTMLInputElement)
     text.style.transform = `translate(${-el.scrollLeft}px,${-el.scrollTop}px)`;
     text.textContent = el.value || el.placeholder;
     box.append(text);
-    if (el.scrollTop)
-      box.style.backgroundPositionY = `calc(${getComputedStyle(el).backgroundPositionY} - ${el.scrollTop}px)`;
   }
   return box;
 }
