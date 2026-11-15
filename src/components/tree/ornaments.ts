@@ -58,7 +58,6 @@ const designs = [
 ] as const;
 const tilts = [-9, 6, -4, 12, -7, 3, 8, -12, 4];
 const sizes = [0.94, 0.82, 1, 0.88, 0.78, 0.97, 0.86];
-const cords = [9, 16, 7, 12, 18, 10, 14];
 
 export function ornament(index: number, count: number) {
   const spots =
@@ -79,7 +78,6 @@ export function ornament(index: number, count: number) {
     y,
     tilt: tilts[slot % tilts.length] ?? 0,
     size: sizes[slot % sizes.length] ?? 1,
-    cord: cords[slot % cords.length] ?? 10,
     label: designs[style],
     sprite: `${Math.floor(style / 2) * 50}% ${(style % 2) * 100}%`,
     hue: [0, 45, -56, 145, 208][Math.floor(index / 6) % 5] ?? 0,

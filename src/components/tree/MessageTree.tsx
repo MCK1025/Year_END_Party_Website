@@ -45,22 +45,6 @@ export function MessageTree({
                 aria-label={`이야기 ${number} 열기 · ${art.label} · ${forestKinds[note.kind]}`}
                 onClick={() => setSelectedId(note.id)}
               >
-                <svg
-                  className="ornament-twig"
-                  viewBox="0 0 38 36"
-                  aria-hidden="true"
-                  focusable="false"
-                  style={{ transform: art.x > 50 ? "scaleX(-1)" : undefined }}
-                >
-                  <g transform={`translate(0 ${28 - art.cord})`}>
-                    <path className="sprig-stem" d="M36 -8 Q19 5 2 1" />
-                    <path
-                      className="sprig-needles"
-                      d="M26 -2l4 -7 M23 0l8 1 M16 1l6 -6 M13 2l6 3 M6 2l5 -4"
-                    />
-                  </g>
-                  <path className="ornament-cord" d={`M2 ${29 - art.cord} Q0 25 2 33`} />
-                </svg>
                 <span
                   className="ornament-art"
                   aria-hidden="true"

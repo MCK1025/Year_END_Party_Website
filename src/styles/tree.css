@@ -59,9 +59,6 @@
   transform: translate(-50%, -50%);
   pointer-events: none;
 }
-.tree-stage:not(.tree-stage-full) :is(.sprig-stem, .sprig-needles) {
-  display: none;
-}
 .message-tree {
   container-type: inline-size;
   background: radial-gradient(ellipse at 50% 59%, #213d31, var(--tree-night) 69%);
@@ -83,26 +80,6 @@
   background: transparent;
   padding: 0;
   cursor: pointer;
-}
-.ornament-twig {
-  position: absolute;
-  top: -27px;
-  left: calc(50% - 2px);
-  width: 38px;
-  height: 36px;
-  transform-origin: 2px center;
-  pointer-events: none;
-  fill: none;
-  stroke-linecap: round;
-}
-.sprig-stem,
-.sprig-needles {
-  stroke: var(--tree-light);
-  stroke-width: 1.5px;
-}
-.ornament-cord {
-  stroke: var(--tree-warm);
-  stroke-width: 1px;
 }
 .ornament-art {
   display: block;
