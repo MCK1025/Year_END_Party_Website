@@ -35,7 +35,7 @@ export function TreePanel() {
         )}
         {!data.settings.started_at && (
           <Note>
-            먼저 실시간 진행 메뉴에서 행사를 시작해주세요. 트리는 행사일 오후 6시 이후 공개 가능합니다.
+            먼저 실시간 진행 메뉴에서 행사를 시작해주세요. 트리는 설정한 시작 시각부터 공개할 수 있습니다.
           </Note>
         )}
         <Button

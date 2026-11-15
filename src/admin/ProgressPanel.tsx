@@ -75,6 +75,14 @@ export function ProgressPanel({ rehearsal = false }: { readonly rehearsal?: bool
             {state.paused ? "일시 정지 중" : "진행 중"} · 공개된 힌트 {state.payload.hints?.length ?? 0}개
           </p>
           <p className="small">
+            {!rehearsal && (
+              <>
+                {data.settings.event_start_at
+                  ? `콘텐츠 공개 가능 시각 · ${new Date(data.settings.event_start_at).toLocaleString("ko-KR", { timeZone: "Asia/Seoul", dateStyle: "medium", timeStyle: "short" })} (한국시간)`
+                  : "콘텐츠 공개를 위해 설정·내보내기에서 행사일과 시작 시각을 저장해주세요."}
+                <br />
+              </>
+            )}
             마지막 조작:{" "}
             {state.updated_at
               ? new Date(state.updated_at).toLocaleTimeString("ko-KR", { timeZone: "Asia/Seoul" })
@@ -163,7 +171,7 @@ export function ProgressPanel({ rehearsal = false }: { readonly rehearsal?: bool
           action={() => task.run(() => send(pending.command, pending.revision), "진행 상태를 반영했습니다.")}
         >
           {pending.command.command === "start_event"
-            ? "설문·추천·이야기 트리 작성과 수정이 즉시 마감됩니다. 일시 정지·대기실 복귀·되돌리기를 해도 응답은 다시 열리지 않습니다. 콘텐츠 공개는 행사일 오후 6시 이후 다음 순서로 진행합니다."
+            ? "설문·추천·이야기 트리 작성과 수정이 즉시 마감됩니다. 일시 정지·대기실 복귀·되돌리기를 해도 응답은 다시 열리지 않습니다. 콘텐츠는 설정한 행사 시작 시각부터 다음 순서로 공개할 수 있습니다."
             : "공개된 정보는 직원 휴대폰에 바로 표시됩니다. 이미 본 내용은 되돌려도 기억에서 지울 수 없습니다."}
         </Confirm>
       )}

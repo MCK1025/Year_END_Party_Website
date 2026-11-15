@@ -57,7 +57,7 @@ Only stateful hint entrance and button press: 180ms opacity/translateY(4px), eas
 - Each tree holds up to 30 stories. Stocking and gift stickers are keyboard-accessible buttons with a minimum 48px target. A taller tree accommodates more than 12 ornaments. The same buttons work over the SVG fir when WebGL is unavailable.
 - Notes open a native focus-managed dialog with readable wrapping, category/date and anonymous body; no author identity. Dialog uses existing 180ms opacity/translate entrance, honoring reduced motion. Consulted beui center-morph-modal for focus/enter/exit mechanism; retain native dialog rather than adding a motion dependency. Fir/snow is a novel effect, not a catalog interaction.
 - Snow gently drifts; lights breathe subtly, notes remain stationary. Provide an explicit effects pause; offscreen/background scenes stop, reduced-motion renders a still frame. Context loss falls back without hiding notes. Renderer DPR is capped at 1.5 and no shadows/post-processing are used on phones.
-- Staff forest contains only own posts, including edit/delete before event start; entire collection is admin-only until explicit reviewed tree publication after event start and the 18:00 KST gate. Admin can close the tree and restore the previous event screen. Public display is an overlay of the current event phase, preserving the underlying game progress.
+- Staff can edit and delete their own stories before event start. The organizer can publish the reviewed collection once the event has started and the configured Korean release time has arrived. Closing the public tree restores the underlying event phase.
 
 ## 7. Depth
 

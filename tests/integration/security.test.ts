@@ -27,23 +27,33 @@ describe.sequential("authorization, consent and release boundaries", () => {
     await sql.end();
   });
 
-  it("uses the server release predicate at 17:59 and 18:00 KST", async () => {
+  it("opens at the configured minute in Korea, including shortly after midnight", async () => {
     // Given / When
     const rows =
-      await sql`select private.release_open('2026-12-01 18:00:00+09','2026-12-01 17:59:59+09') early,
-      private.release_open('2026-12-01 18:00:00+09','2026-12-01 18:00:00+09') ready`;
+      await sql`select private.release_open('2026-12-01 00:07:00+09','2026-12-01 00:06:59+09') early,
+      private.release_open('2026-12-01 00:07:00+09','2026-12-01 00:07:00+09') ready`;
     // Then
     expect(rows[0]).toEqual({ early: false, ready: true });
   });
-  it("rejects times other than 18:00 KST when organizer saves the date", async () => {
-    // Given
+  it("saves an organizer-selected release time and enforces it on publication", async () => {
     const d = await dashboard();
-    // When
-    const result = await admin.functions.invoke("portal", {
-      body: { action: "settings", payload: { ...d.settings, event_start_at: "2026-12-01T17:59:00+09:00" } },
-    });
-    // Then
-    expect(result.error).toBeTruthy();
+    async function schedule(value: string | null) {
+      await call(admin, { action: "settings", payload: { ...d.settings, event_start_at: value } }, okSchema);
+    }
+    try {
+      const day = (offset: number) => new Date(Date.now() + offset * 86400000).toISOString().slice(0, 10);
+      const future = `${day(2)}T00:07:00+09:00`;
+      await schedule(future);
+      expect(Date.parse((await dashboard()).settings.event_start_at ?? "")).toBe(Date.parse(future));
+      expect((await command("phase", { phase: "RECAP" })).error).toBeTruthy();
+      await schedule(`${day(-2)}T15:35:00+09:00`);
+      expect((await sql`select public.content_open() as open`)[0]?.open).toBe(true);
+      await schedule(null);
+      expect((await dashboard()).state.phase).toBe("WAITING");
+      expect((await command("phase", { phase: "RECAP" })).error).toBeTruthy();
+    } finally {
+      await schedule(d.settings.event_start_at);
+    }
   });
   it("denies privileged actions when a verified employee calls them directly", async () => {
     // Given

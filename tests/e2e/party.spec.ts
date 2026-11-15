@@ -83,7 +83,9 @@ test("guest saves a story, then sees organizer reveals live through the ending",
   await organizer.getByRole("button", { name: "다음 순서 · 이 사람, 누구일까요?" }).click();
   await organizer.getByRole("dialog").getByRole("button", { name: "확인", exact: true }).click();
   const ready = await dashboard();
-  const round = ready.rounds.find((r) => r.employee_id === self.id && r.hints[0] === "우주를 걷는 사람");
+  const round = ready.rounds.find(
+    (r) => r.approved && r.eligible && r.employee_id === self.id && r.hints[0] === "우주를 걷는 사람",
+  );
   if (!round) throw new Error("Round not saved");
   await organizer.getByLabel("출제할 인물").selectOption(round.id);
   await organizer.getByRole("button", { name: "이 인물로 시작" }).click();

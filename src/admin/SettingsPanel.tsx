@@ -12,11 +12,11 @@ export function SettingsPanel() {
   const initial = data.settings;
   const locked = !!initial.started_at || data.state.editing_locked;
   const task = useTask();
-  const [date, setDate] = useState(
-    initial.event_start_at
-      ? new Date(new Date(initial.event_start_at).getTime() + 9 * 3600000).toISOString().slice(0, 10)
-      : "",
-  );
+  const koreanStart = initial.event_start_at
+    ? new Date(Date.parse(initial.event_start_at) + 9 * 3600000).toISOString()
+    : "";
+  const [date, setDate] = useState(koreanStart.slice(0, 10));
+  const [time, setTime] = useState(koreanStart.slice(11, 16) || "18:00");
   const [deletion, setDeletion] = useState(initial.deletion_date ?? "");
   const [survey, setSurvey] = useState(initial.survey_open);
   const [nomination, setNomination] = useState(initial.nomination_open);
@@ -30,7 +30,7 @@ export function SettingsPanel() {
       {
         action: "settings",
         payload: {
-          event_start_at: date ? `${date}T18:00:00+09:00` : null,
+          event_start_at: date ? `${date}T${time}:00+09:00` : null,
           deletion_date: deletion || null,
           survey_open: !locked && survey,
           nomination_open: !locked && nomination,
@@ -54,12 +54,15 @@ export function SettingsPanel() {
               setConfirm("save");
             }}
           >
+            <Field label="행사일" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
             <Field
-              label="행사일"
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              hint="공개 시각은 행사일 오후 6시 (한국시간)입니다. 이후 순서는 직접 진행합니다."
+              label="행사 시작 시각 (한국시간)"
+              type="time"
+              value={time}
+              disabled={!date}
+              required={Boolean(date)}
+              onChange={(e) => setTime(e.target.value)}
+              hint="이 시각부터 콘텐츠를 공개할 수 있습니다. 실시간 진행에서 ‘다음 순서’를 누르면 직원에게 보입니다."
             />
             <Field
               label="개인정보 삭제 예정일"
@@ -196,7 +199,7 @@ export function SettingsPanel() {
           {confirm === "purge"
             ? "되돌릴 수 없습니다. 필요한 결과를 먼저 내려받았는지 확인해주세요. 삭제 중 오류가 나면 공개는 중단된 상태로 유지되며 재실행할 수 있습니다."
             : confirm === "save"
-              ? "행사일 변경 또는 접속 중단 시 화면은 대기 상태로 돌아갑니다. 마감하면 직원은 더 이상 수정할 수 없습니다."
+              ? "행사일이나 시작 시각을 변경하거나 접속을 중단하면 직원 화면은 대기실로 돌아갑니다. 이미 마감된 응답은 다시 열리지 않습니다."
               : "다운로드 이력이 기록됩니다. CSV는 설문·추천·시상 3개 파일입니다. 브라우저가 여러 파일 다운로드를 차단하면 엑셀을 선택해주세요."}
         </Confirm>
       )}
