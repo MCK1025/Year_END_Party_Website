@@ -14,6 +14,7 @@ export function MotionDiagnostics({ still }: { readonly still: boolean }) {
   function decision(scope: "invitation" | "book") {
     const labels: Record<string, string> = {
       webgl: "WebGL",
+      dom: "본문 입체 전환",
       simple: scope === "invitation" ? "간단한 봉투 효과" : "간단한 전환",
       static: "정적 초대장",
       "3d": "3D",

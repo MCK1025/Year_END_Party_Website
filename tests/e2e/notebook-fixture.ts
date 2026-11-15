@@ -2,7 +2,11 @@ import type { Page } from "@playwright/test";
 
 const id = "11111111-1111-4111-8111-111111111111";
 const person = { id, name: "가상 직원", department: "시험", active: true };
-export async function fixture(page: Page, updates = { revision: 1, paused: false }) {
+export async function fixture(
+  page: Page,
+  updates = { revision: 1, paused: false },
+  options: { extraQuestions?: number; choice?: boolean } = {},
+) {
   let rejectRefresh = false;
   await page.route("**/functions/v1/portal", async (route) => {
     const { action } = route.request().postDataJSON();
@@ -19,6 +23,24 @@ export async function fixture(page: Page, updates = { revision: 1, paused: false
             directory: [person, { ...person, id: "22222222-2222-4222-8222-222222222222", name: "가상 동료" }],
             questions: [
               { id: "dream", prompt: "어릴 적 나의 꿈은?", choices: [], sort_order: 1, active: true },
+              ...(options.choice
+                ? [
+                    {
+                      id: "time",
+                      prompt: "함께한 시간",
+                      choices: ["점심시간", "퇴근길"],
+                      sort_order: 2,
+                      active: true,
+                    },
+                  ]
+                : []),
+              ...Array.from({ length: options.extraQuestions ?? 0 }, (_, i) => ({
+                id: `entry_${i}`,
+                prompt: `기억 ${i + 1}`,
+                choices: [],
+                sort_order: i + 3,
+                active: true,
+              })),
             ],
             survey: null,
             nomination: null,

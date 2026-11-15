@@ -7,6 +7,7 @@ type Playback = {
   readonly firstFrame: () => void;
   readonly activity: (reason: string) => void;
   readonly compile: () => void;
+  readonly ephemeralCanvas?: boolean;
 };
 export function createGraphicsSession(
   canvas: HTMLCanvasElement,
@@ -41,6 +42,7 @@ export function createGraphicsSession(
     for (const effect of effects) effect.update(0);
   } catch (error) {
     for (const effect of effects) effect.dispose();
+    if (playback?.ephemeralCanvas) renderer.forceContextLoss();
     renderer.dispose();
     throw error;
   }
@@ -171,6 +173,7 @@ export function createGraphicsSession(
       document.removeEventListener("visibilitychange", sync);
       canvas.removeEventListener("webglcontextlost", lost);
       for (const effect of effects) effect.dispose();
+      if (playback?.ephemeralCanvas) renderer.forceContextLoss();
       renderer.dispose();
     },
   };

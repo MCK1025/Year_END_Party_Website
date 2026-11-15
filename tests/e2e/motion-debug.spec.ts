@@ -49,16 +49,19 @@ for (const mode of ["no-waapi", "throw", "hidden", "zero"]) {
   test(`book diagnosis ${mode}`, async ({ page }) => {
     await fixture(page);
     await page.goto("/?motionDebug=1#/survey");
-    await page.locator(".book-turn").evaluate((el, kind) => {
-      if (kind === "no-waapi") Object.defineProperty(el, "animate", { value: undefined });
+    await page.locator(".book-surface").evaluate((_, kind) => {
+      if (kind === "no-waapi") Object.defineProperty(Element.prototype, "animate", { value: undefined });
       if (kind === "throw")
-        Object.defineProperty(el, "animate", {
+        Object.defineProperty(Element.prototype, "animate", {
           value: () => {
             throw new Error("private-error");
           },
         });
-      if (kind === "hidden") el.style.display = "none";
-      if (kind === "zero") el.style.width = "0px";
+      if (kind === "hidden" || kind === "zero") {
+        const style = document.createElement("style");
+        style.textContent = `.book-surface:has(.survey-entries){${kind === "hidden" ? "display:none" : "width:0;padding:0"}}`;
+        document.head.append(style);
+      }
     }, mode);
     await page.getByRole("link", { name: /다음 장/ }).click();
     await expect(page.getByLabel("추천할 동료")).toBeVisible();
@@ -161,15 +164,15 @@ test("revision alone preserves the active turn, real pause and orientation settl
     page.waitForResponse((r) => r.url().includes("/functions/v1/portal")),
     page.evaluate(() => dispatchEvent(new Event("online"))),
   ]);
-  await expect(page.locator(".book-turn")).toHaveAttribute("data-turn", "forward");
+  await expect(page.locator(".curl-stage")).toHaveAttribute("data-turn", "forward");
   updates.revision++;
   updates.paused = true;
   await page.evaluate(() => dispatchEvent(new Event("online")));
-  await expect(page.locator(".book-turn")).not.toHaveAttribute("data-turn", /.+/);
+  await expect(page.locator(".curl-stage")).toHaveCount(0);
   await page.getByRole("link", { name: /이전 장/ }).click();
-  await expect(page.locator(".book-turn")).toHaveAttribute("data-turn", "backward");
+  await expect(page.locator(".curl-stage")).toHaveAttribute("data-turn", "backward");
   await page.setViewportSize({ width: 840, height: 390 });
-  await expect(page.locator(".book-turn")).not.toHaveAttribute("data-turn", /.+/);
+  await expect(page.locator(".curl-stage")).toHaveCount(0);
   const data = await report(page);
   expect(data).toContain("EVENT_STATE_CHANGED");
   expect(data).toContain("VIEWPORT_GEOMETRY_CHANGED");

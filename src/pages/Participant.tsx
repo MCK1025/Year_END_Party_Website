@@ -66,6 +66,9 @@ export function Participant() {
             data.state.phase,
             data.state.paused,
             data.state.editing_locked,
+            data.settings.started_at,
+            data.settings.survey_open,
+            data.settings.nomination_open,
             treeOpen,
             data.state.payload,
           ])}

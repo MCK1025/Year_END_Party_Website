@@ -18,7 +18,7 @@ async function capture(page: Page, state: string, readAt?: string) {
       );
     });
     if (readAt) await page.locator(readAt).first().scrollIntoViewIfNeeded();
-    await expect(page.locator(".book-turn[data-turn]")).toHaveCount(0);
+    await expect(page.locator(".curl-stage[data-turn]")).toHaveCount(0);
     await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.screenshot({ path: `artifacts/screens/notebook/${state}-${width}.png` });
@@ -35,10 +35,10 @@ test("one active employee page preserves writing across chapters, history, font 
   await page.getByRole("checkbox", { name: /내 답변을/ }).check();
   await capture(page, "survey");
   await page.getByRole("link", { name: /다음 장/ }).click();
-  await expect(page.locator(".book-turn")).toHaveAttribute("data-turn", "forward");
+  await expect(page.locator(".curl-stage")).toHaveAttribute("data-turn", "forward");
   await page.getByLabel("고마운 이유 (10자 이상)").fill("한 해 동안 도움을 많이 받았어요.");
   await page.getByRole("link", { name: /이전 장/ }).click();
-  await expect(page.locator(".book-turn")).toHaveAttribute("data-turn", "backward");
+  await expect(page.locator(".curl-stage")).toHaveAttribute("data-turn", "backward");
   await expect(story).toHaveValue(text);
   await page.locator(".book-settings summary").click();
   await page.getByLabel("글씨", { exact: true }).selectOption("ui");
@@ -83,7 +83,7 @@ test("font asset renders Korean, private forest edits survive navigation, hints 
   await page.getByRole("link", { name: "대나무숲", exact: true }).click();
   await expect(body.first()).toHaveValue("보내기 전의 마음");
   await expect(body.last()).toHaveValue("수정 중인 글");
-  await expect(page.locator(".book-turn")).not.toHaveAttribute("data-turn", /.+/);
+  await expect(page.locator(".curl-stage")).toHaveCount(0);
   await capture(page, "reduced", "form:has(button) textarea");
   await page.getByRole("button", { name: "수정 취소" }).click();
   await expect(page.locator(".story-text")).toHaveText("올 한 해도 함께해 주셔서 고맙습니다.");

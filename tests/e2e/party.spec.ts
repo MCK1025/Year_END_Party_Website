@@ -98,7 +98,8 @@ test("guest saves a story, then sees organizer reveals live through the ending",
   await organizer.getByRole("button", { name: "정답 공개", exact: true }).click();
   await organizer.getByRole("dialog").getByRole("button", { name: "확인", exact: true }).click();
   await expect(page.getByRole("heading", { name: "가상직원 하나" })).toBeVisible({ timeout: 10000 });
-  await command("phase", { phase: "TASTES" });
+  expect((await command("phase", { phase: "TASTES" })).error).toBeNull();
+  const previousTastes = new Set((await dashboard()).tastes.map((t) => t.id));
   await call(
     admin,
     {
@@ -107,7 +108,11 @@ test("guest saves a story, then sees organizer reveals live through the ending",
     },
     okSchema,
   );
-  await command("taste_question", { taste_id: (await dashboard()).tastes.at(-1)?.id });
+  const question = (await dashboard()).tastes.find(
+    (t) => !previousTastes.has(t.id) && t.approved && t.prompt === "우리의 저녁 취향은?",
+  );
+  if (!question) throw Error("Approved test question was not created");
+  expect((await command("taste_question", { taste_id: question.id })).error).toBeNull();
   await expect(page.getByRole("heading", { name: "우리의 저녁 취향은?" })).toBeVisible({ timeout: 10000 });
   await command("taste_reveal");
   await expect(page.getByText("고기", { exact: true })).toBeVisible({ timeout: 10000 });

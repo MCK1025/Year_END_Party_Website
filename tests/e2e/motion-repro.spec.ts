@@ -20,12 +20,13 @@ test("a height-only resize does not cancel a user page turn", async ({ page }) =
   await fixture(page);
   await page.goto("/?motionDebug=1#/survey");
   await page.getByRole("link", { name: /다음 장/ }).click();
-  await expect(page.locator(".book-turn")).toHaveAttribute("data-turn", "forward");
+  await expect(page.locator(".curl-stage")).toHaveAttribute("data-turn", "forward");
   await page.setViewportSize({ width: 390, height: 720 });
-  const result = await page.locator(".book-turn").evaluate((leaf) => {
-    const before = leaf.getAnimations()[0]?.playState;
+  await expect(page.locator(".curl-stage")).toHaveAttribute("data-mode", /webgl|dom/);
+  const result = await page.locator(".curl-stage").evaluate((leaf) => {
+    const before = leaf.getAnimations({ subtree: true })[0]?.playState;
     window.dispatchEvent(new Event("resize"));
-    return [before, leaf.getAnimations()[0]?.playState];
+    return [before, leaf.getAnimations({ subtree: true })[0]?.playState];
   });
   expect(result).toEqual(["running", "running"]);
 });

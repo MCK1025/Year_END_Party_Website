@@ -118,16 +118,7 @@
 .book-surface:focus:not(:focus-visible) {
   outline: none;
 }
-.book-turn {
-  opacity: 0;
-  position: absolute;
-  inset: 0;
-  height: min(100%, 92svh);
-  pointer-events: none;
-  transform-origin: left center;
-  backface-visibility: hidden;
-  background: linear-gradient(90deg, var(--line), var(--paper) 5%, var(--ivory) 96%, var(--line));
-}
+
 .book-pager {
   padding-top: var(--s3);
   border-top: 1px solid var(--line);
@@ -216,15 +207,7 @@
   font-size: 24px;
   line-height: 1.65;
 }
-.book-surface .field textarea {
-  background: repeating-linear-gradient(
-      to bottom,
-      transparent 0 calc(1lh - 1px),
-      color-mix(in srgb, var(--line) 50%, transparent) calc(1lh - 1px) 1lh
-    )
-    local var(--ivory);
-  background-position: 0 var(--s3);
-}
+
 .employee-view .book-surface .dark-panel h2 {
   font: 600 24px / 1.5 var(--body);
   color: var(--ivory);
@@ -243,6 +226,10 @@
   color: var(--ink);
   border: 1px solid var(--line);
   border-left: 5px solid var(--navy);
+}
+.book-surface .overline,
+.book-surface .field > span {
+  width: fit-content;
 }
 .employee-view .invitation-cover .overline,
 .employee-view .invitation-cover h1 em {
@@ -314,24 +301,6 @@
     padding: var(--s6);
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  .book-turn {
-    display: none;
-  }
-}
-@media (prefers-reduced-motion: no-preference) {
-  .book-simple-turn {
-    animation: book-simple-turn 180ms ease-out both;
-  }
-}
-@keyframes book-simple-turn {
-  from {
-    opacity: 0.65;
-  }
-  to {
-    opacity: 0;
-  }
-}
 .motion-diagnostics {
   max-width: min(72vw, 360px);
   overflow-wrap: anywhere;
@@ -343,4 +312,141 @@
 }
 .book-settings .motion-diagnostics textarea {
   width: 100%;
+}
+/* The metal stays on the cover. Only the opaque ruled stock enters a transition. */
+.notebook {
+  --stock: var(--ivory);
+  --rule: #e0e3da;
+  --rule-step: 2.375rem;
+  --binding-width: clamp(23px, 5vw, 34px);
+  --paper-inset: clamp(14px, 3vw, 36px);
+  --punch-line: calc(var(--binding-width) + 5px);
+  --margin-rule: #e3d6c8;
+  border: 1px solid #cfcabd;
+  border-radius: 5px 12px 12px 5px;
+  background: var(--stock);
+  box-shadow:
+    1px 2px 0 var(--ivory),
+    2px 3px 0 var(--line),
+    3px 5px 0 var(--paper),
+    4px 6px 0 var(--line);
+}
+.book-index {
+  border-radius: 5px 9px 0 0;
+}
+.book-leaf {
+  padding: 0;
+  border-inline-start: 0;
+}
+.book-status,
+.book-pager {
+  padding: 10px var(--paper-inset) 10px calc(var(--binding-width) + var(--paper-inset));
+}
+.book-frame {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  overflow-anchor: none;
+  background: var(--stock);
+}
+.book-surface {
+  perspective: none;
+  min-height: 100svh;
+  padding: clamp(24px, 4vw, 42px) var(--paper-inset) 2rem calc(var(--binding-width) + var(--paper-inset));
+  background-color: var(--stock);
+  background-image:
+    linear-gradient(
+      90deg,
+      transparent var(--punch-line),
+      var(--margin-rule) var(--punch-line) calc(var(--punch-line) + 1px),
+      transparent 0
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0 calc(var(--rule-step) - 1px),
+      var(--rule) calc(var(--rule-step) - 1px) var(--rule-step)
+    );
+}
+.book-binding {
+  position: absolute;
+  pointer-events: none;
+  z-index: 4;
+  inset: 0 auto 0 0;
+  width: var(--binding-width);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 44'%3E%3Cellipse cx='23' cy='23' rx='4.2' ry='3.6' fill='%23867d6a'/%3E%3Cellipse cx='23' cy='22' rx='3' ry='2' fill='%233d3b35'/%3E%3Cpath d='M-3 31C5 33 26 29 23 22C21 18 9 17 -3 21' fill='none' stroke='%237f7767' stroke-width='2.8'/%3E%3Cpath d='M-2 30C6 31 24 28 22.5 23' fill='none' stroke='%23d3c8b4' stroke-width='1.3'/%3E%3C/svg%3E");
+  background-size: 100% 44px;
+  background-repeat: repeat-y;
+}
+.book-surface .panel:not(.dark-panel) {
+  border: 0;
+}
+.book-surface .page-heading {
+  padding-bottom: var(--s2);
+}
+.book-surface .field textarea,
+.employee-view[data-script="pen"] .book-surface .field textarea {
+  line-height: var(--rule-step);
+  padding: 0.22rem 0.4rem 0.5rem;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0 calc(var(--rule-step) - 1px),
+      #c8cec1 calc(var(--rule-step) - 1px) var(--rule-step)
+    )
+    0 -0.1rem / 100% var(--rule-step) local var(--stock);
+  border: 1px solid transparent;
+  border-radius: 0;
+}
+.book-surface .field textarea:focus-visible {
+  outline-offset: 1px;
+}
+.book-motion-note {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .book-motion-note {
+    display: block;
+    max-width: 22ch;
+  }
+}
+.curl-stage {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.turn-window,
+.curl-stage > canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.turn-window {
+  background: var(--stock);
+  overflow: hidden;
+  transform-origin: left center;
+  backface-visibility: hidden;
+}
+.turn-select > svg {
+  position: absolute;
+  right: 3px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.turn-check {
+  display: inline-grid !important;
+  place-items: center;
+  border-radius: 2px;
+}
+@media (max-width: 360px) {
+  .notebook {
+    --binding-width: 19px;
+    --paper-inset: 11px;
+  }
+  .book-index nav {
+    gap: 0 7px;
+  }
 }

@@ -66,6 +66,7 @@ export function BookSettings() {
           <input type="checkbox" checked={still} onChange={(e) => change(plain, e.target.checked)} /> 페이지
           효과 끄기
         </label>
+        <p className="book-motion-note">기기의 동작 줄이기 설정에 따라 페이지를 바로 이동합니다.</p>
         {debuggingMotion && <MotionDiagnostics still={still} />}
       </fieldset>
     </details>
