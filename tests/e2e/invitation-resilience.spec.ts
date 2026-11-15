@@ -15,7 +15,7 @@ for (const phase of ["preparing", "arriving", "opening", "reading"]) {
 }
 
 for (const failure of ["creation", "shader"]) {
-  test(`graphics ${failure} failure presents an actionable static invitation`, async ({ page }) => {
+  test(`graphics ${failure} failure presents an actionable lightweight invitation`, async ({ page }) => {
     await page.addInitScript((kind) => {
       if (kind === "creation")
         Object.defineProperty(HTMLCanvasElement.prototype, "getContext", { value: () => null });
@@ -25,7 +25,7 @@ for (const failure of ["creation", "shader"]) {
         };
     }, failure);
     await page.goto("/#/invite");
-    await expect(page.locator(".invite-page")).toHaveAttribute("data-renderer", "static");
+    await expect(page.locator(".invite-page")).toHaveAttribute("data-renderer", "simple");
     await page.getByRole("button", { name: "행사장으로 가기" }).click();
     await expect(page.getByLabel("비밀번호", { exact: true })).toBeVisible();
   });

@@ -62,6 +62,13 @@ export function Participant() {
         <BookLayout
           treeOpen={treeOpen}
           revision={data.state.revision}
+          scene={JSON.stringify([
+            data.state.phase,
+            data.state.paused,
+            data.state.editing_locked,
+            treeOpen,
+            data.state.payload,
+          ])}
           status={
             <>
               <span className="status">{connection}</span>

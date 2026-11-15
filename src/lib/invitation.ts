@@ -24,7 +24,7 @@ export type InvitationPhase =
   | "reading"
   | "departing"
   | "completed";
-export type InvitationRenderMode = "webgl" | "static";
+export type InvitationRenderMode = "webgl" | "static" | "simple";
 export const invitationKey = "hyeseong:2026:invitation:v1:entered";
 let entered = false;
 export function hasEnteredInvitation() {

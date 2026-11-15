@@ -1,5 +1,8 @@
 import { type MouseEvent, type ReactNode, useLayoutEffect, useRef } from "react";
 import { Link, NavLink, useLocation, useNavigationType } from "react-router-dom";
+import { motionMedia, motionPolicy, safeRoute } from "../../lib/motion";
+import { traceMotion } from "../../lib/motionDebug";
+import { startTurn } from "./bookTurn";
 import { useBookView } from "./preferences";
 
 const chapters = [
@@ -14,11 +17,13 @@ export function BookLayout({
   treeOpen,
   status,
   revision,
+  scene,
 }: {
   readonly children: ReactNode;
   readonly treeOpen: boolean;
   readonly status: ReactNode;
   readonly revision: number;
+  readonly scene: string;
 }) {
   const { pathname, state, key } = useLocation();
   const action = useNavigationType();
@@ -27,69 +32,66 @@ export function BookLayout({
   const index = pages.findIndex((p) => p.path === pathname);
   const paper = useRef<HTMLElement>(null);
   const sheet = useRef<HTMLDivElement>(null);
-  const previous = useRef({ pathname, key, revision });
+  const previous = useRef({ pathname, key, revision, scene, still });
+  const cancel = useRef<((reason: string) => void) | null>(null);
   const scrolls = useRef(new Map<string, number>());
+  useLayoutEffect(() => () => cancel.current?.("COMPONENT_UNMOUNTED"), []);
   useLayoutEffect(() => {
     const prior = previous.current;
-    previous.current = { pathname, key, revision };
-    const surface = paper.current;
-    const leaf = sheet.current;
-    if (!surface || !leaf || prior.pathname === pathname) return;
+    previous.current = { pathname, key, revision, scene, still };
+    const moved = prior.pathname !== pathname,
+      changed = prior.scene !== scene;
+    if (moved || changed || prior.still !== still) {
+      cancel.current?.(changed ? "EVENT_STATE_CHANGED" : moved ? "ROUTE_SUPERSEDED" : "POLICY_CHANGED");
+      cancel.current = null;
+    }
+    const trace = traceMotion("book");
+    if (!moved) {
+      if (changed || prior.still !== still || prior.key !== key)
+        trace(
+          changed ? "EVENT_STATE_CHANGED" : still ? "USER_PAGE_EFFECTS_DISABLED" : "NAVIGATION_NOT_ELIGIBLE",
+          { mode: "none" },
+        );
+      return;
+    }
     scrolls.current.set(prior.key, window.scrollY);
-    surface.focus({ preventScroll: true });
+    paper.current?.focus({ preventScroll: true });
     window.scrollTo(0, action === "POP" ? (scrolls.current.get(key) ?? 0) : 0);
-    const reduced = matchMedia("(prefers-reduced-motion: reduce)");
-    if (
-      prior.revision !== revision ||
-      still ||
-      reduced.matches ||
-      action === "POP" ||
-      state?.bookFrom !== prior.pathname ||
-      document.hidden ||
-      !leaf.animate
-    )
-      return;
-    const forward = chapters.findIndex((p) => p.path === prior.pathname) < index;
-    let animation: Animation;
-    try {
-      animation = leaf.animate(
-        forward
-          ? [
-              { transform: "rotateY(0deg)", opacity: 1 },
-              { transform: "rotateY(-91deg)", opacity: 0 },
-            ]
-          : [
-              { transform: "rotateY(-91deg)", opacity: 0 },
-              { transform: "rotateY(-12deg)", opacity: 0.85, offset: 0.72 },
-              { transform: "rotateY(0deg)", opacity: 0 },
-            ],
-        { duration: 480, easing: "ease-in-out" },
-      );
-    } catch {
+    const policy = motionPolicy(motionMedia()?.matches, still);
+    const matches = state?.bookFrom === prior.pathname;
+    trace("REQUEST", {
+      from: safeRoute(prior.pathname),
+      to: safeRoute(pathname),
+      navigation: action,
+      bookFromMatches: matches,
+      revisionChanged: revision !== prior.revision,
+      eventChanged: changed,
+      pageEffectsOff: still,
+      reduced: motionMedia()?.matches ?? null,
+      hidden: document.hidden,
+    });
+    const reason =
+      policy !== "ALLOWED"
+        ? policy
+        : changed
+          ? "EVENT_STATE_CHANGED"
+          : action === "POP"
+            ? "NAVIGATION_POP"
+            : !matches
+              ? "NAVIGATION_NOT_ELIGIBLE"
+              : document.hidden
+                ? "DOCUMENT_HIDDEN"
+                : null;
+    if (reason || !sheet.current) {
+      trace(reason ?? "ZERO_SIZE", { mode: "none" });
       return;
     }
-    leaf.dataset.turn = forward ? "forward" : "backward";
-    function stop() {
-      animation.cancel();
-      if (leaf) delete leaf.dataset.turn;
-    }
-    const timer = window.setTimeout(stop, 850);
-    let ended = false;
-    const finish = () => {
-      if (ended) return;
-      ended = true;
-      clearTimeout(timer);
-      stop();
-      reduced.removeEventListener("change", finish);
-      window.removeEventListener("resize", finish);
-      document.removeEventListener("visibilitychange", finish);
-    };
-    reduced.addEventListener("change", finish);
-    window.addEventListener("resize", finish);
-    document.addEventListener("visibilitychange", finish);
-    void animation.finished.then(finish, finish);
-    return finish;
-  }, [action, index, key, pathname, state, still, revision]);
+    cancel.current = startTurn(
+      sheet.current,
+      chapters.findIndex((p) => p.path === prior.pathname) < index,
+      trace,
+    );
+  }, [pathname, key, revision, scene, still, action, index, state]);
   function ignoreRepeatedClick(event: MouseEvent<HTMLElement>) {
     if (event.detail > 1 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey)
       event.preventDefault();
@@ -108,8 +110,10 @@ export function BookLayout({
               to={p.path}
               state={where}
               onClick={(e) => {
-                if (p.path === pathname && !e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey)
+                if (p.path === pathname && !e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey) {
+                  traceMotion("book")("SAME_PAGE", { mode: "none", from: safeRoute(pathname) });
                   e.preventDefault();
+                }
               }}
             >
               <span aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>

@@ -58,13 +58,15 @@ test("reduced motion, blocked storage, root and replay remain usable without loa
   expect(graphics).toEqual([]);
 });
 
-test("late preparation cannot restart static mode; direct admin is ungated", async ({ page }) => {
+test("late preparation cannot restart graphics after lightweight fallback; direct admin is ungated", async ({
+  page,
+}) => {
   await page.route(/assets\/invitation-.*\.js/, async (route) => {
-    await new Promise((resolve) => setTimeout(resolve, 2600));
+    await new Promise((resolve) => setTimeout(resolve, 3500));
     await route.continue();
   });
   await page.goto("/#/invite");
-  await expect(page.locator(".invite-page")).toHaveAttribute("data-renderer", "static", { timeout: 4000 });
+  await expect(page.locator(".invite-page")).toHaveAttribute("data-renderer", "simple", { timeout: 4400 });
   await page.waitForLoadState("networkidle");
   await expect(page.locator(".invite-page")).toHaveAttribute("data-phase", "reading");
   await expect(page.locator("canvas")).toHaveCount(0);

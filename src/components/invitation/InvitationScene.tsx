@@ -2,66 +2,161 @@ import { type RefObject, useEffect, useRef } from "react";
 import type { createInvitationScene } from "../../graphics/invitation";
 import { invitationAnchor } from "../../graphics/invitation-layout";
 import { type InvitationPhase, invitationMotion } from "../../lib/invitation";
+import { debuggingMotion, errorKind, geometry, type MotionTrace } from "../../lib/motionDebug";
 
 type Props = {
   readonly letter: RefObject<HTMLElement | null>;
   readonly departing: boolean;
-  readonly phase: (phase: InvitationPhase) => void;
-  readonly failed: () => void;
+  readonly phase: (next: InvitationPhase) => void;
+  readonly failed: (reason: string) => void;
   readonly complete: () => void;
+  readonly trace: MotionTrace;
 };
-export function InvitationScene({ letter, departing, phase, failed, complete }: Props) {
+export function InvitationScene({ letter, departing, phase, failed, complete, trace }: Props) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const session = useRef<ReturnType<typeof createInvitationScene> | null>(null);
   useEffect(() => {
-    let live = true;
-    const fail = () => {
-      if (live) {
-        live = false;
-        session.current?.dispose();
-        session.current = null;
-        failed();
-      }
+    const surface = canvas.current,
+      content = letter.current;
+    if (!surface || !content) return;
+    let owned: ReturnType<typeof createInvitationScene> | null = null;
+    const release = () => {
+      owned?.dispose();
+      if (session.current === owned) session.current = null;
+      owned = null;
     };
-    const timer = setTimeout(fail, invitationMotion.preparationTimeout);
+    let live = true,
+      stage = "IMPORT",
+      active = false,
+      first = false,
+      ready = false,
+      eligible = false;
+    const bounds = surface.getBoundingClientRect();
+    let inView =
+      bounds.bottom > 0 && bounds.top < innerHeight && bounds.right > 0 && bounds.left < innerWidth;
+    const preparationView =
+      typeof IntersectionObserver === "function"
+        ? new IntersectionObserver(([entry]) => {
+            if (!live || !entry) return;
+            inView = entry.isIntersecting;
+            if (!inView) trace("OFFSCREEN");
+            watch();
+          })
+        : undefined;
+    let remaining: number = invitationMotion.preparationTimeout;
+    let since = performance.now();
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    function fail(reason: string, error?: unknown) {
+      if (!live) return;
+      live = false;
+      clearTimeout(timer);
+      trace(reason, { stage, errorType: errorKind(error) });
+      preparationView?.disconnect();
+      release();
+      failed(reason);
+    }
+    // The preparation budget accrues only in the foreground. After start, count only drawable time.
+    function watch() {
+      const now = performance.now();
+      if (eligible) remaining -= now - since;
+      since = now;
+      clearTimeout(timer);
+      eligible = live && !document.hidden && !first && (ready ? active : inView);
+      if (eligible)
+        timer = setTimeout(
+          () => fail(ready ? "FIRST_FRAME_TIMEOUT" : "PREPARATION_TIMEOUT"),
+          Math.max(0, remaining),
+        );
+    }
+    const visibility = () => {
+      trace(document.hidden ? "DOCUMENT_HIDDEN" : "DOCUMENT_VISIBLE");
+      watch();
+    };
+    preparationView?.observe(surface);
+    document.addEventListener("visibilitychange", visibility);
+    watch();
+    trace("IMPORT_START");
     void import("../../graphics/invitation")
-      .then(async ({ createInvitationScene }) => {
-        if (!live || !canvas.current || !letter.current) return;
-        const surface = canvas.current;
-        const content = letter.current;
+      .then(async (mod) => {
+        if (!live) {
+          trace("LATE_IMPORT_IGNORED");
+          return;
+        }
+        trace("IMPORT_END");
+        stage = "INIT";
+        trace("INIT_START");
         try {
-          const created = createInvitationScene(
+          const created = mod.createInvitationScene(
             surface,
             () => invitationAnchor(surface.getBoundingClientRect(), content.getBoundingClientRect()),
             {
               phase(next) {
                 if (!live) return;
-                if (next === "reading") session.current?.setPaused(true);
                 phase(next);
+                if (next === "reading") session.current?.setPaused(true);
               },
-              failed: fail,
+              activity(reason) {
+                if (!live) return;
+                active = reason === "ACTIVE";
+                trace(reason, debuggingMotion ? geometry(surface) : {});
+                watch();
+              },
+              compile() {
+                stage = "SHADER";
+                trace("SHADER_START");
+              },
+              firstFrame() {
+                if (!live) return;
+                first = true;
+                clearTimeout(timer);
+                trace("FIRST_RENDER_RETURNED", debuggingMotion ? geometry(surface) : {});
+                if (debuggingMotion) {
+                  const s = getComputedStyle(surface);
+                  if (s.visibility === "hidden" || s.display === "none" || Number(s.opacity) === 0)
+                    trace("CSS_HIDDEN");
+                }
+              },
               complete() {
                 if (live) complete();
               },
+              failed: fail,
             },
           );
+          owned = created;
           session.current = created;
+          trace("INIT_END");
           await created.ready;
-          if (!live) return;
-          clearTimeout(timer);
+          if (!live) {
+            trace("LATE_READY_IGNORED");
+            return;
+          }
+          if (!document.hidden && (!surface.clientWidth || !surface.clientHeight)) {
+            fail("ZERO_SIZE");
+            return;
+          }
+          trace("SHADER_READY");
+          preparationView?.disconnect();
+          ready = true;
+          eligible = false;
+          remaining = invitationMotion.preparationTimeout;
+          stage = "FIRST_FRAME";
+          watch();
+          trace("START_REQUESTED");
           created.start();
-        } catch {
-          fail();
-        } // Optional graphics boundary: the complete HTML invitation is the fallback.
+        } catch (error) {
+          fail(stage === "INIT" ? "WEBGL_INIT_FAILED" : "SHADER_PREPARATION_FAILED", error);
+        }
       })
-      .catch(fail);
+      .catch((error) => fail("IMPORT_FAILED", error));
     return () => {
       live = false;
       clearTimeout(timer);
-      session.current?.dispose();
-      session.current = null;
+      preparationView?.disconnect();
+      document.removeEventListener("visibilitychange", visibility);
+      release();
+      trace("SCENE_DISPOSED");
     };
-  }, [letter, phase, failed, complete]);
+  }, [letter, phase, failed, complete, trace]);
   useEffect(() => {
     if (departing) session.current?.depart();
   }, [departing]);

@@ -1,6 +1,9 @@
 import { createContext, type ReactNode, useContext, useState } from "react";
 import { useLocation } from "react-router-dom";
 
+import { debuggingMotion } from "../../lib/motionDebug";
+import { MotionDiagnostics } from "../MotionDiagnostics";
+
 const key = "hyeseong:2026:book-view";
 function read() {
   try {
@@ -63,6 +66,7 @@ export function BookSettings() {
           <input type="checkbox" checked={still} onChange={(e) => change(plain, e.target.checked)} /> 페이지
           효과 끄기
         </label>
+        {debuggingMotion && <MotionDiagnostics still={still} />}
       </fieldset>
     </details>
   );
