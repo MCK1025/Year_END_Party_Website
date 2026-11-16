@@ -12,6 +12,7 @@ test("an IME draft at the bottom moves from the current visible slice when captu
   await fixture(page, undefined, { extraQuestions: 18 });
   await page.route(/assets\/rasterPaper-.*\.js/, (r) => r.abort());
   await page.goto("/#/survey");
+  await expect(page.getByRole("heading", { name: "들려주지 않은 당신의 이야기", exact: true })).toBeVisible();
   const last = page.getByRole("textbox", { name: /기억 18/ });
   const draft = Array.from({ length: 16 }, (_, i) => `겨울 기억 ${i + 1}`).join("\n");
   await last.fill(draft);
@@ -30,7 +31,7 @@ test("an IME draft at the bottom moves from the current visible slice when captu
   const stage = page.locator(".curl-stage");
   await expect(stage).toHaveAttribute("data-mode", "dom");
   await expect(stage).toContainText("겨울 기억 16");
-  await expect(stage).not.toContainText("아직 들려주지 않은");
+  await expect(stage).not.toContainText("들려주지 않은");
   expect((await stage.boundingBox())?.height).toBeLessThanOrEqual(536);
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(stage).toHaveCount(0);

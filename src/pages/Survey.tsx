@@ -22,9 +22,9 @@ export function Survey() {
         <span aria-hidden="true" className="paper-sticker sticker-gift" />
         <p className="overline">Prologue · 나를 소개하는 여섯 문장</p>
         <h1>
-          아직 들려주지 않은
+          들려주지 않은
           <br />
-          당신의 이야기.
+          당신의 이야기
         </h1>
         <p className="muted">짧아도 좋아요. 오늘 대화의 작은 실마리가 됩니다.</p>
       </header>
