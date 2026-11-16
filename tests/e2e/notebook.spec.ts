@@ -24,6 +24,46 @@ async function capture(page: Page, state: string, readAt?: string) {
     await page.screenshot({ path: `artifacts/screens/notebook/${state}-${width}.png` });
   }
 }
+for (const [id, family] of [
+  ["gamja", "Gamja Flower"],
+  ["yeon", "Yeon Sung"],
+] as const) {
+  test(`${family} renders Korean and persists across chapters and reload`, async ({ page }) => {
+    await fixture(page);
+    await page.goto("/#/survey");
+    const answer = page.getByLabel("어릴 적 나의 꿈은?");
+    await answer.fill("겨울밤에 별을 세는 사람");
+    const consent = page.getByRole("checkbox", { name: /내 답변을/ });
+    await consent.check();
+    await page.locator(".book-settings summary").click();
+    const settings = page.getByLabel("글씨", { exact: true });
+    await page.getByLabel("페이지 효과 끄기").check();
+    await settings.selectOption(id);
+    await expect(answer).toHaveCSS("font-family", new RegExp(family));
+    await expect
+      .poll(() =>
+        page.evaluate(async (name) => {
+          const faces = await document.fonts.load(`24px "${name}"`, "겨울밤");
+          return faces.length > 0 && faces.every((face) => face.status === "loaded");
+        }, family),
+      )
+      .toBe(true);
+    await expect(consent).toBeChecked();
+    await expect(answer).toHaveValue("겨울밤에 별을 세는 사람");
+    await expect(settings).not.toHaveCSS("font-family", new RegExp(family));
+    await page.locator(".book-settings summary").click();
+    await page
+      .locator(".survey-entries .field")
+      .first()
+      .screenshot({ path: `artifacts/screens/notebook/font-${id}.png` });
+    await page.getByRole("link", { name: /고마운 동료/ }).click();
+    await page.reload();
+    await expect(page.locator(".book-surface h1")).toHaveCSS("font-family", new RegExp(family));
+    await page.locator(".book-settings summary").click();
+    await expect(settings).toHaveValue(id);
+    await expect(page.getByLabel("페이지 효과 끄기")).toBeChecked();
+  });
+}
 test("one active employee page preserves writing across chapters, history, font changes and failed save refresh", async ({
   page,
 }) => {

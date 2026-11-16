@@ -25,23 +25,19 @@ function fontData(url: string) {
   return item;
 }
 async function embeddedFonts() {
+  const sheet = document.querySelector<HTMLLinkElement>("link[data-book-font]")?.sheet;
+  if (!sheet?.href) return "/* system font */";
+  const rules = [...sheet.cssRules].filter((rule) => rule instanceof CSSFontFaceRule);
+  const family = rules[0]?.style.getPropertyValue("font-family").replace(/["']/g, "");
   const loaded = new Set(
     [...document.fonts]
-      .filter((f) => f.status === "loaded" && f.family.includes("Nanum Pen Script"))
+      .filter((f) => f.status === "loaded" && f.family.replace(/["']/g, "") === family)
       .map((f) => f.unicodeRange.toLowerCase().replaceAll(" ", "")),
   );
   if (!loaded.size) return "/* system font */";
-  const sheet = [...document.styleSheets].find((s) =>
-    s.href?.startsWith(new URL(`${import.meta.env.BASE_URL}fonts/nanum-pen/font.css`, location.origin).href),
-  );
-  if (!sheet?.href) return "/* system font */";
   const jobs: Promise<string>[] = [];
-  for (const rule of sheet.cssRules) {
-    if (
-      !(rule instanceof CSSFontFaceRule) ||
-      !loaded.has(rule.style.getPropertyValue("unicode-range").toLowerCase().replaceAll(" ", ""))
-    )
-      continue;
+  for (const rule of rules) {
+    if (!loaded.has(rule.style.getPropertyValue("unicode-range").toLowerCase().replaceAll(" ", ""))) continue;
     const src = rule.style.getPropertyValue("src").match(/url\(["']?([^)"']+)/)?.[1];
     if (!src || !/^\.\/[\w.-]+\.woff2$/.test(src)) continue;
     jobs.push(fontData(new URL(src, sheet.href).href).then((data) => rule.cssText.replace(src, data)));
