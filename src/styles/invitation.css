@@ -28,6 +28,19 @@
 .site-header:has(.guest-tools) {
   flex-wrap: wrap;
 }
+.music-tools {
+  display: grid;
+  justify-items: start;
+}
+.music-retry {
+  min-height: 48px;
+  padding-inline: var(--s1);
+  color: var(--gold-ink);
+  font: 500 0.8125rem / 1.4 var(--body);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
 .music-control {
   display: inline-flex;
   align-items: center;
