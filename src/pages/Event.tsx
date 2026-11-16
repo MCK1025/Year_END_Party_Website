@@ -3,6 +3,8 @@ import { CompanyLogo } from "../components/CompanyLogo";
 import { EventView } from "../components/EventView";
 import { RecapCards } from "../components/RecapCards";
 import { Note, Panel } from "../components/ui";
+import { WaitingStory } from "../components/waiting/WaitingStory";
+import { invitationCopy } from "../lib/invitation";
 
 import { useGuest } from "./Participant";
 
@@ -22,15 +24,15 @@ export function Event() {
       )}
       {waiting ? (
         <>
-          <section className="event-cover">
+          <section className="event-cover waiting-cover">
             <CompanyLogo path={data.settings.logo_path} />
-            <p className="overline">Your seat is here</p>
+            <p className="overline">{invitationCopy.name}</p>
             <h1>한 걸음 더 가까워진, 그리고 가까워질 우리.</h1>
-            <p className="event-year">2026</p>
             <p className="muted" style={{ whiteSpace: "pre-line" }}>
               {data.settings.welcome}
             </p>
           </section>
+          <WaitingStory eventPaused={state.paused} />
           <Panel>
             <p>{data.survey ? "당신의 이야기가 잘 도착했습니다." : "아직 들려주지 않은 이야기가 있어요."}</p>
             <p className="small">

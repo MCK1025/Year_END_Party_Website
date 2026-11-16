@@ -13,8 +13,9 @@ export function visiblePaper(paper: HTMLElement): PaperSlice {
   };
 }
 const unavailable =
-  'canvas,video,iframe,dialog[open],input[type="password"],[data-private],[aria-busy="true"]';
-const omit = 'script,style,link,dialog,template,input[type="hidden"],[hidden]';
+  'canvas:not(.work-story-light[data-story-overlay]),video,iframe,dialog[open],input[type="password"],[data-private],[aria-busy="true"]';
+const omit =
+  'script,style,link,dialog,template,input[type="hidden"],[hidden],canvas.work-story-light[data-story-overlay]';
 function paintControl(original: HTMLElement, copy: HTMLElement) {
   const style = getComputedStyle(original);
   for (const property of style) copy.style.setProperty(property, style.getPropertyValue(property));
@@ -141,6 +142,13 @@ export function mirrorPaper(paper: HTMLElement, slice: PaperSlice) {
     if (result instanceof HTMLButtonElement) {
       result.type = "button";
       result.disabled = node instanceof HTMLButtonElement && node.disabled;
+    }
+    // The image stays in the paper snapshot; freeze its current camera and fade
+    // before navigation unmounts the waiting-room animations.
+    if (result instanceof HTMLElement && node.closest(".work-story") && node.getAnimations?.().length) {
+      const frame = getComputedStyle(node);
+      result.style.transform = frame.transform;
+      result.style.opacity = frame.opacity;
     }
     for (const child of node.childNodes) {
       const c = copy(child);

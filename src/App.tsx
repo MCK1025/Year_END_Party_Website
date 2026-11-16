@@ -4,6 +4,7 @@ import { BookPreferences, BookSettings } from "./components/book/preferences";
 import { InvitationEntry } from "./components/invitation/InvitationEntry";
 import { Showcase } from "./components/Showcase";
 import { Mark, Note } from "./components/ui";
+import { WaitingStory } from "./components/waiting/WaitingStory";
 import { Event } from "./pages/Event";
 import { Forest } from "./pages/Forest";
 import { Invitation } from "./pages/Invitation";
@@ -61,6 +62,14 @@ function AppShell() {
             <Route path="/invite" element={<Invitation />} />
             <Route path="/login" element={<InvitationEntry />} />
             <Route path="/admin" element={<Admin />} />
+            <Route
+              path="/preview/waiting-story"
+              element={
+                <main className="guest">
+                  <WaitingStory />
+                </main>
+              }
+            />
             <Route element={<Participant />}>
               <Route path="/survey" element={<Survey />} />
               <Route path="/nominate" element={<Nominate />} />
@@ -72,6 +81,16 @@ function AppShell() {
               ))}
             </Route>
             {import.meta.env.DEV && <Route path="/showcase" element={<Showcase />} />}
+            {import.meta.env.DEV && (
+              <Route
+                path="/dev/waiting-story"
+                element={
+                  <main className="guest">
+                    <WaitingStory inspect />
+                  </main>
+                }
+              />
+            )}
             <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
         </Suspense>
