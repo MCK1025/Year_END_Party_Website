@@ -62,6 +62,7 @@ Only stateful hint entrance and button press: 180ms opacity/translateY(4px), eas
 ## 7. Depth
 
 ### Invitation arrival (2026-11-14)
+- During reading, a translucent yellow pen stroke loops over the heading and message. Its two fixed glints and the line fade before each new stroke. The 4.4-second cycle ends on departure and becomes a faint still heart when motion is reduced.
 - Preserve the exact event theme. One matte navy envelope arrives over the paper background, opens on its top hinge, and releases an ivory letter. The letter becomes real HTML at rest; its DOM bounds own the graphics anchor, including at large text sizes.
 - Reuse all existing colors, serif/system font stacks, 4px spacing scale and Button. Letter width at most 480px, heading 30–40px, mobile padding 24px (16px at 320), stage padding 48px above/96px below. Content grows and scrolls. Only a fine orbit, italic year and folded paper carry ornament.
 - Arrival/settle/open/unfold ends at 1.2/1.5/2.2/3 seconds of active graphics time; departure takes 1 second. Reading pauses rendering. Preparation over 2 seconds, reduced motion or GPU failure yields the same static HTML invitation. Departure has a 1.5 second navigation safety timer.

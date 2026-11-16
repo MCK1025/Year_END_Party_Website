@@ -86,7 +86,7 @@
 .invite-letter {
   position: relative;
   width: min(100%, 480px);
-  padding: 7.75rem clamp(1.65rem, 9vw, 3.25rem) 3.75rem;
+  padding: clamp(1.5rem, 5vw, 2.5rem) 0 var(--s8);
   display: grid;
   gap: var(--s6);
   text-align: center;
@@ -95,41 +95,86 @@
   border-radius: var(--radius-small);
   visibility: hidden;
 }
+.invite-message {
+  position: relative;
+  display: grid;
+  gap: var(--s6);
+  padding: clamp(2rem, 8vw, 3rem) clamp(1.65rem, 9vw, 3.25rem) 2rem;
+}
 .letter-heart {
+  --heart-cycle: 4.4s;
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   pointer-events: none;
+  mix-blend-mode: multiply;
   fill: none;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-.heart-foil {
-  stroke-width: 2.5;
+.heart-ink {
+  stroke: #e6bf37;
+  stroke-width: 3.6;
+  opacity: 0.34;
 }
-.heart-halo {
-  stroke: #ffda45;
-  stroke-width: 8;
-  filter: blur(4px);
+.heart-glint {
+  fill: #eac65c;
   opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
 }
 .invite-letter > .button {
   justify-self: center;
   max-width: 100%;
 }
 @media (prefers-reduced-motion: no-preference) {
-  .letter-heart[data-lamplight="true"] .heart-halo {
-    animation: letter-lamplight 5.6s ease-in-out infinite;
+  .letter-heart[data-motion="true"] .heart-ink {
+    stroke-dasharray: 1.01 1.01;
+    animation: heart-handwriting var(--heart-cycle) linear infinite;
+  }
+  .heart-glint + .heart-glint {
+    --glint-delay: 90ms;
+  }
+  .letter-heart[data-motion="true"] .heart-glint {
+    animation: heart-glint var(--heart-cycle) ease-in-out var(--glint-delay, 0s) infinite;
   }
 }
-@keyframes letter-lamplight {
+@keyframes heart-handwriting {
   0%,
+  5% {
+    stroke-dashoffset: 1.01;
+    opacity: 0;
+    animation-timing-function: cubic-bezier(0.3, 0.05, 0.4, 1);
+  }
+  8% {
+    stroke-dashoffset: 0.96;
+    opacity: 0.68;
+    animation-timing-function: cubic-bezier(0.35, 0.08, 0.45, 1);
+  }
+  37%,
+  63% {
+    stroke-dashoffset: 0;
+    opacity: 0.68;
+    animation-timing-function: ease-in-out;
+  }
+  85%,
   100% {
+    stroke-dashoffset: 0;
     opacity: 0;
   }
-  50% {
-    opacity: 0.78;
+}
+@keyframes heart-glint {
+  0%,
+  51%,
+  62%,
+  100% {
+    opacity: 0;
+    transform: scale(0.62);
+  }
+  56% {
+    opacity: 0.64;
+    transform: scale(1);
   }
 }
 .invite-identity .overline {
@@ -224,9 +269,6 @@
 @media (max-width: 360px) {
   .invite-page {
     padding-inline: var(--s4);
-  }
-  .invite-letter {
-    padding-top: 8.5rem;
   }
 }
 @media (prefers-reduced-motion: reduce) {

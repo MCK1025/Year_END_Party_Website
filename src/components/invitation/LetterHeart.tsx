@@ -1,70 +1,31 @@
-import { useLayoutEffect, useRef, useState } from "react";
 import { useBookView } from "../book/preferences";
 
-const outline =
-  "M180 436 C165 428 23 350 14 212 C8 139 6 44 57 20 C109 -4 157 46 178 99 Q180 105 182 99 C203 46 247 -5 293 16 C347 40 353 112 347 192 C339 314 286 376 180 436 Z";
-
-export function LetterHeart({
-  reading,
-  motionAllowed,
-}: {
-  readonly reading: boolean;
-  readonly motionAllowed: boolean;
-}) {
+export function LetterHeart({ motionAllowed }: { readonly motionAllowed: boolean }) {
   const { still } = useBookView();
-  const foil = useRef<SVGPathElement>(null);
-  const opened = useRef(false);
-  const [complete, setComplete] = useState(false);
-  useLayoutEffect(() => {
-    if (!reading) return;
-    const path = foil.current;
-    const firstReading = !opened.current;
-    opened.current = true;
-    if (!firstReading || still || !motionAllowed || !path || typeof path.animate !== "function") {
-      setComplete(true);
-      return;
-    }
-    // Draw in the outline's own coordinates. Once finished the SVG paints its normal solid stroke.
-    let drawing: Animation;
-    try {
-      const length = path.getTotalLength() + 1;
-      const dash = `${length} ${length}`;
-      drawing = path.animate(
-        [
-          { strokeDasharray: dash, strokeDashoffset: length },
-          { strokeDasharray: dash, strokeDashoffset: 0 },
-        ],
-        { duration: 1800, easing: "ease-in-out" },
-      );
-    } catch {
-      setComplete(true);
-      return;
-    }
-    drawing.onfinish = () => setComplete(true);
-    return () => {
-      drawing.onfinish = null;
-      drawing.cancel();
-    };
-  }, [reading, motionAllowed, still]);
   return (
     <svg
       className="letter-heart"
-      data-lamplight={complete && reading && motionAllowed && !still}
+      data-motion={motionAllowed && !still}
       aria-hidden="true"
       focusable="false"
-      viewBox="0 0 360 460"
+      viewBox="0 0 360 262"
       preserveAspectRatio="none"
     >
-      <defs>
-        <linearGradient id="letter-gold" x1="0" y1="0" x2="1" y2=".8">
-          <stop stopColor="#d8ab18" />
-          <stop offset=".32" stopColor="#f1c928" />
-          <stop offset=".64" stopColor="#d4a71a" />
-          <stop offset="1" stopColor="#e9c128" />
-        </linearGradient>
-      </defs>
-      <path className="heart-halo" vectorEffect="non-scaling-stroke" d={outline} />
-      <path className="heart-foil" stroke="url(#letter-gold)" ref={foil} d={outline} />
+      <path
+        className="heart-ink"
+        pathLength="1"
+        d="M59 247 C94 252 133 240 166 223 C233 190 317 137 327 77
+           C335 29 304 7 269 14 C231 21 199 55 182 91
+           C177 57 153 21 121 15 C77 5 37 30 31 73
+           C20 133 81 187 150 217 C180 231 207 239 228 240"
+      />
+      <g className="heart-glints">
+        <path className="heart-glint" d="M80 12 Q81 18 85 19 Q81 20 80 26 Q79 20 75 19 Q79 18 80 12Z" />
+        <path
+          className="heart-glint"
+          d="M310 17 Q311 22 315 23 Q311 24 310 29 Q309 24 305 23 Q309 22 310 17Z"
+        />
+      </g>
     </svg>
   );
 }

@@ -151,13 +151,15 @@ function InvitationAttempt({ replay }: { readonly replay: () => void }) {
           inert={phase !== "reading"}
           aria-hidden={phase !== "reading"}
         >
-          <h1>{invitationCopy.theme}</h1>
-          <p className="invite-body">{invitationCopy.body}</p>
+          <div className="invite-message">
+            <h1>{invitationCopy.theme}</h1>
+            <p className="invite-body">{invitationCopy.body}</p>
+            {phase === "reading" && <LetterHeart motionAllowed={mode !== "static"} />}
+          </div>
           <Button onClick={enter}>{invitationCopy.enter}</Button>
           <span className="invite-year" aria-hidden="true">
             2026
           </span>
-          <LetterHeart reading={phase === "reading"} motionAllowed={mode !== "static"} />
         </article>
       </div>
       {mode !== "webgl" && (
