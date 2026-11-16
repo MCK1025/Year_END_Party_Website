@@ -25,11 +25,7 @@ export function Event() {
           <section className="event-cover">
             <CompanyLogo path={data.settings.logo_path} />
             <p className="overline">Your seat is here</p>
-            <h1>
-              한 걸음 더 가까워진,
-              <br />
-              그리고 가까워질 우리.
-            </h1>
+            <h1>한 걸음 더 가까워진, 그리고 가까워질 우리.</h1>
             <p className="event-year">2026</p>
             <p className="muted" style={{ whiteSpace: "pre-line" }}>
               {data.settings.welcome}
@@ -52,11 +48,7 @@ export function Event() {
         <>
           <header className="page-heading">
             <p className="overline">A year, in moments</p>
-            <h1>
-              함께여서 남은
-              <br />
-              우리의 장면들.
-            </h1>
+            <h1>함께여서 남은 우리의 장면들.</h1>
             <p className="muted">천천히 넘기며, 그날의 이야기를 나눠보세요.</p>
           </header>
           <RecapCards key={state.revision} />

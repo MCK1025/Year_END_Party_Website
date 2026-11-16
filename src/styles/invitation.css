@@ -48,20 +48,12 @@
   border-radius: var(--radius-small);
   visibility: hidden;
 }
-.invite-letter h1 {
-  text-wrap: balance;
-  font-size: clamp(30px, 4vw, 40px);
-  letter-spacing: -0.04em;
-}
-.invite-phrase {
-  display: inline-block;
-}
 .invite-identity .overline {
   font-size: 13px;
   letter-spacing: 0.08em;
 }
 .invite-body {
-  white-space: pre-line;
+  text-wrap: balance;
   color: var(--muted);
 }
 .invite-year {

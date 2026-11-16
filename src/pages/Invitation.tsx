@@ -11,7 +11,6 @@ import {
   type InvitationRenderMode,
   invitationCopy,
   invitationMotion,
-  invitationThemeParts,
 } from "../lib/invitation";
 import { motionMedia, motionPolicy, observeMotion } from "../lib/motion";
 import { traceMotion } from "../lib/motionDebug";
@@ -142,14 +141,7 @@ function InvitationAttempt({ replay }: { readonly replay: () => void }) {
           inert={phase !== "reading"}
           aria-hidden={phase !== "reading"}
         >
-          <h1>
-            {invitationThemeParts.map((part, index) => (
-              <span key={part}>
-                {index > 0 ? " " : ""}
-                <span className="invite-phrase">{part}</span>
-              </span>
-            ))}
-          </h1>
+          <h1>{invitationCopy.theme}</h1>
           <p className="invite-body">{invitationCopy.body}</p>
           <Button onClick={enter}>{invitationCopy.enter}</Button>
           <span className="invite-year" aria-hidden="true">

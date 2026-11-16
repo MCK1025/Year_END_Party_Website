@@ -28,11 +28,7 @@ export function EventView({
             <p className="overline">
               Who is behind the story? {p.round_index ? `· ${String(p.round_index).padStart(2, "0")}` : ""}
             </p>
-            <h1>
-              아는 사람.
-              <br />
-              몰랐던 이야기.
-            </h1>
+            <h1>아는 사람. 몰랐던 이야기.</h1>
             <p className="muted">
               옆 동료와 이야기하며 맞혀보세요.
               <br />
@@ -74,11 +70,7 @@ export function EventView({
         <div className="stack">
           <header className="page-heading">
             <p className="overline">The things we have in common</p>
-            <h1>
-              생각보다,
-              <br />
-              우린 닮았을지도.
-            </h1>
+            <h1>생각보다, 우린 닮았을지도.</h1>
             <p className="muted">우리 회사에서 가장 많이 나온 답은 무엇일까요?</p>
           </header>
           <Panel title={p.question ?? "다음 취향을 기다리는 중"}>
@@ -112,10 +104,7 @@ export function EventView({
         <div className="stack">
           <header className="page-heading">
             <p className="overline">With our gratitude</p>
-            <h1>
-              당신이 있어,
-              <br />참 다행이었습니다.
-            </h1>
+            <h1>당신이 있어, 참 다행이었습니다.</h1>
             <p className="muted">동료들의 마음이 가장 많이 모인 분을 소개합니다.</p>
           </header>
           {!p.winners?.length && (
@@ -143,9 +132,7 @@ export function EventView({
           <CompanyLogo path={logoPath} />
           <p className="overline">To our next chapter</p>
           <h1>
-            <span className="keep-phrase">다음 한 걸음도,</span>
-            <br />
-            함께.
+            <span className="keep-phrase">다음 한 걸음도,</span> 함께.
           </h1>
           <p style={{ whiteSpace: "pre-line" }}>{p.message}</p>
           <p className="event-year">2026</p>

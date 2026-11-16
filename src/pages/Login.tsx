@@ -38,10 +38,7 @@ export function Login({ fromInvitation = false }: { readonly fromInvitation?: bo
         <div>
           <p className="overline">A little closer, together.</p>
           <h1>
-            한 걸음
-            <br />더 가까워진,
-            <br />
-            <em>그리고 가까워질 우리.</em>
+            한 걸음 더 가까워진, <em>그리고 가까워질 우리.</em>
           </h1>
           <p className="small" style={{ color: "var(--on-dark)" }}>
             매일 만나는 사이에도,
@@ -64,11 +61,7 @@ export function Login({ fromInvitation = false }: { readonly fromInvitation?: bo
       <section className="login-form">
         <div>
           <p className="overline">당신의 자리를 준비했습니다</p>
-          <h2>
-            반갑습니다.
-            <br />
-            이제, 조금 더 가까이.
-          </h2>
+          <h2>반갑습니다. 이제, 조금 더 가까이.</h2>
         </div>
         {!configured ? (
           <Note error>Supabase 연결 설정이 필요합니다. 관리자에게 준비 상황을 확인해주세요.</Note>
