@@ -14,6 +14,11 @@
 .invite-top .button {
   flex: none;
 }
+.invite-identity {
+  display: grid;
+  justify-items: start;
+  gap: var(--s2);
+}
 .invite-stage {
   position: relative;
   isolation: isolate;
@@ -51,7 +56,7 @@
 .invite-phrase {
   display: inline-block;
 }
-.invite-letter .overline {
+.invite-identity .overline {
   font-size: 13px;
   letter-spacing: 0.08em;
 }
@@ -64,14 +69,6 @@
   font-size: 28px;
   font-style: italic;
   color: var(--gold-ink);
-}
-.invite-orbit {
-  width: 48px;
-  height: 20px;
-  border: 1px solid var(--brass);
-  border-radius: 50% 40% 55% 35%;
-  rotate: -12deg;
-  margin: 0 auto;
 }
 .invite-page[data-phase="reading"] .invite-letter {
   visibility: visible;

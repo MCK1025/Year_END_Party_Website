@@ -9,6 +9,10 @@ test("first visit, animated reading, departure, same-tab return and explicit rep
   });
   await page.goto("/#/login");
   await expect(page).toHaveURL(/#\/invite$/);
+  await expect(
+    page.locator(".invite-top").getByText("2026 혜성식품 송년의 밤", { exact: true }),
+  ).toBeVisible();
+  await expect(page.locator(".invite-letter > h1:first-child")).toHaveCount(1);
   await expect(page.getByRole("button", { name: "바로 입장하기" })).toBeVisible();
   await expect(page.locator(".invite-page")).toHaveAttribute("data-phase", "reading", { timeout: 12000 });
   await expect(page.locator(".invite-page")).toHaveAttribute("data-renderer", "webgl");

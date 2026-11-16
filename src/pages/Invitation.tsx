@@ -112,7 +112,10 @@ function InvitationAttempt({ replay }: { readonly replay: () => void }) {
   return (
     <main className="invite-page" data-phase={phase} data-renderer={mode}>
       <header className="invite-top">
-        <CompanyLogo />
+        <div className="invite-identity">
+          <CompanyLogo />
+          <p className="overline">{invitationCopy.name}</p>
+        </div>
         <BookSettings />
         <Button variant="secondary" onClick={finish}>
           {invitationCopy.skip}
@@ -139,8 +142,6 @@ function InvitationAttempt({ replay }: { readonly replay: () => void }) {
           inert={phase !== "reading"}
           aria-hidden={phase !== "reading"}
         >
-          <p className="overline">{invitationCopy.name}</p>
-          <span className="invite-orbit" aria-hidden="true" />
           <h1>
             {invitationThemeParts.map((part, index) => (
               <span key={part}>
