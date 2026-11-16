@@ -4,6 +4,7 @@ import { createGraphicsSession, type GraphicsFailure } from "./service";
 
 export function createInvitationScene(
   canvas: HTMLCanvasElement,
+  symbol: HTMLImageElement,
   anchor: () => InvitationAnchor,
   events: EnvelopeEvents & {
     readonly failed: (reason: GraphicsFailure) => void;
@@ -12,7 +13,7 @@ export function createInvitationScene(
     readonly compile: () => void;
   },
 ) {
-  const effect = envelopeEffect(anchor, events);
+  const effect = envelopeEffect(anchor, events, symbol);
   const session = createGraphicsSession(
     canvas,
     [effect.factory],

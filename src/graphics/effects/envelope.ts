@@ -8,9 +8,13 @@ import {
   Line,
   LineBasicMaterial,
   Mesh,
+  MeshBasicMaterial,
   MeshStandardMaterial,
+  PlaneGeometry,
   Shape,
   ShapeGeometry,
+  SRGBColorSpace,
+  Texture,
   Vector3,
 } from "three";
 import { arrivalPhase, type InvitationPhase, invitationMotion, progress } from "../../lib/invitation";
@@ -24,7 +28,11 @@ export type EnvelopeEvents = {
   readonly phase: (phase: InvitationPhase) => void;
   readonly complete: () => void;
 };
-export function envelopeEffect(anchor: () => InvitationAnchor, events: EnvelopeEvents) {
+export function envelopeEffect(
+  anchor: () => InvitationAnchor,
+  events: EnvelopeEvents,
+  symbol: HTMLImageElement,
+) {
   let active = false;
   let departing = false;
   let origin: number | null = null;
@@ -113,7 +121,16 @@ export function envelopeEffect(anchor: () => InvitationAnchor, events: EnvelopeE
     right.position.z = 0.022;
     front.position.z = 0.03;
     flap.position.set(0, 0.31, 0.035);
-    flap.add(lid);
+    const texture = new Texture(symbol);
+    texture.colorSpace = SRGBColorSpace;
+    texture.needsUpdate = true;
+    const sealWidth = 0.22;
+    const seal = new Mesh(
+      new PlaneGeometry(sealWidth, (sealWidth * symbol.naturalHeight) / symbol.naturalWidth),
+      new MeshBasicMaterial({ map: texture, transparent: true, depthWrite: false, toneMapped: false }),
+    );
+    seal.position.set(0, -0.31, 0.002);
+    flap.add(lid, seal);
     envelope.add(back, left, right, front, flap);
     root.add(paper, envelope);
     const ambient = new AmbientLight(0xffffff, 2.1);
@@ -176,6 +193,7 @@ export function envelopeEffect(anchor: () => InvitationAnchor, events: EnvelopeE
         }
       },
       dispose() {
+        texture.dispose();
         wind.geometry.dispose();
         wind.material.dispose();
         scene.remove(root, ambient, light);

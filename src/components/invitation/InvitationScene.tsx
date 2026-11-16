@@ -1,4 +1,5 @@
 import { type RefObject, useEffect, useRef } from "react";
+import symbolUrl from "../../assets/brand/invitation-symbol.png";
 import type { createInvitationScene } from "../../graphics/invitation";
 import { invitationAnchor } from "../../graphics/invitation-layout";
 import { type InvitationPhase, invitationMotion } from "../../lib/invitation";
@@ -86,8 +87,13 @@ export function InvitationScene({ letter, departing, phase, failed, complete, tr
         stage = "INIT";
         trace("INIT_START");
         try {
+          const symbol = new Image();
+          symbol.src = symbolUrl;
+          await symbol.decode();
+          if (!live) return;
           const created = mod.createInvitationScene(
             surface,
+            symbol,
             () => invitationAnchor(surface.getBoundingClientRect(), content.getBoundingClientRect()),
             {
               phase(next) {

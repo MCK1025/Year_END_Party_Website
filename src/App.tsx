@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { HashRouter, Link, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { BookPreferences, BookSettings } from "./components/book/preferences";
+import { GuestMusic, MusicControl } from "./components/invitation/GuestMusic";
 import { InvitationEntry } from "./components/invitation/InvitationEntry";
 import { Showcase } from "./components/Showcase";
 import { Mark, Note } from "./components/ui";
@@ -18,7 +19,9 @@ export function App() {
   return (
     <HashRouter>
       <BookPreferences>
-        <AppShell />
+        <GuestMusic>
+          <AppShell />
+        </GuestMusic>
       </BookPreferences>
     </HashRouter>
   );
@@ -46,7 +49,10 @@ function AppShell() {
           {location.pathname === "/admin" ? (
             <span className="overline">2026 · 함께의 기록</span>
           ) : (
-            <BookSettings />
+            <div className="guest-tools">
+              <MusicControl />
+              <BookSettings />
+            </div>
           )}
         </header>
       )}

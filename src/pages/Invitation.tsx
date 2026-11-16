@@ -2,8 +2,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BookSettings } from "../components/book/preferences";
 import { CompanyLogo } from "../components/CompanyLogo";
+import { MusicControl, useStartMusic } from "../components/invitation/GuestMusic";
 import { InvitationFallback } from "../components/invitation/InvitationFallback";
 import { InvitationScene } from "../components/invitation/InvitationScene";
+import { LetterHeart } from "../components/invitation/LetterHeart";
 import { Button } from "../components/ui";
 import {
   enterInvitation,
@@ -21,6 +23,7 @@ export function Invitation() {
 }
 function InvitationAttempt({ replay }: { readonly replay: () => void }) {
   const navigate = useNavigate();
+  const startMusic = useStartMusic();
   const [trace] = useState(() => traceMotion("invitation"));
   const [reason, setReason] = useState<string>(() => motionPolicy(motionMedia()?.matches));
   const [mode, setMode] = useState<InvitationRenderMode>(() =>
@@ -31,6 +34,9 @@ function InvitationAttempt({ replay }: { readonly replay: () => void }) {
   const letter = useRef<HTMLElement>(null);
   const finished = useRef(false);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  useEffect(() => {
+    if (phase === "opening" || phase === "reading") startMusic?.();
+  }, [phase, startMusic]);
   const changePhase = useCallback(
     (next: InvitationPhase) => {
       trace(next === "reading" ? "READING_PAUSED" : "PHASE", { phase: next });
@@ -41,12 +47,13 @@ function InvitationAttempt({ replay }: { readonly replay: () => void }) {
   );
   const finish = useCallback(() => {
     if (finished.current) return;
+    startMusic?.();
     finished.current = true;
     trace("LOGIN_NAVIGATION");
     clearTimeout(timer.current);
     enterInvitation();
     navigate("/login", { replace: true, state: { invitationPassed: true, fromInvitation: true } });
-  }, [navigate, trace]);
+  }, [navigate, trace, startMusic]);
   const fallback = useCallback(
     (failure: string) => {
       setReason(failure);
@@ -115,7 +122,10 @@ function InvitationAttempt({ replay }: { readonly replay: () => void }) {
           <CompanyLogo />
           <p className="overline">{invitationCopy.name}</p>
         </div>
-        <BookSettings />
+        <div className="guest-tools">
+          <MusicControl />
+          <BookSettings />
+        </div>
         <Button variant="secondary" onClick={finish}>
           {invitationCopy.skip}
         </Button>
@@ -147,6 +157,7 @@ function InvitationAttempt({ replay }: { readonly replay: () => void }) {
           <span className="invite-year" aria-hidden="true">
             2026
           </span>
+          <LetterHeart reading={phase === "reading"} motionAllowed={mode !== "static"} />
         </article>
       </div>
       {mode !== "webgl" && (
