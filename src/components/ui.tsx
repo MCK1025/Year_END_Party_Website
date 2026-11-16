@@ -1,6 +1,8 @@
-import { ArrowRightIcon, AsteriskIcon } from "@phosphor-icons/react";
+import { ArrowRightIcon } from "@phosphor-icons/react";
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, TextareaHTMLAttributes } from "react";
 import { useEffect, useId, useRef, useState } from "react";
+
+import symbol from "../assets/brand/hyeseong-symbol.png";
 
 export function Button({
   children,
@@ -119,11 +121,7 @@ export function Select({
   );
 }
 export function Mark() {
-  return (
-    <span className="brand-mark" aria-hidden="true">
-      <AsteriskIcon weight="light" size={24} />
-    </span>
-  );
+  return <img className="brand-mark" src={symbol} width={144} height={85} alt="" />;
 }
 export function Forward() {
   return <ArrowRightIcon aria-hidden="true" size={18} />;

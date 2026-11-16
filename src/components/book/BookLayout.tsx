@@ -30,7 +30,7 @@ export function BookLayout({
 }) {
   const { pathname, state, key } = useLocation();
   const action = useNavigationType();
-  const { still, face } = useBookView();
+  const { still } = useBookView();
   const pages = treeOpen ? chapters : chapters.slice(0, -1);
   const index = pages.findIndex((p) => p.path === pathname);
   const paper = useRef<HTMLElement>(null);
@@ -38,7 +38,7 @@ export function BookLayout({
   const liveTurn = useLivePageTurn(paper, pathname === "/event" ? event : null);
   const turn = useRef<ReturnType<typeof freezeTurn>>(null);
   const destination = useRef("");
-  const previous = useRef({ pathname, key, scene, still, face, revision });
+  const previous = useRef({ pathname, key, scene, still, revision });
   const scrolls = useRef(new Map<string, number>());
   const composing = useRef(false);
   const pendingIme = useRef<HTMLAnchorElement | null>(null);
@@ -93,14 +93,13 @@ export function BookLayout({
   useLayoutEffect(() => () => turn.current?.end("COMPONENT_UNMOUNTED"), []);
   useLayoutEffect(() => {
     const prior = previous.current;
-    previous.current = { pathname, key, scene, still, face, revision };
+    previous.current = { pathname, key, scene, still, revision };
     const moved = prior.pathname !== pathname;
     if (moved || prior.scene !== scene) {
       pendingIme.current = null;
       composing.current = false;
     }
     if (prior.scene !== scene) turn.current?.end("EVENT_STATE_CHANGED");
-    if (prior.face !== face) turn.current?.end("TYPEFACE_CHANGED");
     if (prior.still !== still) turn.current?.end("POLICY_CHANGED");
     if (!moved) return;
     scrolls.current.set(prior.key, window.scrollY);
@@ -118,7 +117,7 @@ export function BookLayout({
       traceMotion("book")(action === "POP" ? "NAVIGATION_POP" : "NAVIGATION_NOT_ELIGIBLE", { mode: "none" });
     window.scrollTo(0, action === "POP" ? (scrolls.current.get(key) ?? 0) : 0);
     paper.current?.focus({ preventScroll: true });
-  }, [pathname, key, scene, still, face, revision, state, action]);
+  }, [pathname, key, scene, still, revision, state, action]);
   function beforeLink(e: MouseEvent<HTMLElement>) {
     if (e.defaultPrevented || e.button !== 0 || e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;
     if (e.target instanceof Element && e.target.closest(".book-status button"))

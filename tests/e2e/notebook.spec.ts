@@ -24,47 +24,33 @@ async function capture(page: Page, state: string, readAt?: string) {
     await page.screenshot({ path: `artifacts/screens/notebook/${state}-${width}.png` });
   }
 }
-for (const [id, family] of [
-  ["gamja", "Gamja Flower"],
-  ["yeon", "Yeon Sung"],
-] as const) {
-  test(`${family} renders Korean and persists across chapters and reload`, async ({ page }) => {
-    await fixture(page);
-    await page.goto("/#/survey");
-    const answer = page.getByLabel("어릴 적 나의 꿈은?");
-    await answer.fill("겨울밤에 별을 세는 사람");
-    const consent = page.getByRole("checkbox", { name: /내 답변을/ });
-    await consent.check();
-    await page.locator(".book-settings summary").click();
-    const settings = page.getByLabel("글씨", { exact: true });
-    await page.getByLabel("페이지 효과 끄기").check();
-    await settings.selectOption(id);
-    await expect(answer).toHaveCSS("font-family", new RegExp(family));
-    await expect
-      .poll(() =>
-        page.evaluate(async (name) => {
-          const faces = await document.fonts.load(`24px "${name}"`, "겨울밤");
-          return faces.length > 0 && faces.every((face) => face.status === "loaded");
-        }, family),
-      )
-      .toBe(true);
-    await expect(consent).toBeChecked();
-    await expect(answer).toHaveValue("겨울밤에 별을 세는 사람");
-    await expect(settings).not.toHaveCSS("font-family", new RegExp(family));
-    await page.locator(".book-settings summary").click();
-    await page
-      .locator(".survey-entries .field")
-      .first()
-      .screenshot({ path: `artifacts/screens/notebook/font-${id}.png` });
-    await page.getByRole("link", { name: /고마운 동료/ }).click();
-    await page.reload();
-    await expect(page.locator(".book-surface h1")).toHaveCSS("font-family", new RegExp(family));
-    await page.locator(".book-settings summary").click();
-    await expect(settings).toHaveValue(id);
-    await expect(page.getByLabel("페이지 효과 끄기")).toBeChecked();
-  });
-}
-test("one active employee page preserves writing across chapters, history, font changes and failed save refresh", async ({
+test("new and returning guests see Gamja Flower and retain their motion preference", async ({ page }) => {
+  await fixture(page);
+  await page.goto("/#/survey");
+  const heading = page.locator(".book-surface h1");
+  const summary = page.locator(".book-settings summary");
+  const stop = page.getByRole("checkbox", { name: "페이지 효과 끄기" });
+  const brand = page.getByRole("link", { name: "한 걸음 더 가까이" }).locator("img");
+  await expect(brand).toBeVisible();
+  await expect
+    .poll(() => brand.evaluate((el) => el instanceof HTMLImageElement && el.naturalWidth))
+    .toBe(144);
+  await expect(heading).toHaveCSS("font-family", /Gamja Flower/);
+  await summary.click();
+  await expect(page.locator(".book-settings select")).toHaveCount(0);
+  await expect(stop).not.toBeChecked();
+  await page.locator(".site-header").screenshot({ path: "artifacts/screens/notebook/company-header.png" });
+  await page.evaluate(() => localStorage.setItem("hyeseong:2026:book-view", "yeon:still"));
+  await page.reload();
+  await expect(heading).toHaveCSS("font-family", /Gamja Flower/);
+  await summary.click();
+  await expect(stop).toBeChecked();
+  await stop.uncheck();
+  await page.reload();
+  await summary.click();
+  await expect(stop).not.toBeChecked();
+});
+test("one active employee page preserves writing across chapters, history, motion settings and failed save refresh", async ({
   page,
 }) => {
   await fixture(page);
@@ -81,11 +67,11 @@ test("one active employee page preserves writing across chapters, history, font 
   await expect(page.locator(".curl-stage")).toHaveAttribute("data-turn", "backward");
   await expect(story).toHaveValue(text);
   await page.locator(".book-settings summary").click();
-  await page.getByLabel("글씨", { exact: true }).selectOption("ui");
+  await page.getByLabel("페이지 효과 끄기").check();
   await page.locator(".book-settings summary").click();
   await expect(story).toHaveValue(text);
   await expect(page.getByRole("checkbox", { name: /내 답변을/ })).toBeChecked();
-  await capture(page, "system");
+  await capture(page, "gamja");
   await page.goBack();
   await expect(page.getByLabel("고마운 이유 (10자 이상)")).toHaveValue("한 해 동안 도움을 많이 받았어요.");
   await page.goForward();
@@ -116,7 +102,7 @@ test("font asset renders Korean, private forest edits survive navigation, hints 
   const { root } = await cdp.send("DOM.getDocument");
   const { nodeId } = await cdp.send("DOM.querySelector", { nodeId: root.nodeId, selector: ".hint p" });
   const { fonts } = await cdp.send("CSS.getPlatformFontsForNode", { nodeId });
-  expect(fonts.some((f) => f.isCustomFont && f.glyphCount > 0 && /Nanum/i.test(f.familyName))).toBe(true);
+  expect(fonts.some((f) => f.isCustomFont && f.glyphCount > 0 && /Gamja/i.test(f.familyName))).toBe(true);
   await mkdir("artifacts/screens/notebook", { recursive: true });
   await writeFile("artifacts/screens/notebook/rendered-font.json", JSON.stringify(fonts, null, 2));
   await page.emulateMedia({ reducedMotion: "reduce" });

@@ -1,15 +1,6 @@
 .employee-view {
   --pencil-ink: #34332f;
-  --writing: var(--body);
-}
-.employee-view[data-script="pen"] {
-  --writing: "Nanum Pen Script", var(--body);
-}
-.employee-view[data-script="gamja"] {
   --writing: "Gamja Flower", var(--body);
-}
-.employee-view[data-script="yeon"] {
-  --writing: "Yeon Sung", var(--body);
 }
 .employee-view .site-header {
   padding-block: var(--s2);
@@ -41,11 +32,6 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--s3);
-  min-height: 48px;
-}
-.book-settings select {
-  border: 1px solid var(--line);
-  padding: 8px;
   min-height: 48px;
 }
 .invite-top .book-settings {
@@ -175,8 +161,7 @@
   color: var(--pencil-ink);
   text-wrap: balance;
 }
-.employee-view:not([data-script="system"])
-  :is(.book-surface h1, .invite-letter h1, .invitation-cover h1, .login-form h2) {
+.employee-view :is(.book-surface h1, .invite-letter h1, .invitation-cover h1, .login-form h2) {
   font-size: clamp(36px, 5vw, 46px);
   line-height: 1.17;
   letter-spacing: normal;
@@ -198,7 +183,7 @@
   font-weight: 400;
   color: var(--pencil-ink);
 }
-.employee-view:not([data-script="system"])
+.employee-view
   :is(
     .page-heading .muted,
     .invite-body,
@@ -376,7 +361,7 @@
   padding-bottom: var(--s2);
 }
 .book-surface .field textarea,
-.employee-view:not([data-script="system"]) .book-surface .field textarea {
+.employee-view .book-surface .field textarea {
   line-height: var(--writing-leading);
   padding: 0.22rem 0.4rem 0.5rem;
   background: #fffcf6;

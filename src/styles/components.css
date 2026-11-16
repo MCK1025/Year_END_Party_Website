@@ -132,13 +132,10 @@
 }
 .brand-mark {
   width: 40px;
-  height: 40px;
-  display: inline-grid;
-  place-items: center;
-  border: 1px solid var(--brass);
-  border-radius: 50%;
-  color: var(--brass);
+  height: auto;
+  display: block;
   flex-shrink: 0;
+  mix-blend-mode: multiply;
 }
 .confirm {
   margin: auto;
