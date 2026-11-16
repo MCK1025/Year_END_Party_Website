@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { okSchema } from "../../supabase/functions/_shared/contracts";
-import { PrivateImage } from "../components/PrivateImage";
+import { CompanyLogo } from "../components/CompanyLogo";
 import { Button, Check, Confirm, Field, Note, Panel, TextArea } from "../components/ui";
 import { api, upload } from "../lib/api";
 import { exportData } from "../lib/exportData";
@@ -99,7 +99,7 @@ export function SettingsPanel() {
         </Panel>
         <div className="stack">
           <Panel title="우리 회사 로고">
-            {data.settings.logo_path && <PrivateImage path={data.settings.logo_path} alt="회사 로고" logo />}
+            <CompanyLogo path={data.settings.logo_path} />
             <Field
               label="로고 이미지"
               type="file"
@@ -123,7 +123,7 @@ export function SettingsPanel() {
                 })
               }
             >
-              로고 숨기기
+              기본 로고로 복원
             </Button>
           </Panel>
           <Panel title="결과 다운로드">

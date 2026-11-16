@@ -154,7 +154,7 @@ export function ProgressPanel({ rehearsal = false }: { readonly rehearsal?: bool
         </Panel>
         <Panel title="직원 화면 미리보기">
           <div className="progress-preview" ref={preview}>
-            <EventView state={state} />
+            <EventView state={state} logoPath={data.settings.logo_path} />
           </div>
         </Panel>
       </div>

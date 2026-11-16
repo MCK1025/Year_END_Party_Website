@@ -170,6 +170,15 @@
   height: 64px;
   object-fit: contain;
 }
+.hyeseong-wordmark {
+  display: block;
+  width: min(10rem, 100%);
+  height: auto;
+  mix-blend-mode: multiply;
+}
+.invite-top .hyeseong-wordmark {
+  width: clamp(96px, 14vw, 140px);
+}
 .recap-photo {
   width: 100%;
   height: auto;

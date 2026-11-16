@@ -5,7 +5,7 @@ const person = { id, name: "가상 직원", department: "시험", active: true }
 export async function fixture(
   page: Page,
   updates: { revision: number; paused: boolean; hints?: string[] } = { revision: 1, paused: false },
-  options: { extraQuestions?: number; choice?: boolean } = {},
+  options: { extraQuestions?: number; choice?: boolean; phase?: "WAITING" | "END"; logoPath?: string } = {},
 ) {
   let rejectRefresh = false;
   await page.route("**/functions/v1/portal", async (route) => {
@@ -51,10 +51,10 @@ export async function fixture(
               survey_open: true,
               nomination_open: true,
               welcome: "함께하는 겨울",
-              logo_path: null,
+              logo_path: options.logoPath ?? null,
             },
             state: {
-              phase: "WHO_AM_I",
+              phase: options.phase ?? "WHO_AM_I",
               revision: updates.revision,
               paused: updates.paused,
               payload: {

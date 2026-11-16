@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
+import { CompanyLogo } from "../components/CompanyLogo";
 import { EventView } from "../components/EventView";
-import { PrivateImage } from "../components/PrivateImage";
 import { RecapCards } from "../components/RecapCards";
-import { Mark, Note, Panel } from "../components/ui";
+import { Note, Panel } from "../components/ui";
 
 import { useGuest } from "./Participant";
 
@@ -23,11 +23,7 @@ export function Event() {
       {waiting ? (
         <>
           <section className="event-cover">
-            {data.settings.logo_path ? (
-              <PrivateImage path={data.settings.logo_path} alt="회사 로고" logo />
-            ) : (
-              <Mark />
-            )}
+            <CompanyLogo path={data.settings.logo_path} />
             <p className="overline">Your seat is here</p>
             <h1>
               한 걸음 더 가까워진,
@@ -66,10 +62,10 @@ export function Event() {
           <RecapCards key={state.revision} />
         </>
       ) : (
-        <EventView state={state} />
+        <EventView state={state} logoPath={data.settings.logo_path} />
       )}
-      {!waiting && data.settings.logo_path && (
-        <PrivateImage path={data.settings.logo_path} alt="회사 로고" logo />
+      {!waiting && state.phase !== "END" && data.settings.logo_path && (
+        <CompanyLogo path={data.settings.logo_path} />
       )}
       <span aria-hidden="true" className="paper-sticker sticker-gift" />
     </div>

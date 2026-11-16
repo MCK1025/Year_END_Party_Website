@@ -1,5 +1,6 @@
 import type { EventState } from "../../supabase/functions/_shared/contracts";
-import { Mark, Panel } from "./ui";
+import { CompanyLogo } from "./CompanyLogo";
+import { Panel } from "./ui";
 
 export const phaseNames = {
   PRE_SURVEY: "사전 설문",
@@ -10,7 +11,13 @@ export const phaseNames = {
   AWARDS: "고마운 동료",
   END: "다음 한 걸음",
 } as const;
-export function EventView({ state }: { readonly state: EventState }) {
+export function EventView({
+  state,
+  logoPath,
+}: {
+  readonly state: EventState;
+  readonly logoPath: string | null;
+}) {
   const p = state.payload;
   const maxCount = Math.max(...(p.results ?? []).map((v) => v.count), 1);
   switch (state.phase) {
@@ -133,7 +140,7 @@ export function EventView({ state }: { readonly state: EventState }) {
     case "END":
       return (
         <section className="event-cover">
-          <Mark />
+          <CompanyLogo path={logoPath} />
           <p className="overline">To our next chapter</p>
           <h1>
             <span className="keep-phrase">다음 한 걸음도,</span>
