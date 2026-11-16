@@ -8,7 +8,7 @@ test("the six original illustrations fit portrait, landscape and desktop without
   await fixture(page, undefined, { phase: "PRE_SURVEY" });
   await page.goto("/#/event");
   const story = page.locator(".work-story");
-  const titles = ["연구소", "사무실", "생산실", "생산실", "물류팀", "우리가 만드는 맛있는 세상"];
+  const titles = ["연구개발팀", "경영관리팀", "생산팀", "생산팀", "물류팀", "우리가 만드는 맛있는 세상"];
   for (const [i, title] of titles.entries()) {
     await expect(story.getByRole("heading")).toHaveText(title);
     await expect(story.locator(".work-story-image")).toHaveAttribute(
@@ -103,7 +103,7 @@ test("WebGL loss, slow CPU and missing primary image retain story navigation and
   await expect(story.locator(".work-story-image")).toBeVisible();
   await story.screenshot({ path: "artifacts/screens/waiting-story/graphics-fallback.png" });
   await story.getByRole("button", { name: "다음 장면" }).click();
-  await expect(story.getByRole("heading")).toHaveText("사무실");
+  await expect(story.getByRole("heading")).toHaveText("경영관리팀");
   await page.getByRole("link", { name: "나의 이야기", exact: true }).click();
   await expect(page.getByRole("heading", { name: "들려주지 않은 당신의 이야기" })).toBeVisible();
 });

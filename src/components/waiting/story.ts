@@ -15,7 +15,7 @@ export type StoryScene = {
 // Pixel measurements on the original artwork, before resizing the delivery assets.
 export const scenes: readonly [StoryScene, ...StoryScene[]] = [
   {
-    title: "연구소",
+    title: "연구개발팀",
     caption: "한 방울의 차이까지, 소스와 식품의 가능성을 연구합니다.",
     alt: "연구원이 비커 속 소스 샘플을 살피고 동료가 실험 결과를 기록한다.",
     size: [536, 448],
@@ -26,7 +26,7 @@ export const scenes: readonly [StoryScene, ...StoryScene[]] = [
     surface: { center: [274, 324], radii: [13, 2.1], kind: "ripple" },
   },
   {
-    title: "사무실",
+    title: "경영관리팀",
     caption: "일정을 계획하고 세무를 계산하며, 모든 과정이 이어지도록 준비합니다.",
     alt: "달력이 걸린 사무실에서 세 동료가 일정표와 계산기, 업무 문서를 검토한다.",
     size: [536, 448],
@@ -37,7 +37,7 @@ export const scenes: readonly [StoryScene, ...StoryScene[]] = [
     surface: { center: [268, 107], radii: [8, 8], kind: "calendar" },
   },
   {
-    title: "생산실",
+    title: "생산팀",
     caption: "하나의 맛으로 만들어지는 과정",
     alt: "두 작업자가 배합통에 재료를 붓고 중앙 배합축을 중심으로 소스가 섞인다.",
     size: [536, 448],
@@ -54,7 +54,7 @@ export const scenes: readonly [StoryScene, ...StoryScene[]] = [
     surface: { center: [333, 324], radii: [24, 4], kind: "reflection" },
   },
   {
-    title: "생산실",
+    title: "생산팀",
     caption: "맛을 안전하게 전달하기 위해 정성을 다해 담아 포장합니다.",
     alt: "충진 설비 아래 캡스파우트가 놓여 있고 작업자가 완성된 제품을 상자에 담는다.",
     size: [1448, 1086],
