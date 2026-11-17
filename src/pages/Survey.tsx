@@ -22,7 +22,11 @@ export function Survey() {
         <span aria-hidden="true" className="paper-sticker sticker-gift" />
         <p className="overline">Prologue · 나를 소개하는 여섯 문장</p>
         <h1>들려주지 않은 당신의 이야기</h1>
-        <p className="muted">짧아도 좋아요.\n오늘 대화의 작은 실마리가 됩니다.</p>
+        <p className="muted">
+          짧아도 좋아요.
+          <br />
+          오늘 대화의 작은 실마리가 됩니다.
+        </p>
       </header>
       {!open && <Note>설문이 마감되었습니다. 저장한 이야기는 그대로 남아 있습니다.</Note>}
       <form

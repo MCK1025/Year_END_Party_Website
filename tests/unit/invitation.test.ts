@@ -1,11 +1,16 @@
 import { describe, expect, it, vi } from "vitest";
 import { invitationAnchor } from "../../src/graphics/invitation-layout";
-import { arrivalPhase, invitationCopy, progress } from "../../src/lib/invitation";
+import { arrivalPhase, invitationCopy, invitationMotion, progress } from "../../src/lib/invitation";
 
 describe("invitation", () => {
   it("preserves the theme and reaches an unbounded reading state", () => {
     expect(invitationCopy.theme).toBe("한 걸음 더 가까워진, 그리고 가까워질 우리.");
-    expect([0, 1.2, 1.5, 2.2, 3, 1000].map(arrivalPhase)).toEqual([
+    const { arrive, settle, open, read } = invitationMotion;
+    expect(arrive).toBeGreaterThan(0);
+    expect(settle).toBeGreaterThan(arrive);
+    expect(open).toBeGreaterThan(settle);
+    expect(read).toBeGreaterThan(open);
+    expect([0, arrive, settle, open, read, read + 1000].map(arrivalPhase)).toEqual([
       "arriving",
       "settling",
       "opening",
@@ -13,6 +18,9 @@ describe("invitation", () => {
       "reading",
       "reading",
     ]);
+    expect(arrivalPhase(arrive - 0.001)).toBe("arriving");
+    expect(arrivalPhase(settle - 0.001)).toBe("settling");
+    expect(arrivalPhase(read - 0.001)).toBe("opening");
     expect(progress(-1, 0, 1)).toBe(0);
     expect(progress(2, 0, 1)).toBe(1);
   });

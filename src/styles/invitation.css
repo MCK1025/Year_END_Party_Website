@@ -182,6 +182,7 @@
   letter-spacing: 0.08em;
 }
 .invite-body {
+  white-space: pre-line;
   text-wrap: balance;
   color: var(--muted);
 }
