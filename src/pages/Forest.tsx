@@ -49,7 +49,7 @@ function ForestBoard({ admin, locked }: { readonly admin: boolean; readonly lock
         {!admin && <span aria-hidden="true" className="paper-sticker sticker-tree-snowman" />}
         <p className="overline">Our story tree · 이름 없이 전하는 마음</p>
         <h1>혜성식품 이야기 트리</h1>
-        <p className="muted">바라는 마음도, 고마운 마음도, 조금 아쉬웠던 마음도.</p>
+        <p className="muted">바라는 마음도,\n고마운 마음도,\n조금 아쉬웠던 마음도.</p>
       </header>
       {!admin && (
         <Panel title="여기서는, 이름을 내려놓아요.">

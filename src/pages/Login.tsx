@@ -61,7 +61,7 @@ export function Login({ fromInvitation = false }: { readonly fromInvitation?: bo
       <section className="login-form">
         <div>
           <p className="overline">당신의 자리를 준비했습니다</p>
-          <h2>반갑습니다. 이제, 조금 더 가까이.</h2>
+          <h2>반갑습니다.\n이제, 조금 더 가까이.</h2>
         </div>
         {!configured ? (
           <Note error>Supabase 연결 설정이 필요합니다. 관리자에게 준비 상황을 확인해주세요.</Note>

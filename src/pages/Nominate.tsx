@@ -24,7 +24,7 @@ export function Nominate() {
         <span aria-hidden="true" className="paper-sticker sticker-rudolph" />
         <p className="overline">A quiet thank you</p>
         <h1>올해, 고마웠던 한 사람.</h1>
-        <p className="muted">든든했던 순간을 떠올려 한 명의 동료를 추천해주세요.</p>
+        <p className="muted">든든했던 순간을 떠올려\n한 명의 동료를 추천해주세요.</p>
       </header>
       {!open && <Note>추천이 마감되었습니다. 제출한 내용은 확인만 가능합니다.</Note>}
       {submitted && (!editing || !open) ? (

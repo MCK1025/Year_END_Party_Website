@@ -2,16 +2,16 @@ export const invitationCopy = {
   arrival: "함께한 당신에게, 초대장이 도착했습니다.",
   name: "2026 혜성식품 송년의 밤",
   theme: "한 걸음 더 가까워진, 그리고 가까워질 우리.",
-  body: "함께한 시간을 돌아보고, 서로에게 한 걸음 더 가까워지는 자리에 여러분을 초대합니다.",
+  body: "함께한 시간을 돌아보고,\n서로에게 한 걸음 더 가까워지는\n자리에 여러분을 초대합니다.",
   enter: "행사장으로 가기",
   skip: "바로 입장하기",
 } as const;
 export const invitationMotion = {
-  arrive: 1.2,
-  settle: 1.5,
-  open: 2.2,
+  arrive: 1.5,
+  settle: 2,
+  open: 2.5,
   read: 3,
-  departure: 1,
+  departure: 1.1,
   preparationTimeout: 3000,
   departureTimeout: 2500,
 } as const;
