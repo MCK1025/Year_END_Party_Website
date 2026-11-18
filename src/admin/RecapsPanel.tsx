@@ -10,7 +10,7 @@ function RecapEditor({ card }: { readonly card?: Dashboard["recaps"][number] }) 
   const { refresh } = useAdmin();
   const task = useTask();
   const [caption, setCaption] = useState(card?.caption ?? "");
-  const [published, setPublished] = useState(card?.published ?? false);
+  const [published, setPublished] = useState(card?.published ?? true);
   const [order, setOrder] = useState(card?.sort_order ?? 0);
   const [path, setPath] = useState(card?.asset_path ?? null);
   const [confirm, setConfirm] = useState(false);
@@ -38,7 +38,7 @@ function RecapEditor({ card }: { readonly card?: Dashboard["recaps"][number] }) 
             if (!card) {
               setCaption("");
               setPath(null);
-              setPublished(false);
+              setPublished(true);
             }
           });
         }}
