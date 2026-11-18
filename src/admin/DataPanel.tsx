@@ -97,7 +97,7 @@ export function DataPanel() {
               {survey ? (
                 <div className="stack-sm">
                   <p className="small">
-                    게임 활용 {survey.consent ? "동의" : "비동의"} ·{" "}
+                    설문 등록 ·{" "}
                     {new Date(survey.updated_at).toLocaleString("ko-KR", { timeZone: "Asia/Seoul" })}
                   </p>
                   {data.questions.map((q) => (
@@ -109,7 +109,10 @@ export function DataPanel() {
                       </p>
                     </div>
                   ))}
-                  <CardReview key={data.state.revision} survey={survey} />
+                  <CardReview
+                    key={`${survey.updated_at}-${JSON.stringify(data.card_reviews.find((r) => r.employee_id === e.id)?.question_keys)}`}
+                    survey={survey}
+                  />
                 </div>
               ) : (
                 <p className="empty">저장된 설문이 없습니다.</p>

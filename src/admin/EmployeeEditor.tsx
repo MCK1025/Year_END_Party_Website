@@ -35,7 +35,7 @@ export function EmployeeEditor({ employee }: { readonly employee: Dashboard["emp
       >
         <Field label="이름" value={name} onChange={(e) => setName(e.target.value)} required maxLength={60} />
         <Field
-          label="부서"
+          label="직책"
           value={department}
           onChange={(e) => setDepartment(e.target.value)}
           required

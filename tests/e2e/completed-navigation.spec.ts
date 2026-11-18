@@ -29,12 +29,12 @@ test("a consecutive click on a different free-browsing destination must not be d
   await expect(page).toHaveURL(/#\/tree$/);
   await page.getByRole("link", { name: "자유 관람 홈으로", exact: true }).click();
   await expect(page).toHaveURL(/#\/afterparty$/);
-  await page.getByRole("link", { name: /우리들의 취향 카드/ }).dispatchEvent("click", {
+  await page.getByRole("link", { name: /혜성식품 인물 카드/ }).dispatchEvent("click", {
     button: 0,
     detail: 2,
   });
   await expect(page).toHaveURL(/#\/cards$/);
-  await expect(page.getByText(/공개된 취향 카드가 아직 없습니다/)).toBeVisible();
+  await expect(page.getByText(/공개된 인물 카드가 아직 없습니다/)).toBeVisible();
 });
 
 test("touch users can quickly move between the large tree and card links", async ({ browser, baseURL }) => {

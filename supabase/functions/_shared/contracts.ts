@@ -73,6 +73,7 @@ export const stateSchema = z.object({
     round_id: uuid.optional(),
     round_index: z.number().optional(),
     hints: z.array(z.string()).optional(),
+    hint_questions: z.array(z.string()).optional(),
     person: z.object({ name: z.string(), department: z.string() }).nullable().optional(),
     taste_id: uuid.optional(),
     question: z.string().optional(),

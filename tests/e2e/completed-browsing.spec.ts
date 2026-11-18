@@ -1,6 +1,7 @@
 import { expect, type Page, test } from "@playwright/test";
 import { okSchema } from "../../supabase/functions/_shared/contracts";
-import { admin, boot, call, dashboard, employee, env, signAdmin, sql } from "../integration/helpers";
+import { admin, boot, call, dashboard, employee, env, signAdmin } from "../integration/helpers";
+import { localDatabase } from "./local-db";
 
 test("the organizer ends the event and employees freely browse, reconnect and search real approved answers", async ({
   browser,
@@ -8,6 +9,7 @@ test("the organizer ends the event and employees freely browse, reconnect and se
   baseURL,
 }) => {
   if (!baseURL || new URL(baseURL).hostname !== "127.0.0.1") throw Error("Local preview required");
+  const sql = localDatabase();
   test.setTimeout(180000);
   const screens = process.env.PARTY_BROWSERS === "50" ? 50 : 5;
   const guests: Page[] = [];
@@ -134,7 +136,7 @@ test("the organizer ends the event and employees freely browse, reconnect and se
     first.on("request", (r) => {
       if (r.url().includes("/functions/v1/portal") && r.postDataJSON()?.action === "taste_cards") cardReads++;
     });
-    await first.getByRole("link", { name: /우리들의 취향 카드/ }).click();
+    await first.getByRole("link", { name: /혜성식품 인물 카드/ }).click();
     await expect(first.locator(".taste-card")).toContainText(longAnswer);
     await expect(first.locator(".taste-card-nav")).toContainText("1 / 5");
     const initialName = await first.locator(".taste-person h2").textContent();
@@ -172,7 +174,7 @@ test("the organizer ends the event and employees freely browse, reconnect and se
       .click();
     await expect(first.locator(".message-tree")).toBeVisible();
     await first.getByRole("link", { name: "자유 관람 홈으로", exact: true }).click();
-    await first.getByRole("link", { name: /우리들의 취향 카드/ }).click();
+    await first.getByRole("link", { name: /혜성식품 인물 카드/ }).click();
     await expect(first.locator(".taste-card")).toBeVisible();
     expect(cardReads).toBe(1);
     const blocked = await admin.functions.invoke("portal", {
@@ -192,7 +194,7 @@ test("the organizer ends the event and employees freely browse, reconnect and se
     await late.getByLabel("비밀번호", { exact: true }).fill("900101");
     await late.getByRole("button", { name: "우리의 자리로" }).click();
     await expect(late).toHaveURL(/#\/afterparty$/, { timeout: 15000 });
-    await first.getByRole("link", { name: /우리들의 취향 카드/ }).click();
+    await first.getByRole("link", { name: /혜성식품 인물 카드/ }).click();
     const treeGuest = guests[1];
     if (!treeGuest) throw Error("Missing tree screen");
     await treeGuest.locator('.book-index a[href="#/tree"]').click();

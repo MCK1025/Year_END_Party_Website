@@ -1,7 +1,7 @@
 import { okSchema } from "../../supabase/functions/_shared/contracts";
 import { useBookDraft } from "../components/book/drafts";
 import { useSavedNavigation } from "../components/book/useSavedNavigation";
-import { Button, Check, Note, Panel, Select, TextArea } from "../components/ui";
+import { Button, Note, Panel, Select, TextArea } from "../components/ui";
 import { api } from "../lib/api";
 import { useTask } from "../lib/useTask";
 import { useGuest } from "./Participant";
@@ -11,11 +11,9 @@ export function Survey() {
   const navigate = useSavedNavigation();
   const task = useTask();
   const [draftAnswers, setAnswers, forgetAnswers] = useBookDraft("answers", data.survey?.answers ?? {});
-  const [draftConsent, setConsent, forgetConsent] = useBookDraft("consent", data.survey?.consent ?? false);
   const excluded = data.survey?.excluded ?? [];
   const open = data.settings.survey_open && responseWindow;
   const answers = open ? draftAnswers : (data.survey?.answers ?? {});
-  const consent = open ? draftConsent : (data.survey?.consent ?? false);
   return (
     <div className="stack">
       <header className="page-heading">
@@ -34,10 +32,9 @@ export function Survey() {
         onSubmit={(event) => {
           event.preventDefault();
           void task.run(async () => {
-            await api({ action: "save_survey", payload: { answers, consent, excluded } }, okSchema);
+            await api({ action: "save_survey", payload: { answers, excluded } }, okSchema);
             await refresh();
             forgetAnswers();
-            forgetConsent();
             navigate("/nominate");
           });
         }}
@@ -91,20 +88,16 @@ export function Survey() {
         ))}
         <Panel>
           <div className="sticker-caption">
-            <h2>공개 활용 동의</h2>
+            <h2>이야기 활용 안내</h2>
             <span aria-hidden="true" className="paper-sticker sticker-tree-snowman" />
           </div>
           <p className="small">
-            답변은 행사 운영과 동료 소개에만 사용합니다. 동의한 답변도 관리자의 검수를 거친 뒤 공개합니다.
-            공개 활용 동의는 선택입니다. 행사 참여에는 영향이 없습니다.
+            저장한 답변은 행사 운영과 동료 소개에 사용합니다. 관리자가 검수하고 승인한 답변만 인물 퀴즈, 취향
+            통계, 이름과 직책이 표시되는 혜성식품 인물 카드에 공개합니다.
           </p>
           <p className="small">
             개인정보 삭제 예정일: {data.settings.deletion_date ?? "관리자가 안내할 예정입니다."}
           </p>
-          <Check checked={consent} onChange={setConsent} disabled={!open || task.busy}>
-            내 답변을 인물 힌트와 익명 취향 통계, 행사 종료 후 이름·소속이 표시되는 취향 카드에 활용하는 데
-            동의합니다.
-          </Check>
         </Panel>
         {task.notice && <Note error={task.failed}>{task.notice}</Note>}
         <Button type="submit" busy={task.busy} disabled={!open || task.busy}>

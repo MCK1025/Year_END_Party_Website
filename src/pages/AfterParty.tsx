@@ -12,7 +12,7 @@ export function AfterParty() {
         </Link>
         <Link className="button secondary afterparty-link" to="/cards" state={{ bookFrom: "/afterparty" }}>
           <CardsIcon size={24} aria-hidden="true" />
-          <span>우리들의 취향 카드</span>
+          <span>혜성식품 인물 카드</span>
         </Link>
       </nav>
       <header className="page-heading">

@@ -1,6 +1,9 @@
 import { expect, type Page, test } from "@playwright/test";
-import { admin, env, signAdmin, sql } from "../integration/helpers";
+import { admin, env, signAdmin } from "../integration/helpers";
 import { openLogin } from "./invitation-helper";
+import { localDatabase } from "./local-db";
+
+const sql = localDatabase();
 
 async function capture(page: Page, state: string) {
   for (const width of [320, 375, 768, 1280]) {
@@ -30,7 +33,7 @@ test.afterAll(async () => {
   await sql`delete from private.employees where employee_no='TEST-BROWSER-NEW'`;
   await sql.end();
 });
-test("birthday-only login, survey consent and anonymous message persist across sessions", async ({
+test("birthday-only login, survey registration and anonymous message persist across sessions", async ({
   page,
   browser,
 }) => {
@@ -41,7 +44,7 @@ test("birthday-only login, survey consent and anonymous message persist across s
   await page.getByLabel("비밀번호", { exact: true }).fill("900101");
   await page.getByRole("button", { name: "우리의 자리로" }).click();
   await page.getByRole("link", { name: "나의 이야기", exact: true }).click();
-  await expect(page.getByRole("checkbox")).toHaveCount(1);
+  await expect(page.getByRole("checkbox")).toHaveCount(0);
   await capture(page, "survey");
   await page.getByRole("link", { name: "이야기 트리", exact: true }).click();
   await expect(page.getByText("아직 보낸 마음이 없습니다.")).toBeVisible();
@@ -77,7 +80,7 @@ test("administrator adds and permanently deletes one employee through confirmati
   await capture(page, "admin-people");
   await page.getByLabel("새 직원 사번").fill("TEST-BROWSER-NEW");
   await page.getByLabel("새 직원 이름").fill("가상 브라우저 직원");
-  await page.getByLabel("새 직원 부서").fill("가상팀");
+  await page.getByLabel("새 직원 직책").fill("가상팀");
   await page.getByLabel("새 직원 생년월일").fill("2002-04-06");
   await page.getByRole("button", { name: "직원 추가", exact: true }).click();
   const person = page.locator("details").filter({ hasText: "가상 브라우저 직원" });

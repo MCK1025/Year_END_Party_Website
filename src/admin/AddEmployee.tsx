@@ -41,7 +41,7 @@ export function AddEmployee() {
           required
         />
         <Field
-          label="새 직원 부서"
+          label="새 직원 직책"
           value={form.department}
           onChange={(e) => setForm({ ...form, department: e.target.value })}
           maxLength={100}

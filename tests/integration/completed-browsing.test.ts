@@ -95,9 +95,10 @@ describe.sequential("completed browsing access and publication", () => {
     expect(original.data).toEqual([{ employee_id: ids[0] }]);
     await unverified.auth.signOut();
   });
-  it("validates admin review, consent, excluded and empty answers and detects stale forms", async () => {
+  it("requires admin review regardless of legacy consent and rejects excluded or empty answers and stale forms", async () => {
     await approve(0, ["food", "hobby"]);
-    await expect(approve(1, ["food"])).rejects.toThrow();
+    await approve(1, ["food"]);
+    await approve(1, []);
     await expect(approve(2, ["dream"])).rejects.toThrow();
     await expect(approve(4, ["food"])).rejects.toThrow();
     await approve(2, ["hobby"]);

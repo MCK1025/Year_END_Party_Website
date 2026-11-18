@@ -164,7 +164,7 @@ export function ProgressPanel({ rehearsal = false }: { readonly rehearsal?: bool
           )}
           {completed && (
             <Note>
-              자유 관람이 시작되었습니다. 직원들이 이야기 트리와 승인된 취향 카드를 자유롭게 둘러볼 수
+              자유 관람이 시작되었습니다. 직원들이 이야기 트리와 승인된 인물 카드를 자유롭게 둘러볼 수
               있습니다.
             </Note>
           )}
@@ -205,7 +205,7 @@ export function ProgressPanel({ rehearsal = false }: { readonly rehearsal?: bool
           {pending.command.command === "complete_event" ? (
             <div className="stack-sm">
               <p>
-                직원 화면이 자유 관람 홈으로 이동합니다. 이후 공식 게임 진행은 종료됩니다. 취향 카드는
+                직원 화면이 자유 관람 홈으로 이동합니다. 이후 공식 게임 진행은 종료됩니다. 인물 카드는
                 설문·추천에서 승인한 답변만 공개합니다.
               </p>
               <Check checked={reviewedTree} onChange={setReviewedTree}>

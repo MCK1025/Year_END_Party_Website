@@ -49,6 +49,7 @@ export function EventView({
           {p.hints?.map((hint, i) => (
             <article className="hint" key={hint}>
               <span className="overline">CLUE {String(i + 1).padStart(2, "0")}</span>
+              {p.hint_questions?.[i] && <h3>{p.hint_questions[i]}</h3>}
               <p>{hint}</p>
             </article>
           ))}

@@ -65,8 +65,7 @@ function TasteEditor({ taste }: { readonly taste?: Dashboard["tastes"][number] }
         {taste && (
           <>
             <p className="small">
-              자동 집계 결과를 확인하고, 유사한 자유 입력은 합쳐주세요. 공개에 동의한 활성 직원의 답변만
-              집계합니다.
+              자동 집계 결과를 확인하고, 유사한 자유 입력은 합쳐주세요. 활성 직원의 저장된 답변을 집계합니다.
             </p>
             {results.map((r, i) => (
               <div className="grid-two" key={r.key}>

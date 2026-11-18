@@ -14,15 +14,13 @@ function RoundEditor({ round }: { readonly round?: Dashboard["rounds"][number] }
   const [approved, setApproved] = useState(round?.approved ?? false);
   const [order, setOrder] = useState(round?.sort_order ?? 0);
   const [confirm, setConfirm] = useState(false);
-  const eligible = data.employees.filter(
-    (e) => e.active && data.surveys.some((s) => s.employee_id === e.id && s.consent),
-  );
+  const eligible = data.employees.filter((e) => e.active && data.surveys.some((s) => s.employee_id === e.id));
   const survey = data.surveys.find((s) => s.employee_id === employee);
   const questions = data.questions.filter(
-    (q) => q.active && survey?.consent && !survey.excluded.includes(q.id) && survey.answers[q.id],
+    (q) => q.active && survey && !survey.excluded.includes(q.id) && survey.answers[q.id],
   );
   function toggle(key: string, checked: boolean) {
-    if (checked && keys.length < 3) {
+    if (checked && keys.length < 6) {
       setKeys([...keys, key]);
       setHints([...hints, survey?.answers[key] ?? ""]);
     }
@@ -64,9 +62,9 @@ function RoundEditor({ round }: { readonly round?: Dashboard["rounds"][number] }
           });
         }}
       >
-        {round && !round.eligible && <Note error>공개 동의가 변경되었습니다. 다시 검수해주세요.</Note>}
+        {round && !round.eligible && <Note error>답변 또는 문항이 변경되었습니다. 다시 검수해주세요.</Note>}
         <Select
-          label="공개에 동의한 직원"
+          label="설문을 등록한 직원"
           value={employee}
           onChange={(id) => {
             setEmployee(id);
@@ -84,13 +82,13 @@ function RoundEditor({ round }: { readonly round?: Dashboard["rounds"][number] }
         </Select>
         {employee && (
           <div>
-            <p className="small">공개 가능한 답변 중 1~3개를 선택하세요. 선택한 순서대로 공개합니다.</p>
+            <p className="small">질문과 답변을 1~6개 선택하세요. 선택한 순서대로 함께 공개합니다.</p>
             {questions.map((q) => (
               <Check
                 key={q.id}
                 checked={keys.includes(q.id)}
                 onChange={(v) => toggle(q.id, v)}
-                disabled={keys.length >= 3 && !keys.includes(q.id)}
+                disabled={keys.length >= 6 && !keys.includes(q.id)}
               >
                 {q.prompt}
                 <br />
@@ -120,7 +118,7 @@ function RoundEditor({ round }: { readonly round?: Dashboard["rounds"][number] }
           onChange={(e) => setOrder(Number(e.target.value))}
         />
         <Check checked={approved} onChange={setApproved}>
-          동의한 답변에 근거한 힌트이며, 민감한 내용이 없는지 검수했습니다.
+          저장된 답변에 근거한 힌트이며, 민감한 내용이 없는지 검수했습니다.
         </Check>
         <div className="actions">
           <Button type="submit" busy={task.busy} disabled={!employee || keys.length === 0}>

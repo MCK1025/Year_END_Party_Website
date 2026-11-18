@@ -8,6 +8,7 @@ import { AdminLogin } from "./AdminLogin";
 import { AdminContext } from "./context";
 import { DataPanel } from "./DataPanel";
 import { PeoplePanel } from "./PeoplePanel";
+import { PersonCardsPanel } from "./PersonCardsPanel";
 import { ProgressPanel } from "./ProgressPanel";
 import { QuestionsPanel } from "./QuestionsPanel";
 import { RecapsPanel } from "./RecapsPanel";
@@ -20,6 +21,7 @@ const tabs = [
   "실시간 진행",
   "사원 관리",
   "설문·추천",
+  "인물 카드",
   "이야기 트리",
   "공개 트리",
   "질문 관리",
@@ -38,6 +40,8 @@ function Contents({ tab }: { readonly tab: Tab }) {
       return <PeoplePanel />;
     case "설문·추천":
       return <DataPanel />;
+    case "인물 카드":
+      return <PersonCardsPanel />;
     case "이야기 트리":
       return <Forest admin />;
     case "공개 트리":

@@ -18,7 +18,7 @@ const chapters = [
 const completedChapters = [
   { path: "/afterparty", name: "자유 관람 홈" },
   { path: "/tree", name: "이야기 트리" },
-  { path: "/cards", name: "취향 카드" },
+  { path: "/cards", name: "인물 카드" },
 ] as const;
 export function BookLayout({
   children,

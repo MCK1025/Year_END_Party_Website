@@ -9,7 +9,7 @@ test("completed home keeps compact icon links side by side above the familiar st
   const links = page.getByRole("navigation", { name: "자유 관람 콘텐츠" });
   await expect(links.getByRole("link")).toHaveCount(2);
   await expect(links.getByRole("link").nth(0)).toHaveText("이야기 트리");
-  await expect(links.getByRole("link").nth(1)).toHaveText("우리들의 취향 카드");
+  await expect(links.getByRole("link").nth(1)).toHaveText("혜성식품 인물 카드");
   const story = page.locator(".work-story");
   await expect(story).toHaveAttribute("data-static", "true");
   await expect(story.locator("canvas")).toHaveCount(0);
@@ -48,9 +48,9 @@ test("completed story plays, pauses and releases its animation when a card link 
   await expect(story).toHaveAttribute("data-playing", "false");
   await page
     .getByRole("navigation", { name: "자유 관람 콘텐츠" })
-    .getByRole("link", { name: "우리들의 취향 카드" })
+    .getByRole("link", { name: "혜성식품 인물 카드" })
     .click();
   await expect(page).toHaveURL(/#\/cards$/);
   await expect(story).toHaveCount(0);
-  await expect(page.getByRole("heading", { name: "우리들의 취향 카드", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "혜성식품 인물 카드", exact: true })).toBeVisible();
 });

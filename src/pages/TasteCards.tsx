@@ -26,7 +26,7 @@ export function TasteCards() {
     <div className="stack">
       <header className="page-heading">
         <p className="overline">A little more about us</p>
-        <h1>우리들의 취향 카드</h1>
+        <h1>혜성식품 인물 카드</h1>
         <p className="muted">한 장씩 넘기며 동료의 이야기를 만나보세요.</p>
       </header>
       <Link className="button secondary" to="/afterparty" state={{ bookFrom: "/cards" }}>
@@ -47,12 +47,12 @@ export function TasteCards() {
           <Button onClick={retry}>다시 불러오기</Button>
         </>
       ) : !cards ? (
-        <Note>공개된 취향 카드를 불러오고 있습니다.</Note>
+        <Note>공개된 인물 카드를 불러오고 있습니다.</Note>
       ) : !card ? (
         <Note>
           {query.trim()
             ? "이름에 맞는 공개 카드가 없습니다."
-            : "공개된 취향 카드가 아직 없습니다. 설문을 작성하고 공개 검수를 마친 동료의 카드가 여기에 표시됩니다."}
+            : "공개된 인물 카드가 아직 없습니다. 설문을 작성하고 공개 검수를 마친 동료의 카드가 여기에 표시됩니다."}
         </Note>
       ) : (
         <>

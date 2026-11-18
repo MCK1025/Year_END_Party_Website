@@ -5,6 +5,7 @@ import { admin, boot, call, command, dashboard, employee, eventDate, signAdmin, 
 describe.sequential("own-only forest and reviewed Christmas publication", () => {
   beforeAll(async () => {
     await signAdmin();
+    await sql`update public.event_public_state set phase='WAITING',payload='{}',paused=false,tree_open=false,revision=revision+1 where id`;
     await sql`update private.settings set started_at=null,enabled=true,survey_open=true,nomination_open=true`;
     await sql`delete from public.forest_posts`;
     await sql`delete from private.forest_limits`;

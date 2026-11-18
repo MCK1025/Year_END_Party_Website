@@ -56,7 +56,7 @@ export const requestSchema = z.discriminatedUnion("action", [
     action: z.literal("save_survey"),
     payload: z.object({
       answers: z.record(z.string().max(40), z.string().trim().min(1).max(500)),
-      consent: z.boolean(),
+      consent: z.boolean().optional(),
       excluded: z.array(z.string().max(40)).max(30),
     }),
   }),
@@ -134,8 +134,8 @@ export const requestSchema = z.discriminatedUnion("action", [
     payload: z.object({
       id: uuid.optional(),
       employee_id: uuid,
-      question_keys: z.array(short).min(1).max(3),
-      hints: z.array(z.string().trim().min(1).max(500)).min(1).max(3),
+      question_keys: z.array(short).min(1).max(6),
+      hints: z.array(z.string().trim().min(1).max(500)).min(1).max(6),
       approved: z.boolean(),
       sort_order: z.number().int().min(0).max(100),
     }),

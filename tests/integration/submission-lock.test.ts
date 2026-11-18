@@ -6,6 +6,7 @@ import { admin, boot, call, dashboard, employee, eventDate, signAdmin, sql } fro
 describe.sequential("private post ownership and durable event submission lock", () => {
   beforeAll(async () => {
     await signAdmin();
+    await sql`update public.event_public_state set phase='WAITING',payload='{}',paused=false,tree_open=false,revision=revision+1 where id`;
     await sql`update private.settings set started_at=null,enabled=true,survey_open=true,nomination_open=true`;
     await sql`delete from private.forest_limits`;
   });
