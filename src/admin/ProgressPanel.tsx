@@ -8,6 +8,7 @@ import { api } from "../lib/api";
 import { useTask } from "../lib/useTask";
 import { useAdmin } from "./context";
 import { type CommandInput, GameControls, type PendingCommand } from "./GameControls";
+import { RestartEvent } from "./RestartEvent";
 
 const next: Partial<Record<Phase, Phase>> = {
   PRE_SURVEY: "RECAP",
@@ -165,6 +166,7 @@ export function ProgressPanel({ rehearsal = false }: { readonly rehearsal?: bool
               있습니다.
             </Note>
           )}
+          {!rehearsal && started && <RestartEvent disabled={task.busy} />}
           {!rehearsal && !completed && (
             <Button
               variant="secondary"

@@ -189,6 +189,19 @@ test("the organizer ends the event and employees freely browse, reconnect and se
     await late.getByLabel("비밀번호", { exact: true }).fill("900101");
     await late.getByRole("button", { name: "우리의 자리로" }).click();
     await expect(late).toHaveURL(/#\/afterparty$/, { timeout: 15000 });
+    await first.getByRole("link", { name: /우리들의 취향 카드/ }).click();
+    const treeGuest = guests[1];
+    if (!treeGuest) throw Error("Missing tree screen");
+    await treeGuest.locator('.book-index a[href="#/tree"]').click();
+    await expect(treeGuest.locator(".message-tree")).toBeVisible();
+    await page.getByRole("button", { name: "처음부터 다시 진행", exact: true }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "확인", exact: true }).click();
+    for (const guest of guests) await expect(guest).toHaveURL(/#\/event$/, { timeout: 15000 });
+    expect((await dashboard()).state).toMatchObject({ phase: "WAITING", editing_locked: true });
+    for (const phase of ["RECAP", "WHO_AM_I", "TASTES", "AWARDS", "END"]) await send("phase", { phase });
+    await send("complete_event", { reviewed: true });
+    for (const guest of guests) await expect(guest).toHaveURL(/#\/afterparty$/, { timeout: 15000 });
+    console.log(`${screens} connected screens restarted and completed the event again`);
   } finally {
     await Promise.allSettled(guests.map((g) => g.context().close()));
     await sql`update public.event_public_state set phase='WAITING',payload='{}',tree_open=false,paused=false,revision=revision+1`;

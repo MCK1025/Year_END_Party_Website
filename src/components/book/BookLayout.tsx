@@ -138,7 +138,7 @@ export function BookLayout({
       return;
     const to = link.hash.slice(1);
     if (!pages.some((p) => p.path === to)) return;
-    if (e.detail > 1 || to === pathname) {
+    if (to === pathname) {
       e.preventDefault();
       traceMotion("book")("SAME_PAGE", { mode: "none" });
       return;

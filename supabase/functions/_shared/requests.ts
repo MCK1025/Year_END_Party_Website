@@ -15,6 +15,7 @@ export const commandSchema = z.object({
   command: z.enum([
     "start_event",
     "complete_event",
+    "restart_event",
     "tree_open",
     "tree_close",
     "pause",
