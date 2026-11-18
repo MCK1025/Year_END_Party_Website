@@ -12,6 +12,7 @@ export function SettingsPanel() {
   const initial = data.settings;
   const locked = !!initial.started_at || data.state.editing_locked;
   const task = useTask();
+  const saveTask = useTask();
   const koreanStart = initial.event_start_at
     ? new Date(Date.parse(initial.event_start_at) + 9 * 3600000).toISOString()
     : "";
@@ -70,7 +71,9 @@ export function SettingsPanel() {
               value={deletion}
               onChange={(e) => setDeletion(e.target.value)}
             />
-            {locked && <Note>행사가 시작되어 응답을 다시 열 수 없습니다.</Note>}
+            {locked && (
+              <Note>설문·동료 추천 응답은 마감 상태입니다. 행사일과 시작 시각은 변경할 수 있습니다.</Note>
+            )}
             <Check checked={!locked && survey} onChange={setSurvey} disabled={locked}>
               설문 수정 허용
             </Check>
@@ -92,9 +95,10 @@ export function SettingsPanel() {
               onChange={(e) => setEnding(e.target.value)}
               required
             />
-            <Button type="submit" busy={task.busy}>
+            <Button type="submit" busy={task.busy || saveTask.busy}>
               설정 저장
             </Button>
+            {saveTask.notice && <Note error={saveTask.failed}>{saveTask.notice}</Note>}
           </form>
         </Panel>
         <div className="stack">
@@ -174,26 +178,28 @@ export function SettingsPanel() {
           }
           onClose={() => setConfirm(null)}
           action={() =>
-            task.run(
-              async () => {
-                switch (confirm) {
-                  case "save":
-                    await save();
-                    break;
-                  case "purge":
-                    await api({ action: "purge", payload: { confirmation: "개인정보 영구 삭제" } }, okSchema);
-                    await refresh();
-                    break;
-                  case "csv":
-                  case "xlsx":
-                    await exportData(confirm);
-                    break;
-                  default:
-                    break;
-                }
-              },
-              confirm === "purge" ? "개인정보를 삭제하고 접속을 중단했습니다." : "완료했습니다.",
-            )
+            confirm === "save"
+              ? saveTask.run(save, "행사 일정과 설정을 저장했습니다.")
+              : task.run(
+                  async () => {
+                    switch (confirm) {
+                      case "purge":
+                        await api(
+                          { action: "purge", payload: { confirmation: "개인정보 영구 삭제" } },
+                          okSchema,
+                        );
+                        await refresh();
+                        break;
+                      case "csv":
+                      case "xlsx":
+                        await exportData(confirm);
+                        break;
+                      default:
+                        break;
+                    }
+                  },
+                  confirm === "purge" ? "개인정보를 삭제하고 접속을 중단했습니다." : "완료했습니다.",
+                )
           }
         >
           {confirm === "purge"
