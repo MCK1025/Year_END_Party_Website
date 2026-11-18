@@ -166,7 +166,10 @@ test("the organizer ends the event and employees freely browse, reconnect and se
     });
     expect(cardReads).toBe(1);
     await first.getByRole("link", { name: "자유 관람 홈으로", exact: true }).click();
-    await first.getByRole("link", { name: /우리들의 이야기 트리/ }).click();
+    await first
+      .getByRole("navigation", { name: "자유 관람 콘텐츠" })
+      .getByRole("link", { name: "이야기 트리", exact: true })
+      .click();
     await expect(first.locator(".message-tree")).toBeVisible();
     await first.getByRole("link", { name: "자유 관람 홈으로", exact: true }).click();
     await first.getByRole("link", { name: /우리들의 취향 카드/ }).click();

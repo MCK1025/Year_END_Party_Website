@@ -241,16 +241,17 @@
 }
 .afterparty-links {
   display: grid;
-  gap: var(--s6);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s2);
 }
-.afterparty-link {
-  display: grid;
-  gap: var(--s3);
-  padding: var(--s6);
-  background: var(--ivory);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  text-decoration: none;
+.afterparty-link.button {
+  flex-direction: column;
+  gap: var(--s1);
+  padding: var(--s2);
+  min-width: 0;
+  font-size: 13px;
+  text-align: center;
+  text-wrap: balance;
 }
 .afterparty-link svg {
   color: var(--gold-ink);
@@ -301,10 +302,5 @@
 @media (prefers-reduced-motion: no-preference) {
   .taste-card[data-still="false"] {
     animation: invitation-read 180ms ease-out;
-  }
-}
-@media (min-width: 700px) {
-  .afterparty-links {
-    grid-template-columns: 1fr 1fr;
   }
 }

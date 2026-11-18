@@ -22,7 +22,10 @@ test("a consecutive click on a different free-browsing destination must not be d
   page,
 }) => {
   await completedHome(page);
-  await page.getByRole("link", { name: /우리들의 이야기 트리/ }).click();
+  await page
+    .getByRole("navigation", { name: "자유 관람 콘텐츠" })
+    .getByRole("link", { name: "이야기 트리", exact: true })
+    .click();
   await expect(page).toHaveURL(/#\/tree$/);
   await page.getByRole("link", { name: "자유 관람 홈으로", exact: true }).click();
   await expect(page).toHaveURL(/#\/afterparty$/);
