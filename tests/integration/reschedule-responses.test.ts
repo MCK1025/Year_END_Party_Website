@@ -60,13 +60,6 @@ describe.sequential("response reopening before a rescheduled event", () => {
     expect(!nominationResult.error).toBe(nomination);
     if (survey) expect((await boot(guest)).survey?.answers).toEqual(answers);
     if (nomination) expect((await boot(guest)).nomination?.nominee_id).toBe(target.id);
-    expect(
-      (
-        await guest.functions.invoke("portal", {
-          body: { action: "forest_post", payload: { kind: "thanks", body: "이야기 작성은 계속 마감" } },
-        })
-      ).error?.context?.status,
-    ).toBe(403);
     await guest.auth.signOut();
   });
 

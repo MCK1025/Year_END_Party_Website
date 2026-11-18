@@ -81,16 +81,23 @@ describe.sequential("own story editing before a rescheduled start", () => {
       kind: "wish",
       body: "일정 변경 후 수정한 내 이야기",
     });
-    expect(
-      (
-        await guest.functions.invoke("portal", {
-          body: {
-            action: "forest_post",
-            payload: { kind: "thanks", body: "새 글 작성은 마감 유지" },
-          },
-        })
-      ).error?.context?.status,
-    ).toBe(403);
+    await call(
+      guest,
+      {
+        action: "forest_post",
+        payload: {
+          kind: "thanks",
+          body: "변경된 행사 시각 전에 새로 남긴 이야기",
+        },
+      },
+      okSchema,
+    );
+    const created = (await call(sameOwner, { action: "forest_mine", payload: {} }, forestListSchema)).find(
+      (item) => item.body === "변경된 행사 시각 전에 새로 남긴 이야기",
+    );
+    expect(created).toBeDefined();
+    if (!created) throw new Error("Missing reopened story");
+    expect((await other.from("forest_posts").select("id").eq("id", created.id)).data).toEqual([]);
     await call(sameOwner, { action: "forest_delete", payload: { id: post.id } }, okSchema);
     expect(await call(guest, { action: "forest_mine", payload: {} }, forestListSchema)).not.toContainEqual(
       expect.objectContaining({ id: post.id }),
@@ -109,17 +116,12 @@ describe.sequential("own story editing before a rescheduled start", () => {
         okSchema,
       );
       // When / Then
-      for (const action of ["forest_edit", "forest_delete"]) {
-        expect(
-          (
-            await guest.functions.invoke("portal", {
-              body: {
-                action,
-                payload: { id: post.id, kind: "wish", body: "마감 후 변경 시도" },
-              },
-            })
-          ).error?.context?.status,
-        ).toBe(403);
+      for (const body of [
+        { action: "forest_post", payload: { kind: "wish", body: "마감 후 작성 시도" } },
+        { action: "forest_edit", payload: { id: post.id, kind: "wish", body: "마감 후 변경 시도" } },
+        { action: "forest_delete", payload: { id: post.id } },
+      ]) {
+        expect((await guest.functions.invoke("portal", { body })).error?.context?.status).toBe(403);
       }
       expect(await call(guest, { action: "forest_mine", payload: {} }, forestListSchema)).toContainEqual(
         post,
@@ -145,17 +147,12 @@ describe.sequential("own story editing before a rescheduled start", () => {
     // When: the deadline arrives without closing the client session.
     await sql`update private.settings set event_start_at=now() where id`;
     // Then
-    for (const action of ["forest_edit", "forest_delete"]) {
-      expect(
-        (
-          await guest.functions.invoke("portal", {
-            body: {
-              action,
-              payload: { id: post.id, kind: "wish", body: "새 마감 시각 이후 변경" },
-            },
-          })
-        ).error?.context?.status,
-      ).toBe(403);
+    for (const body of [
+      { action: "forest_post", payload: { kind: "wish", body: "새 마감 시각 이후 작성" } },
+      { action: "forest_edit", payload: { id: post.id, kind: "wish", body: "새 마감 시각 이후 변경" } },
+      { action: "forest_delete", payload: { id: post.id } },
+    ]) {
+      expect((await guest.functions.invoke("portal", { body })).error?.context?.status).toBe(403);
     }
     expect(await call(guest, { action: "forest_mine", payload: {} }, forestListSchema)).toContainEqual(post);
     await guest.auth.signOut();

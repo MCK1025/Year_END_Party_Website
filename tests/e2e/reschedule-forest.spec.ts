@@ -15,7 +15,7 @@ async function capture(page: Page, name: string) {
   });
 }
 
-test("a postponed event lets the owner edit/delete stories live, then closes the pending delete at its deadline", async ({
+test("a postponed event lets employees create and manage stories, then closes all writes at its deadline", async ({
   page,
   browser,
   baseURL,
@@ -73,12 +73,18 @@ test("a postponed event lets the owner edit/delete stories live, then closes the
     await expect(guest).toHaveURL(/#\/event$/, { timeout: 10000 });
     await guest.getByRole("link", { name: "이야기 트리", exact: true }).click();
     await expect(guest.getByRole("button", { name: "내 글 수정하기" })).toHaveCount(2);
-    await expect(guest.getByRole("button", { name: "익명으로 마음 남기기" })).toHaveCount(0);
+    await expect(guest.getByRole("button", { name: "익명으로 마음 남기기" })).toBeVisible();
+    const created = "가상 이야기: 일정을 변경한 뒤 새로 남기는 첫 마음입니다.";
+    await guest.getByLabel("혜성식품에게 전하고 싶은 말").fill(created);
     for (const width of [375, 768, 1280]) {
       await guest.setViewportSize({ width, height: 900 });
       await guest.getByRole("button", { name: "다시 확인", exact: true }).focus();
       await capture(guest, `open-${width}`);
     }
+    await guest.getByRole("button", { name: "익명으로 마음 남기기" }).click();
+    await expect(guest.getByText(created, { exact: true })).toBeVisible();
+    await guest.reload();
+    await expect(guest.getByText(created, { exact: true })).toBeVisible();
     await guest.setViewportSize({ width: 375, height: 900 });
     await guest
       .getByText(first, { exact: true })
@@ -86,7 +92,11 @@ test("a postponed event lets the owner edit/delete stories live, then closes the
       .getByRole("button", { name: "내 글 수정하기" })
       .click();
     const edited = "가상 이야기: 변경된 일정 전에 다시 전하는 고마운 마음입니다.";
-    await guest.getByLabel("혜성식품에게 전하고 싶은 말").fill(edited);
+    await guest
+      .locator("form")
+      .filter({ has: guest.getByRole("button", { name: "내 글 수정 저장" }) })
+      .getByLabel("혜성식품에게 전하고 싶은 말")
+      .fill(edited);
     await capture(guest, "editing-375");
     await guest.getByRole("button", { name: "내 글 수정 저장" }).click();
     await expect(guest.getByText(edited, { exact: true })).toBeVisible();
@@ -125,11 +135,16 @@ test("a postponed event lets the owner edit/delete stories live, then closes the
       },
       okSchema,
     );
-    await guest.getByRole("button", { name: "내 글 삭제하기" }).click();
+    await guest
+      .getByText(second, { exact: true })
+      .locator("..")
+      .getByRole("button", { name: "내 글 삭제하기" })
+      .click();
     await expect(guest.getByRole("dialog")).toBeVisible();
     await expect(guest.getByRole("dialog")).toHaveCount(0, { timeout: 15000 });
     await expect(guest.getByRole("button", { name: "내 글 수정하기" })).toHaveCount(0);
     await expect(guest.getByRole("button", { name: "내 글 삭제하기" })).toHaveCount(0);
+    await expect(guest.getByRole("button", { name: "익명으로 마음 남기기" })).toHaveCount(0);
     await capture(guest, "closed-375");
     expect(await call(owner, { action: "forest_mine", payload: {} }, forestListSchema)).toContainEqual(
       expect.objectContaining({ body: second }),

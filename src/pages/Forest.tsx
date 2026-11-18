@@ -9,28 +9,16 @@ import { useTask } from "../lib/useTask";
 import { useGuest } from "./Participant";
 
 export function Forest({ admin = false }: { readonly admin?: boolean }) {
-  return admin ? <ForestBoard admin locked={false} canCreate={false} /> : <EmployeeForest />;
+  return admin ? <ForestBoard admin locked={false} /> : <EmployeeForest />;
 }
 function EmployeeForest() {
   const { data, responseWindow } = useGuest();
   const started = data.state.editing_locked || !!data.settings.started_at;
   return (
-    <ForestBoard
-      admin={false}
-      locked={started && !(data.settings.forest_edit_open && responseWindow)}
-      canCreate={!started}
-    />
+    <ForestBoard admin={false} locked={started && !(data.settings.forest_edit_open && responseWindow)} />
   );
 }
-function ForestBoard({
-  admin,
-  locked,
-  canCreate,
-}: {
-  readonly admin: boolean;
-  readonly locked: boolean;
-  readonly canCreate: boolean;
-}) {
+function ForestBoard({ admin, locked }: { readonly admin: boolean; readonly locked: boolean }) {
   const [posts, setPosts] = useState<ForestPost[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -83,14 +71,10 @@ function ForestBoard({
             표시하지 않습니다.
           </p>
           <p className="small">본문에는 본인이나 동료를 알아볼 만한 정보를 적지 말아주세요.</p>
-          {canCreate ? (
-            <ForestForm locked={locked} saved={refresh} />
+          {locked ? (
+            <Note>행사가 시작되어 작성·수정·삭제가 마감되었습니다. 보낸 글은 계속 확인 가능합니다.</Note>
           ) : (
-            <Note>
-              {locked
-                ? "행사가 시작되어 작성·수정·삭제가 마감되었습니다. 보낸 글은 계속 확인 가능합니다."
-                : "새 글 작성은 마감됐습니다. 내 글 수정과 삭제는 아래에서 가능합니다."}
-            </Note>
+            <ForestForm locked={locked} saved={refresh} />
           )}
         </Panel>
       )}
