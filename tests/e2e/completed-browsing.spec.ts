@@ -137,30 +137,18 @@ test("the organizer ends the event and employees freely browse, reconnect and se
       if (r.url().includes("/functions/v1/portal") && r.postDataJSON()?.action === "taste_cards") cardReads++;
     });
     await first.getByRole("link", { name: /혜성식품 인물 카드/ }).click();
-    await expect(first.locator(".taste-card")).toContainText(longAnswer);
-    await expect(first.locator(".taste-card-nav")).toContainText("1 / 5");
-    const initialName = await first.locator(".taste-person h2").textContent();
-    await first.getByRole("button", { name: "다음 직원 →" }).click();
-    await expect(first.locator(".taste-person h2")).not.toHaveText(initialName ?? "");
-    await first.locator(".taste-card").dispatchEvent("pointerdown", {
-      pointerType: "touch",
-      pointerId: 1,
-      isPrimary: true,
-      clientX: 300,
-      clientY: 200,
-    });
-    await first.locator(".taste-card").dispatchEvent("pointerup", {
-      pointerType: "touch",
-      pointerId: 1,
-      isPrimary: true,
-      clientX: 100,
-      clientY: 210,
-    });
-    await expect(first.locator(".taste-card-nav")).toContainText("3 / 5");
+    await expect(first.locator(".person-card-button")).toHaveCount(5);
+    await first.locator(".person-card-button").first().click();
+    await expect(first.getByRole("dialog")).toContainText(longAnswer);
+    const initialName = await first.getByRole("dialog").getByRole("heading").textContent();
+    await first.getByRole("button", { name: "닫기", exact: true }).click();
+    await first.locator(".person-card-button").nth(1).click();
+    await expect(first.getByRole("dialog").getByRole("heading")).not.toHaveText(initialName ?? "");
+    await first.getByRole("button", { name: "닫기", exact: true }).click();
     await first.getByLabel("직원 이름 검색").fill("없는사람");
     await expect(first.getByText("이름에 맞는 공개 카드가 없습니다.")).toBeVisible();
     await first.getByLabel("직원 이름 검색").fill("가상직원 하나");
-    await expect(first.locator(".taste-card-nav")).toContainText("1 / 1");
+    await expect(first.locator(".person-card-button")).toHaveCount(1);
     await first.screenshot({
       path: "artifacts/screens/afterparty/card-390.png",
       fullPage: true,
@@ -175,7 +163,7 @@ test("the organizer ends the event and employees freely browse, reconnect and se
     await expect(first.locator(".message-tree")).toBeVisible();
     await first.getByRole("link", { name: "자유 관람 홈으로", exact: true }).click();
     await first.getByRole("link", { name: /혜성식품 인물 카드/ }).click();
-    await expect(first.locator(".taste-card")).toBeVisible();
+    await expect(first.locator(".person-card-button").first()).toBeVisible();
     expect(cardReads).toBe(1);
     const blocked = await admin.functions.invoke("portal", {
       body: {

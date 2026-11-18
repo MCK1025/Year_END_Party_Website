@@ -11,13 +11,13 @@ function RoundEditor({ round }: { readonly round?: Dashboard["rounds"][number] }
   const [employee, setEmployee] = useState(round?.employee_id ?? "");
   const [keys, setKeys] = useState(round?.question_keys ?? []);
   const [hints, setHints] = useState(round?.hints ?? []);
-  const [approved, setApproved] = useState(round?.approved ?? false);
+  const [approved, setApproved] = useState(true);
   const [order, setOrder] = useState(round?.sort_order ?? 0);
   const [confirm, setConfirm] = useState(false);
   const eligible = data.employees.filter((e) => e.active && data.surveys.some((s) => s.employee_id === e.id));
   const survey = data.surveys.find((s) => s.employee_id === employee);
   const questions = data.questions.filter(
-    (q) => q.active && survey && !survey.excluded.includes(q.id) && survey.answers[q.id],
+    (q) => q.active && survey && !survey.excluded.includes(q.id) && survey.answers[q.id]?.trim(),
   );
   function toggle(key: string, checked: boolean) {
     if (checked && keys.length < 6) {
@@ -29,7 +29,6 @@ function RoundEditor({ round }: { readonly round?: Dashboard["rounds"][number] }
       setKeys(keys.filter((k) => k !== key));
       setHints(hints.filter((_, n) => n !== i));
     }
-    setApproved(false);
   }
   return (
     <Panel title={round ? "인물 문제 수정" : "새 인물 문제"}>
@@ -57,7 +56,7 @@ function RoundEditor({ round }: { readonly round?: Dashboard["rounds"][number] }
               setEmployee("");
               setKeys([]);
               setHints([]);
-              setApproved(false);
+              setApproved(true);
             }
           });
         }}
@@ -67,10 +66,20 @@ function RoundEditor({ round }: { readonly round?: Dashboard["rounds"][number] }
           label="설문을 등록한 직원"
           value={employee}
           onChange={(id) => {
+            const nextSurvey = data.surveys.find((s) => s.employee_id === id);
+            const selected = data.questions
+              .filter(
+                (q) =>
+                  q.active &&
+                  nextSurvey &&
+                  !nextSurvey.excluded.includes(q.id) &&
+                  nextSurvey.answers[q.id]?.trim(),
+              )
+              .slice(0, 6);
             setEmployee(id);
-            setKeys([]);
-            setHints([]);
-            setApproved(false);
+            setKeys(selected.map((q) => q.id));
+            setHints(selected.map((q) => nextSurvey?.answers[q.id] ?? ""));
+            setApproved(true);
           }}
         >
           <option value="">직원을 선택해주세요</option>
@@ -104,7 +113,6 @@ function RoundEditor({ round }: { readonly round?: Dashboard["rounds"][number] }
             value={hints[i] ?? ""}
             onChange={(e) => {
               setHints(hints.map((h, n) => (n === i ? e.target.value : h)));
-              setApproved(false);
             }}
             required
           />
@@ -118,7 +126,7 @@ function RoundEditor({ round }: { readonly round?: Dashboard["rounds"][number] }
           onChange={(e) => setOrder(Number(e.target.value))}
         />
         <Check checked={approved} onChange={setApproved}>
-          저장된 답변에 근거한 힌트이며, 민감한 내용이 없는지 검수했습니다.
+          답변과 힌트를 확인하고 저장할 때 이 문제의 공개를 승인합니다.
         </Check>
         <div className="actions">
           <Button type="submit" busy={task.busy} disabled={!employee || keys.length === 0}>

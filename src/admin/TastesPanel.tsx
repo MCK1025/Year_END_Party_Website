@@ -10,7 +10,7 @@ function TasteEditor({ taste }: { readonly taste?: Dashboard["tastes"][number] }
   const task = useTask();
   const [question, setQuestion] = useState(taste?.question_id ?? "food");
   const [prompt, setPrompt] = useState(taste?.prompt ?? "우리 회사, 오늘 가장 먹고 싶은 음식은?");
-  const [approved, setApproved] = useState(taste?.approved ?? false);
+  const [approved, setApproved] = useState(true);
   const [results, setResults] = useState(
     (taste?.results ?? []).map((r) => ({ ...r, key: crypto.randomUUID() })),
   );
@@ -29,7 +29,7 @@ function TasteEditor({ taste }: { readonly taste?: Dashboard["tastes"][number] }
                   question_id: question,
                   prompt,
                   results: taste ? results : null,
-                  approved,
+                  approved: Boolean(taste) && approved,
                 },
               },
               okSchema,
@@ -43,7 +43,6 @@ function TasteEditor({ taste }: { readonly taste?: Dashboard["tastes"][number] }
           value={question}
           onChange={(id) => {
             setQuestion(id);
-            setApproved(false);
           }}
         >
           <option value="">질문 선택</option>
@@ -74,7 +73,6 @@ function TasteEditor({ taste }: { readonly taste?: Dashboard["tastes"][number] }
                   value={r.label}
                   onChange={(e) => {
                     setResults(results.map((v, n) => (n === i ? { ...v, label: e.target.value } : v)));
-                    setApproved(false);
                   }}
                   required
                 />
@@ -89,7 +87,6 @@ function TasteEditor({ taste }: { readonly taste?: Dashboard["tastes"][number] }
                       setResults(
                         results.map((v, n) => (n === i ? { ...v, count: Number(e.target.value) } : v)),
                       );
-                      setApproved(false);
                     }}
                   />
                   <Button
@@ -97,7 +94,6 @@ function TasteEditor({ taste }: { readonly taste?: Dashboard["tastes"][number] }
                     aria-label={`항목 ${i + 1} 삭제`}
                     onClick={() => {
                       setResults(results.filter((_, n) => n !== i));
-                      setApproved(false);
                     }}
                   >
                     제외
@@ -109,7 +105,6 @@ function TasteEditor({ taste }: { readonly taste?: Dashboard["tastes"][number] }
               variant="secondary"
               onClick={() => {
                 setResults([...results, { label: "", count: 0, key: crypto.randomUUID() }]);
-                setApproved(false);
               }}
             >
               항목 추가
@@ -142,7 +137,7 @@ function TasteEditor({ taste }: { readonly taste?: Dashboard["tastes"][number] }
         )}
         {taste && (
           <Check checked={approved} onChange={setApproved}>
-            집계와 표기를 확인했습니다. 공개를 승인합니다.
+            집계와 표기를 확인하고 검수 결과를 저장할 때 공개를 승인합니다.
           </Check>
         )}
         <Button type="submit" busy={task.busy}>

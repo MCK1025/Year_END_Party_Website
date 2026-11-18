@@ -8,11 +8,12 @@ import { useAdmin } from "./context";
 export function CardReview({ survey }: { readonly survey: Dashboard["surveys"][number] }) {
   const { data, refresh } = useAdmin();
   const task = useTask();
-  const [keys, setKeys] = useState(
-    data.card_reviews.find((r) => r.employee_id === survey.employee_id)?.question_keys ?? [],
-  );
   const eligible = data.questions.filter(
     (q) => q.active && !survey.excluded.includes(q.id) && survey.answers[q.id]?.trim(),
+  );
+  const [keys, setKeys] = useState(
+    data.card_reviews.find((r) => r.employee_id === survey.employee_id)?.question_keys ??
+      eligible.map((q) => q.id),
   );
   return (
     <form

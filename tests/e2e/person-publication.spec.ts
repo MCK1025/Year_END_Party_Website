@@ -92,7 +92,7 @@ test("no-consent registration, six-question quiz and two reviewed person cards w
     await host.getByLabel("설문을 등록한 직원").selectOption(first.id);
     for (const q of data.questions) await host.getByRole("checkbox", { name: q.prompt }).check();
     await expect(host.getByRole("textbox", { name: /^힌트 / })).toHaveCount(6);
-    await host.getByRole("checkbox", { name: /민감한 내용이 없는지 검수/ }).check();
+    await expect(host.getByRole("checkbox", { name: /이 문제의 공개를 승인/ })).toBeChecked();
     await capture(host, "admin-six-questions");
     await host.getByRole("button", { name: "문제 저장", exact: true }).click();
     await expect.poll(async () => (await dashboard()).rounds.length).toBe(1);
@@ -134,17 +134,19 @@ test("no-consent registration, six-question quiz and two reviewed person cards w
     }
     await expect(host.getByText("설문 등록 2명 · 공개 승인 2명 · 검수 대기 0명")).toBeVisible();
     await capture(host, "admin-approved");
-    await expect(page.locator(".taste-card-nav")).toContainText("1 / 2");
+    await expect(page.locator(".person-card-button")).toHaveCount(2);
     await page.getByLabel("직원 이름 검색").fill(first.name);
     await sql`update public.employee_directory set department='수정된 과장' where id=${first.id}`;
-    await expect(page.locator(".taste-person")).toContainText("수정된 과장", { timeout: 15000 });
+    await expect(page.locator(".person-card-button")).toContainText("수정된 과장", { timeout: 15000 });
+    await page.locator(".person-card-button").click();
     await expect(page.locator(".taste-answer")).toHaveCount(6);
     await capture(page, "cards-position");
+    await page.getByRole("dialog").getByRole("button", { name: "닫기", exact: true }).click();
     await page.getByLabel("직원 이름 검색").fill("");
-    await page.getByRole("button", { name: "다음 직원 →" }).click();
-    await expect(page.locator(".taste-card-nav")).toContainText("2 / 2");
-    await page.getByRole("button", { name: "← 이전 직원" }).click();
-    await expect(page.locator(".taste-card-nav")).toContainText("1 / 2");
+    await expect(page.locator(".person-card-button")).toHaveCount(2);
+    await page.locator(".person-card-button").nth(1).click();
+    await expect(page.getByRole("dialog")).toBeVisible();
+    await page.getByRole("dialog").getByRole("button", { name: "닫기", exact: true }).click();
     await sql`update private.employees set department=${first.department} where id=${first.id}`;
     for (const tab of ["사원 관리", "설문·추천", "취향 통계"]) {
       await host.getByRole("button", { name: tab, exact: true }).click();
