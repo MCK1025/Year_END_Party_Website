@@ -119,8 +119,7 @@ export function ProgressPanel({ rehearsal = false }: { readonly rehearsal?: bool
           {!rehearsal &&
             (started ? (
               <Note>
-                행사 시작 이력이 있습니다. 설문·추천 수정 허용은 설정·내보내기에서 확인해주세요. 이야기 트리
-                작성과 수정은 마감되었습니다.
+                행사 시작 이력이 있습니다. 응답 수정 기간과 허용 여부는 설정·내보내기에서 확인해주세요.
               </Note>
             ) : (
               <Button

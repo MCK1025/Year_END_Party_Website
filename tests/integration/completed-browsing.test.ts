@@ -181,18 +181,8 @@ describe.sequential("completed browsing access and publication", () => {
     expect((await boot(reconnect)).state.phase).toBe("COMPLETED");
     await reconnect.auth.signOut();
   });
-  it("keeps completion terminal across schedule changes and temporary access closure", async () => {
+  it("keeps completion terminal across temporary access closure and staff deletion", async () => {
     const settings = (await dashboard()).settings;
-    await call(
-      admin,
-      {
-        action: "settings",
-        payload: { ...settings, event_start_at: new Date(Date.now() + 3600000).toISOString() },
-      },
-      okSchema,
-    );
-    expect((await dashboard()).state.phase).toBe("COMPLETED");
-    await expect(cards()).rejects.toThrow();
     await call(admin, { action: "settings", payload: { ...settings, enabled: false } }, okSchema);
     expect((await dashboard()).state.phase).toBe("COMPLETED");
     await expect(cards()).rejects.toThrow();

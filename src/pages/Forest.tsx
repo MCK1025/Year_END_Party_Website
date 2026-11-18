@@ -9,19 +9,37 @@ import { useTask } from "../lib/useTask";
 import { useGuest } from "./Participant";
 
 export function Forest({ admin = false }: { readonly admin?: boolean }) {
-  return admin ? <ForestBoard admin locked={false} /> : <EmployeeForest />;
+  return admin ? <ForestBoard admin locked={false} canCreate={false} /> : <EmployeeForest />;
 }
 function EmployeeForest() {
-  const { data } = useGuest();
-  return <ForestBoard admin={false} locked={data.state.editing_locked || !!data.settings.started_at} />;
+  const { data, responseWindow } = useGuest();
+  const started = data.state.editing_locked || !!data.settings.started_at;
+  return (
+    <ForestBoard
+      admin={false}
+      locked={started && !(data.settings.forest_edit_open && responseWindow)}
+      canCreate={!started}
+    />
+  );
 }
-function ForestBoard({ admin, locked }: { readonly admin: boolean; readonly locked: boolean }) {
+function ForestBoard({
+  admin,
+  locked,
+  canCreate,
+}: {
+  readonly admin: boolean;
+  readonly locked: boolean;
+  readonly canCreate: boolean;
+}) {
   const [posts, setPosts] = useState<ForestPost[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [more, setMore] = useState(false);
   const [editing, setEditing] = useBookDraft("forestEditing", null);
   const [deleting, setDeleting] = useState<ForestPost | null>(null);
+  useEffect(() => {
+    if (locked) setDeleting(null);
+  }, [locked]);
   const task = useTask();
   const action = admin ? "forest_list" : "forest_mine";
   const refresh = useCallback(async () => {
@@ -65,10 +83,14 @@ function ForestBoard({ admin, locked }: { readonly admin: boolean; readonly lock
             표시하지 않습니다.
           </p>
           <p className="small">본문에는 본인이나 동료를 알아볼 만한 정보를 적지 말아주세요.</p>
-          {locked ? (
-            <Note>행사가 시작되어 작성·수정·삭제가 마감되었습니다. 보낸 글은 계속 확인 가능합니다.</Note>
-          ) : (
+          {canCreate ? (
             <ForestForm locked={locked} saved={refresh} />
+          ) : (
+            <Note>
+              {locked
+                ? "행사가 시작되어 작성·수정·삭제가 마감되었습니다. 보낸 글은 계속 확인 가능합니다."
+                : "새 글 작성은 마감됐습니다. 내 글 수정과 삭제는 아래에서 가능합니다."}
+            </Note>
           )}
         </Panel>
       )}

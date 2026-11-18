@@ -87,6 +87,7 @@ export const settingsSchema = z.object({
   survey_open: z.boolean(),
   nomination_open: z.boolean(),
   started_at: z.string().nullable().default(null),
+  forest_edit_open: z.boolean().optional(),
   welcome: z.string(),
   logo_path: z.string().nullable(),
 });
