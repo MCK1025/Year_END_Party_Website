@@ -3,6 +3,7 @@ import { type Dashboard, okSchema } from "../../supabase/functions/_shared/contr
 import { Button, Check, Note, Panel, TextArea } from "../components/ui";
 import { api } from "../lib/api";
 import { useTask } from "../lib/useTask";
+import { CardReview } from "./CardReview";
 import { useAdmin } from "./context";
 
 function ReasonReview({ nomination }: { readonly nomination: Dashboard["nominations"][number] }) {
@@ -108,6 +109,7 @@ export function DataPanel() {
                       </p>
                     </div>
                   ))}
+                  <CardReview key={data.state.revision} survey={survey} />
                 </div>
               ) : (
                 <p className="empty">저장된 설문이 없습니다.</p>

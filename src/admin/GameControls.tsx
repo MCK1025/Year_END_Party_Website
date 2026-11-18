@@ -115,6 +115,7 @@ export function GameControls({
     case "RECAP":
     case "AWARDS":
     case "END":
+    case "COMPLETED":
       return null;
     default:
       return state.phase satisfies never;

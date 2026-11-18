@@ -14,6 +14,7 @@ const short = z.string().trim().min(1).max(100);
 export const commandSchema = z.object({
   command: z.enum([
     "start_event",
+    "complete_event",
     "tree_open",
     "tree_close",
     "pause",
@@ -38,6 +39,15 @@ export const commandSchema = z.object({
 });
 export const requestSchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("bootstrap"), payload: z.object({}) }),
+  z.object({ action: z.literal("taste_cards"), payload: z.object({}) }),
+  z.object({
+    action: z.literal("review_card"),
+    payload: z.object({
+      employee_id: uuid,
+      question_keys: z.array(z.string().min(1).max(40)).max(30),
+      revision: z.number().int().min(0),
+    }),
+  }),
   z.object({ action: z.literal("recaps"), payload: z.object({}) }),
   z.object({ action: z.literal("dashboard"), payload: z.object({}) }),
   z.object({ action: z.literal("export"), payload: z.object({}) }),

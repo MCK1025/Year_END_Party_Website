@@ -15,6 +15,11 @@ const chapters = [
   { path: "/event", name: "행사장" },
   { path: "/tree", name: "공개 트리" },
 ] as const;
+const completedChapters = [
+  { path: "/afterparty", name: "자유 관람 홈" },
+  { path: "/tree", name: "이야기 트리" },
+  { path: "/cards", name: "취향 카드" },
+] as const;
 export function BookLayout({
   children,
   treeOpen,
@@ -31,7 +36,7 @@ export function BookLayout({
   const { pathname, state, key } = useLocation();
   const action = useNavigationType();
   const { still } = useBookView();
-  const pages = treeOpen ? chapters : chapters.slice(0, -1);
+  const pages = event.phase === "COMPLETED" ? completedChapters : treeOpen ? chapters : chapters.slice(0, -1);
   const index = pages.findIndex((p) => p.path === pathname);
   const paper = useRef<HTMLElement>(null);
   const revision = event.revision;

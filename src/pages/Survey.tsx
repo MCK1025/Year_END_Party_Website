@@ -102,7 +102,8 @@ export function Survey() {
             개인정보 삭제 예정일: {data.settings.deletion_date ?? "관리자가 안내할 예정입니다."}
           </p>
           <Check checked={consent} onChange={setConsent} disabled={!open || task.busy}>
-            내 답변을 인물 힌트와 익명 취향 통계에 활용하는 데 동의합니다.
+            내 답변을 인물 힌트와 익명 취향 통계, 행사 종료 후 이름·소속이 표시되는 취향 카드에 활용하는 데
+            동의합니다.
           </Check>
         </Panel>
         {task.notice && <Note error={task.failed}>{task.notice}</Note>}

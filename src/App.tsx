@@ -6,12 +6,14 @@ import { InvitationEntry } from "./components/invitation/InvitationEntry";
 import { Showcase } from "./components/Showcase";
 import { Mark, Note } from "./components/ui";
 import { WaitingStory } from "./components/waiting/WaitingStory";
+import { AfterParty } from "./pages/AfterParty";
 import { Event } from "./pages/Event";
 import { Forest } from "./pages/Forest";
 import { Invitation } from "./pages/Invitation";
 import { Nominate } from "./pages/Nominate";
 import { Participant } from "./pages/Participant";
 import { Survey } from "./pages/Survey";
+import { TasteCards } from "./pages/TasteCards";
 
 const Admin = lazy(() => import("./admin/Admin").then((m) => ({ default: m.Admin })));
 const Tree = lazy(() => import("./pages/Tree").then((m) => ({ default: m.Tree })));
@@ -77,6 +79,8 @@ function AppShell() {
               }
             />
             <Route element={<Participant />}>
+              <Route path="/afterparty" element={<AfterParty />} />
+              <Route path="/cards" element={<TasteCards />} />
               <Route path="/survey" element={<Survey />} />
               <Route path="/nominate" element={<Nominate />} />
               <Route path="/forest" element={<Forest />} />

@@ -24,7 +24,19 @@ export function activeSeconds(deltaMs: number, fixedDuration: boolean) {
 }
 export function safeRoute(route: unknown) {
   return typeof route === "string" &&
-    ["/", "/invite", "/login", "/survey", "/nominate", "/forest", "/event", "/tree", "/admin"].includes(route)
+    [
+      "/",
+      "/invite",
+      "/login",
+      "/survey",
+      "/nominate",
+      "/forest",
+      "/event",
+      "/tree",
+      "/afterparty",
+      "/cards",
+      "/admin",
+    ].includes(route)
     ? route
     : "other";
 }

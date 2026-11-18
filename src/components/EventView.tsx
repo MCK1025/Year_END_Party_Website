@@ -10,6 +10,7 @@ export const phaseNames = {
   TASTES: "우리의 취향",
   AWARDS: "고마운 동료",
   END: "다음 한 걸음",
+  COMPLETED: "자유 관람",
 } as const;
 export function EventView({
   state,
@@ -124,6 +125,13 @@ export function EventView({
               ))}
             </Panel>
           ))}
+        </div>
+      );
+    case "COMPLETED":
+      return (
+        <div className="stack">
+          <h1>2026년, 한 걸음 더 가까워진 우리</h1>
+          <p>함께한 이야기와 서로의 새로운 모습을 천천히 둘러보세요.</p>
         </div>
       );
     case "END":

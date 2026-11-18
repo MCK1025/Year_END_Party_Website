@@ -3,7 +3,7 @@ import { type EventState, type Phase, stateSchema } from "../../supabase/functio
 import { commandSchema } from "../../supabase/functions/_shared/requests";
 import { useLivePageTurn } from "../components/book/useLivePageTurn";
 import { EventView, phaseNames } from "../components/EventView";
-import { Button, Confirm, Note, Panel } from "../components/ui";
+import { Button, Check, Confirm, Note, Panel } from "../components/ui";
 import { api } from "../lib/api";
 import { useTask } from "../lib/useTask";
 import { useAdmin } from "./context";
@@ -33,6 +33,8 @@ export function ProgressPanel({ rehearsal = false }: { readonly rehearsal?: bool
   useLivePageTurn(preview, state);
   const [pending, setPending] = useState<(PendingCommand & { readonly revision: number }) | null>(null);
   const following = next[state.phase];
+  const completed = !rehearsal && state.phase === "COMPLETED";
+  const [reviewedTree, setReviewedTree] = useState(false);
   const started = !!data.settings.started_at || state.editing_locked;
   const confirm = (value: PendingCommand) => setPending({ ...value, revision: state.revision });
   async function send(partial: CommandInput, revision = state.revision) {
@@ -91,26 +93,28 @@ export function ProgressPanel({ rehearsal = false }: { readonly rehearsal?: bool
               ? new Date(state.updated_at).toLocaleTimeString("ko-KR", { timeZone: "Asia/Seoul" })
               : "아직 없음"}
           </p>
-          <div className="actions">
-            <Button
-              variant="secondary"
-              busy={task.busy}
-              onClick={() => run({ command: state.paused ? "resume" : "pause" })}
-            >
-              {state.paused ? "진행 재개" : "잠시 정지"}
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={() =>
-                confirm({
-                  label: rehearsal ? "연습을 초기화할까요?" : "대기실로 돌아갈까요?",
-                  command: { command: "waiting" },
-                })
-              }
-            >
-              대기·초기화
-            </Button>
-          </div>
+          {!completed && (
+            <div className="actions">
+              <Button
+                variant="secondary"
+                busy={task.busy}
+                onClick={() => run({ command: state.paused ? "resume" : "pause" })}
+              >
+                {state.paused ? "진행 재개" : "잠시 정지"}
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() =>
+                  confirm({
+                    label: rehearsal ? "연습을 초기화할까요?" : "대기실로 돌아갈까요?",
+                    command: { command: "waiting" },
+                  })
+                }
+              >
+                대기·초기화
+              </Button>
+            </div>
+          )}
           {!rehearsal &&
             (started ? (
               <Note>행사가 시작되었습니다. 직원의 설문·추천·이야기 트리 작성과 수정은 마감되었습니다.</Note>
@@ -141,7 +145,27 @@ export function ProgressPanel({ rehearsal = false }: { readonly rehearsal?: bool
             </Button>
           )}
           <GameControls state={state} rehearsal={rehearsal} busy={task.busy} run={run} confirm={confirm} />
-          {!rehearsal && (
+          {!rehearsal && !completed && (state.phase === "AWARDS" || state.phase === "END") && (
+            <Button
+              disabled={task.busy || state.paused}
+              onClick={() => {
+                setReviewedTree(false);
+                confirm({
+                  label: "행사를 종료하고 자유 관람을 시작할까요?",
+                  command: { command: "complete_event", reviewed: true },
+                });
+              }}
+            >
+              행사 종료 및 자유 관람 시작
+            </Button>
+          )}
+          {completed && (
+            <Note>
+              자유 관람이 시작되었습니다. 직원들이 이야기 트리와 승인된 취향 카드를 자유롭게 둘러볼 수
+              있습니다.
+            </Note>
+          )}
+          {!rehearsal && !completed && (
             <Button
               variant="secondary"
               disabled={task.busy}
@@ -171,11 +195,24 @@ export function ProgressPanel({ rehearsal = false }: { readonly rehearsal?: bool
         <Confirm
           title={pending.label}
           onClose={() => setPending(null)}
+          disabled={pending.command.command === "complete_event" && !reviewedTree}
           action={() => task.run(() => send(pending.command, pending.revision), "진행 상태를 반영했습니다.")}
         >
-          {pending.command.command === "start_event"
-            ? "설문·추천·이야기 트리 작성과 수정이 즉시 마감됩니다. 일시 정지·대기실 복귀·되돌리기를 해도 응답은 다시 열리지 않습니다. 콘텐츠는 설정한 행사 시작 시각부터 다음 순서로 공개할 수 있습니다."
-            : "공개된 정보는 직원 휴대폰에 바로 표시됩니다. 이미 본 내용은 되돌려도 기억에서 지울 수 없습니다."}
+          {pending.command.command === "complete_event" ? (
+            <div className="stack-sm">
+              <p>
+                직원 화면이 자유 관람 홈으로 이동합니다. 이후 공식 게임 진행은 종료됩니다. 취향 카드는
+                설문·추천에서 승인한 답변만 공개합니다.
+              </p>
+              <Check checked={reviewedTree} onChange={setReviewedTree}>
+                이야기 트리의 전체 글을 검수했으며 자유 관람에 공개합니다.
+              </Check>
+            </div>
+          ) : pending.command.command === "start_event" ? (
+            "설문·추천·이야기 트리 작성과 수정이 즉시 마감됩니다. 일시 정지·대기실 복귀·되돌리기를 해도 응답은 다시 열리지 않습니다. 콘텐츠는 설정한 행사 시작 시각부터 다음 순서로 공개할 수 있습니다."
+          ) : (
+            "공개된 정보는 직원 휴대폰에 바로 표시됩니다. 이미 본 내용은 되돌려도 기억에서 지울 수 없습니다."
+          )}
         </Confirm>
       )}
     </div>

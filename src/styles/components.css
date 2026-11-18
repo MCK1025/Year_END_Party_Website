@@ -239,3 +239,72 @@
     transform: translateY(0);
   }
 }
+.afterparty-links {
+  display: grid;
+  gap: var(--s6);
+}
+.afterparty-link {
+  display: grid;
+  gap: var(--s3);
+  padding: var(--s6);
+  background: var(--ivory);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  text-decoration: none;
+}
+.afterparty-link svg {
+  color: var(--gold-ink);
+}
+.taste-card-nav {
+  display: flex;
+  gap: var(--s2);
+  align-items: center;
+  justify-content: space-between;
+}
+.taste-card-nav .button {
+  padding-inline: var(--s2);
+}
+.taste-card {
+  padding: var(--s6) clamp(12px, 4vw, 24px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--ivory);
+  touch-action: pan-y pinch-zoom;
+}
+.taste-person {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  padding-bottom: var(--s4);
+  border-bottom: 1px solid var(--line);
+}
+.employee-view .book-surface .taste-person h2 {
+  font-family: var(--body);
+  font-size: 22px;
+  font-weight: 600;
+}
+.taste-answer {
+  padding-top: var(--s6);
+  font-family: var(--writing);
+  font-size: 22px;
+  line-height: 1.55;
+}
+.taste-answer dt {
+  color: var(--gold-ink);
+  margin-bottom: var(--s2);
+}
+.taste-answer dd {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .taste-card[data-still="false"] {
+    animation: invitation-read 180ms ease-out;
+  }
+}
+@media (min-width: 700px) {
+  .afterparty-links {
+    grid-template-columns: 1fr 1fr;
+  }
+}

@@ -131,11 +131,13 @@ export function Confirm({
   children,
   action,
   onClose,
+  disabled = false,
 }: {
   readonly title: string;
   readonly children: ReactNode;
   readonly action: () => Promise<void>;
   readonly onClose: () => void;
+  readonly disabled?: boolean;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   const [busy, setBusy] = useState(false);
@@ -152,6 +154,7 @@ export function Confirm({
         </Button>
         <Button
           busy={busy}
+          disabled={disabled}
           onClick={() => {
             setBusy(true);
             void action().finally(() => {

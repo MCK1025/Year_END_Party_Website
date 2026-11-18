@@ -40,7 +40,27 @@ export const winnerSchema = z.object({
   votes: z.number(),
   reasons: z.array(z.string()),
 });
-export const phaseSchema = z.enum(["PRE_SURVEY", "WAITING", "RECAP", "WHO_AM_I", "TASTES", "AWARDS", "END"]);
+export const phaseSchema = z.enum([
+  "PRE_SURVEY",
+  "WAITING",
+  "RECAP",
+  "WHO_AM_I",
+  "TASTES",
+  "AWARDS",
+  "END",
+  "COMPLETED",
+]);
+export const tasteCardsSchema = z.object({
+  revision: z.number().int(),
+  cards: z.array(
+    z.object({
+      id: uuid,
+      name: z.string(),
+      department: z.string(),
+      answers: z.array(z.object({ id: z.string(), question: z.string(), answer: z.string() })),
+    }),
+  ),
+});
 export const stateSchema = z.object({
   phase: phaseSchema,
   revision: z.number().int(),
@@ -108,6 +128,7 @@ export const adminSettingsSchema = settingsSchema.extend({
   ending: z.string(),
 });
 export const dashboardSchema = z.object({
+  card_reviews: z.array(z.object({ employee_id: uuid, question_keys: z.array(z.string()) })).default([]),
   settings: adminSettingsSchema,
   employees: z.array(personSchema.extend({ employee_no: z.string(), online: z.boolean() })),
   surveys: z.array(surveySchema),
