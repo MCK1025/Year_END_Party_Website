@@ -7,10 +7,13 @@ import { EmployeeDrafts } from "../components/book/drafts";
 import { Button, Note } from "../components/ui";
 import { supabase } from "../lib/api";
 import { useParticipant } from "../lib/useParticipant";
+import { useResponseWindow } from "../lib/useResponseWindow";
 
-const Context = createContext<{ readonly data: Bootstrap; readonly refresh: () => Promise<void> } | null>(
-  null,
-);
+const Context = createContext<{
+  readonly data: Bootstrap;
+  readonly responseWindow: boolean;
+  readonly refresh: () => Promise<void>;
+} | null>(null);
 export function useGuest() {
   const value = useContext(Context);
   if (!value) throw new Error("Participant context missing");
@@ -18,6 +21,11 @@ export function useGuest() {
 }
 export function Participant() {
   const { data, error, connection, refresh, refreshAfterSave } = useParticipant();
+  const responseWindow = useResponseWindow({
+    started: !!data?.settings.started_at || !!data?.state.editing_locked,
+    start: data?.settings.event_start_at ?? null,
+    serverTime: data?.server_time,
+  });
   const navigate = useNavigate();
   const location = useLocation();
   const treeSeen = useRef(false);
@@ -71,7 +79,7 @@ export function Participant() {
       </main>
     );
   return (
-    <Context.Provider value={{ data, refresh: refreshAfterSave }}>
+    <Context.Provider value={{ data, responseWindow, refresh: refreshAfterSave }}>
       <CardData key={data.self.id} completed={completed} revision={data.state.revision}>
         <EmployeeDrafts key={data.self.id}>
           <BookLayout
@@ -82,6 +90,8 @@ export function Participant() {
               data.state.paused,
               data.state.editing_locked,
               data.settings.started_at,
+              responseWindow,
+              data.settings.event_start_at,
               data.settings.survey_open,
               data.settings.nomination_open,
               treeOpen,

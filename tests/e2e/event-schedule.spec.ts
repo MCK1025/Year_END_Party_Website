@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { okSchema } from "../../supabase/functions/_shared/contracts";
-import { admin, call, dashboard, env, signAdmin, sql } from "../integration/helpers";
+import { admin, call, dashboard, env, signAdmin } from "../integration/helpers";
+import { localDatabase } from "./local-db";
 
 test.use({ timezoneId: "America/Los_Angeles", viewport: { width: 375, height: 812 } });
 
@@ -8,9 +9,12 @@ test("after event start an organizer can save Korean schedule changes without re
   page,
 }) => {
   await signAdmin();
+  const sql = localDatabase();
   const original = (await dashboard()).settings;
   try {
-    await sql`update private.settings set started_at=now(),survey_open=false,nomination_open=false where id`;
+    await sql`update private.settings set started_at=now(),survey_open=false,nomination_open=false,
+      event_start_at=now()-interval '1 hour' where id`;
+    const beforeSave = (await dashboard()).settings.event_start_at;
     await page.goto("/#/admin");
     await page.getByLabel("관리자 이메일").fill(env.ADMIN_EMAIL);
     await page.getByLabel("비밀번호", { exact: true }).fill(env.ADMIN_PASSWORD);
@@ -44,7 +48,7 @@ test("after event start an organizer can save Korean schedule changes without re
     await page.screenshot({ path: "artifacts/screens/event-schedule/save-error-375.png", fullPage: true });
     await expect(date).toHaveValue("2027-01-02");
     await expect(time).toHaveValue("00:07");
-    expect((await dashboard()).settings.event_start_at).toBe(original.event_start_at);
+    expect((await dashboard()).settings.event_start_at).toBe(beforeSave);
     await page.getByRole("button", { name: "설정 저장" }).click();
     await page.getByRole("dialog").getByRole("button", { name: "확인", exact: true }).click();
     await expect(

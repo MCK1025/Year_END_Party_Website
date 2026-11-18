@@ -7,13 +7,13 @@ import { useTask } from "../lib/useTask";
 import { useGuest } from "./Participant";
 
 export function Survey() {
-  const { data, refresh } = useGuest();
+  const { data, responseWindow, refresh } = useGuest();
   const navigate = useSavedNavigation();
   const task = useTask();
   const [draftAnswers, setAnswers, forgetAnswers] = useBookDraft("answers", data.survey?.answers ?? {});
   const [draftConsent, setConsent, forgetConsent] = useBookDraft("consent", data.survey?.consent ?? false);
   const excluded = data.survey?.excluded ?? [];
-  const open = data.settings.survey_open && !data.state.editing_locked && !data.settings.started_at;
+  const open = data.settings.survey_open && responseWindow;
   const answers = open ? draftAnswers : (data.survey?.answers ?? {});
   const consent = open ? draftConsent : (data.survey?.consent ?? false);
   return (

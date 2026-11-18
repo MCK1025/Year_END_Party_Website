@@ -8,6 +8,7 @@ export function useParticipant() {
   const [error, setError] = useState("");
   const [connection, setConnection] = useState("연결 중");
   const generation = useRef(0);
+  const settingsRevision = useRef<number | undefined>(undefined);
   const load = useCallback(async (afterSave: boolean) => {
     const request = ++generation.current;
     try {
@@ -15,6 +16,7 @@ export function useParticipant() {
       if (request !== generation.current) {
         return;
       }
+      settingsRevision.current = next.state.settings_revision;
       setData((old) => ({ ...next, state: latestState(old?.state, next.state) }));
       setError("");
     } catch (error) {
@@ -39,6 +41,10 @@ export function useParticipant() {
           setData((old) =>
             old && state.data.revision >= old.state.revision ? { ...old, state: state.data } : old,
           );
+        if (state.success && state.data.settings_revision !== settingsRevision.current) {
+          settingsRevision.current = state.data.settings_revision;
+          void refresh();
+        }
       })
       .subscribe((status) => {
         setConnection(status === "SUBSCRIBED" ? "실시간 연결됨" : "재연결 중 · 자동 확인");

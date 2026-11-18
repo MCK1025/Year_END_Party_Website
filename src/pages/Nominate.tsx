@@ -7,14 +7,14 @@ import { useTask } from "../lib/useTask";
 import { useGuest } from "./Participant";
 
 export function Nominate() {
-  const { data, refresh } = useGuest();
+  const { data, responseWindow, refresh } = useGuest();
   const task = useTask();
   const navigate = useSavedNavigation();
   const [editing, setEditing] = useBookDraft("nomEditing", false);
   const [selected, setSelected, forgetSelected] = useBookDraft("selected", data.nomination?.nominee_id ?? "");
   const [reason, setReason, forgetReason] = useBookDraft("reason", data.nomination?.reason ?? "");
   const people = data.directory.filter((e) => e.id !== data.self.id);
-  const open = data.settings.nomination_open && !data.state.editing_locked && !data.settings.started_at;
+  const open = data.settings.nomination_open && responseWindow;
   const submitted = data.nomination;
   const nominee = people.find((e) => e.id === submitted?.nominee_id);
   const reasonLength = Array.from(reason.trim()).length;

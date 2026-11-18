@@ -118,7 +118,10 @@ export function ProgressPanel({ rehearsal = false }: { readonly rehearsal?: bool
           )}
           {!rehearsal &&
             (started ? (
-              <Note>행사가 시작되었습니다. 직원의 설문·추천·이야기 트리 작성과 수정은 마감되었습니다.</Note>
+              <Note>
+                행사 시작 이력이 있습니다. 설문·추천 수정 허용은 설정·내보내기에서 확인해주세요. 이야기 트리
+                작성과 수정은 마감되었습니다.
+              </Note>
             ) : (
               <Button
                 disabled={task.busy}

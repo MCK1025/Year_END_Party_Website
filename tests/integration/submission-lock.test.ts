@@ -114,6 +114,7 @@ describe.sequential("private post ownership and durable event submission lock", 
       expect((await c.functions.invoke("portal", { body: request })).error?.context?.status).toBe(403);
     }
     expect((await boot(c)).settings.started_at).toBeTruthy();
+    await eventDate(false);
     const settings = (await dashboard()).settings;
     const reopen = await admin.functions.invoke("portal", {
       body: { action: "settings", payload: { ...settings, survey_open: true } },

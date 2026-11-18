@@ -4,13 +4,14 @@ import { CompanyLogo } from "../components/CompanyLogo";
 import { Button, Check, Confirm, Field, Note, Panel, TextArea } from "../components/ui";
 import { api, upload } from "../lib/api";
 import { exportData } from "../lib/exportData";
+import { useResponseWindow } from "../lib/useResponseWindow";
 import { useTask } from "../lib/useTask";
 import { useAdmin } from "./context";
 
 export function SettingsPanel() {
   const { data, refresh } = useAdmin();
   const initial = data.settings;
-  const locked = !!initial.started_at || data.state.editing_locked;
+  const started = !!initial.started_at || data.state.editing_locked;
   const task = useTask();
   const saveTask = useTask();
   const koreanStart = initial.event_start_at
@@ -18,6 +19,8 @@ export function SettingsPanel() {
     : "";
   const [date, setDate] = useState(koreanStart.slice(0, 10));
   const [time, setTime] = useState(koreanStart.slice(11, 16) || "18:00");
+  const eventStart = date && time ? `${date}T${time}:00+09:00` : null;
+  const editable = useResponseWindow({ started, start: eventStart });
   const [deletion, setDeletion] = useState(initial.deletion_date ?? "");
   const [survey, setSurvey] = useState(initial.survey_open);
   const [nomination, setNomination] = useState(initial.nomination_open);
@@ -31,10 +34,10 @@ export function SettingsPanel() {
       {
         action: "settings",
         payload: {
-          event_start_at: date ? `${date}T${time}:00+09:00` : null,
+          event_start_at: eventStart,
           deletion_date: deletion || null,
-          survey_open: !locked && survey,
-          nomination_open: !locked && nomination,
+          survey_open: editable && survey,
+          nomination_open: editable && nomination,
           enabled,
           welcome,
           ending,
@@ -71,13 +74,17 @@ export function SettingsPanel() {
               value={deletion}
               onChange={(e) => setDeletion(e.target.value)}
             />
-            {locked && (
-              <Note>설문·동료 추천 응답은 마감 상태입니다. 행사일과 시작 시각은 변경할 수 있습니다.</Note>
+            {started && (
+              <Note>
+                {editable
+                  ? "시작 전 응답 수정이 가능합니다. 허용할 항목을 선택하고 저장해주세요."
+                  : "응답을 다시 허용하려면 행사일과 시작 시각을 현재보다 이후로 변경해주세요."}
+              </Note>
             )}
-            <Check checked={!locked && survey} onChange={setSurvey} disabled={locked}>
+            <Check checked={editable && survey} onChange={setSurvey} disabled={!editable}>
               설문 수정 허용
             </Check>
-            <Check checked={!locked && nomination} onChange={setNomination} disabled={locked}>
+            <Check checked={editable && nomination} onChange={setNomination} disabled={!editable}>
               동료 추천·변경 허용
             </Check>
             <Check checked={enabled} onChange={setEnabled}>
@@ -205,7 +212,7 @@ export function SettingsPanel() {
           {confirm === "purge"
             ? "되돌릴 수 없습니다. 필요한 결과를 먼저 내려받았는지 확인해주세요. 삭제 중 오류가 나면 공개는 중단된 상태로 유지되며 재실행할 수 있습니다."
             : confirm === "save"
-              ? "행사일이나 시작 시각을 변경하거나 접속을 중단하면 직원 화면은 대기실로 돌아갑니다. 이미 마감된 응답은 다시 열리지 않습니다."
+              ? "미래의 행사 시작 시각으로 설정하고 수정 허용을 선택하면, 해당 시각 전까지 선택한 응답을 다시 수정할 수 있습니다. 응답을 다시 허용하면 직원 화면은 대기실로 돌아가며 기존 응답은 보존됩니다."
               : "다운로드 이력이 기록됩니다. CSV는 설문·추천·시상 3개 파일입니다. 브라우저가 여러 파일 다운로드를 차단하면 엑셀을 선택해주세요."}
         </Confirm>
       )}
