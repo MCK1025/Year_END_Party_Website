@@ -1,4 +1,5 @@
 .work-story {
+  position: relative;
   width: min(100%, 40rem);
   margin-inline: auto;
   min-width: 0;
@@ -24,12 +25,29 @@
   cursor: pointer;
   color: var(--navy);
 }
-.work-story-heading button {
-  flex-shrink: 0;
+.work-story-play {
+  position: absolute;
+  z-index: 2;
+  inset: calc(var(--s2) + 1px) 0 auto auto;
   white-space: nowrap;
   font: 500 0.8rem var(--body);
   text-decoration: underline;
   text-underline-offset: 4px;
+}
+.work-story:has(> .work-story-play) .work-story-heading {
+  min-height: calc(44px + var(--s2) * 2 + 1px);
+  padding-inline-end: 5rem;
+}
+.work-story[data-book] .work-story-spread {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  touch-action: pan-y pinch-zoom;
+}
+.work-story[data-book] .work-story-sheet {
+  position: relative;
+  z-index: 1;
+  background: var(--stock, var(--ivory));
 }
 .work-story-stage {
   position: relative;

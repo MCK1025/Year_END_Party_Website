@@ -116,6 +116,7 @@ test("saves independent cover and ordered photos, reloads them, gates private me
     await view.getByRole("button", { name: "오프닝 건너뛰기" }).click();
     await expect(view.locator(".album-image-slot:not([hidden]) img")).toHaveCSS("object-fit", "cover");
     await view.getByRole("button", { name: /다음/ }).click();
+    await expect(view.locator(".album-page")).toHaveCSS("transform", /^matrix3d/);
     await expect(view.getByRole("heading", { name: "가로형 테스트" })).toBeVisible();
     await expect(view.locator(".album-image-slot:not([hidden]) img")).toHaveCSS("object-fit", "contain");
     await fresh.getByRole("button", { name: "미리보기 닫기" }).click();

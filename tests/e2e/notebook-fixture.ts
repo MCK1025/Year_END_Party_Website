@@ -8,6 +8,7 @@ export async function fixture(
   options: {
     extraQuestions?: number;
     choice?: boolean;
+    treeOpen?: boolean;
     phase?: "PRE_SURVEY" | "WAITING" | "RECAP" | "END" | "COMPLETED";
     logoPath?: string;
   } = {},
@@ -62,6 +63,7 @@ export async function fixture(
               phase: options.phase ?? "WHO_AM_I",
               revision: updates.revision,
               paused: updates.paused,
+              tree_open: options.treeOpen ?? false,
               payload: {
                 round_id: id,
                 round_index: 1,

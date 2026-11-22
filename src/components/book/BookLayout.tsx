@@ -5,6 +5,7 @@ import { motionMedia, motionPolicy, safeRoute } from "../../lib/motion";
 import { traceMotion } from "../../lib/motionDebug";
 import { freezeTurn } from "./bookTurn";
 import { useBookView } from "./preferences";
+import { turnReadingPage } from "./turnReadingPage";
 import { useLivePageTurn } from "./useLivePageTurn";
 import { BeforeBookMove } from "./useSavedNavigation";
 
@@ -36,7 +37,8 @@ export function BookLayout({
   const { pathname, state, key } = useLocation();
   const action = useNavigationType();
   const { still } = useBookView();
-  const pages = event.phase === "COMPLETED" ? completedChapters : treeOpen ? chapters : chapters.slice(0, -1);
+  const browsing = event.phase === "COMPLETED";
+  const pages = browsing ? completedChapters : treeOpen ? chapters : chapters.slice(0, -1);
   const index = pages.findIndex((p) => p.path === pathname);
   const paper = useRef<HTMLElement>(null);
   const revision = event.revision;
@@ -50,7 +52,7 @@ export function BookLayout({
   function prepare(to: string) {
     liveTurn.current?.cancel();
     turn.current?.end("ROUTE_SUPERSEDED");
-    if (!paper.current || to === pathname || !pages.some((p) => p.path === to)) return;
+    if (browsing || !paper.current || to === pathname || !pages.some((p) => p.path === to)) return;
     const trace = traceMotion("book");
     const policy = motionPolicy(motionMedia()?.matches, still);
     trace("REQUEST", {
@@ -118,11 +120,20 @@ export function BookLayout({
       return;
     }
     turn.current?.end("ROUTE_SUPERSEDED");
-    if (action === "POP" || !state?.bookFrom)
-      traceMotion("book")(action === "POP" ? "NAVIGATION_POP" : "NAVIGATION_NOT_ELIGIBLE", { mode: "none" });
     window.scrollTo(0, action === "POP" ? (scrolls.current.get(key) ?? 0) : 0);
     paper.current?.focus({ preventScroll: true });
-  }, [pathname, key, scene, still, revision, state, action]);
+    if (browsing && paper.current && prior.scene === scene && prior.revision === revision) {
+      const from = completedChapters.findIndex((p) => p.path === prior.pathname);
+      if (
+        from >= 0 &&
+        index >= 0 &&
+        (action === "POP" || (action === "PUSH" && state?.bookFrom === prior.pathname))
+      )
+        return turnReadingPage(paper.current, index > from, still);
+    }
+    if (action === "POP" || !state?.bookFrom)
+      traceMotion("book")(action === "POP" ? "NAVIGATION_POP" : "NAVIGATION_NOT_ELIGIBLE", { mode: "none" });
+  }, [pathname, key, scene, still, revision, state, action, browsing, index]);
   function beforeLink(e: MouseEvent<HTMLElement>) {
     if (e.defaultPrevented || e.button !== 0 || e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;
     if (e.target instanceof Element && e.target.closest(".book-status button"))

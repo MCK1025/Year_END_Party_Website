@@ -58,6 +58,27 @@ async function setup(page: Page) {
   };
 }
 const album = (page: Page) => page.getByRole("region", { name: "1년 회고", exact: true });
+
+async function sampleTurn(page: Page, direction: "next" | "previous", capture?: string) {
+  const tilt = await page.waitForFunction(
+    () => {
+      const sheet = document.querySelector(".album-page");
+      const turn = sheet?.getAnimations()[0];
+      if (!sheet || !turn) return null;
+      turn.pause();
+      turn.currentTime = 85;
+      return new DOMMatrix(getComputedStyle(sheet).transform).m13;
+    },
+    undefined,
+    { timeout: 2500 },
+  );
+  const value = await tilt.jsonValue();
+  if (direction === "next") expect(value).toBeLessThan(0);
+  else expect(value).toBeGreaterThan(0);
+  if (capture) await album(page).screenshot({ path: capture });
+  await page.locator(".album-page").evaluate((el) => el.getAnimations()[0]?.play());
+}
+
 test("opens the hardback once, navigates by button and swipe, and restores a stable slide across revisions and reloads", async ({
   page,
 }, info) => {
@@ -82,6 +103,7 @@ test("opens the hardback once, navigates by button and swipe, and restores a sta
   await view.screenshot({ path: `${evidence}/cover.png` });
   await view.getByRole("button", { name: /다음/ }).click();
   await expect(view.getByRole("heading", { name: "사진 1" })).toBeVisible();
+  await sampleTurn(page, "next", `${evidence}/turn-next.png`);
   await view
     .locator(".album-stage")
     .dispatchEvent("pointerdown", { pointerId: 3, isPrimary: true, button: 0, clientX: 270, clientY: 110 });
@@ -89,6 +111,7 @@ test("opens the hardback once, navigates by button and swipe, and restores a sta
     .locator(".album-stage")
     .dispatchEvent("pointerup", { pointerId: 3, isPrimary: true, button: 0, clientX: 60, clientY: 114 });
   await expect(view.getByRole("heading", { name: "사진 2" })).toBeVisible();
+  await sampleTurn(page, "next");
   await page.reload();
   await expect(view.getByRole("heading", { name: "사진 2" })).toBeVisible();
   await expect(view.locator(".album-hardback")).toHaveCount(0);
@@ -98,8 +121,13 @@ test("opens the hardback once, navigates by button and swipe, and restores a sta
   await expect(view.getByRole("button", { name: /다음/ })).toBeDisabled();
   await view.getByRole("button", { name: /이전/ }).click();
   await expect(view.getByRole("heading", { name: "사진 1" })).toBeVisible();
+  await sampleTurn(page, "previous", `${evidence}/turn-previous.png`);
   await expect.poll(() => view.locator(".album-page").evaluate((e) => e.getAnimations().length)).toBe(0);
   await view.screenshot({ path: `${evidence}/detail.png` });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await view.getByRole("button", { name: /다음/ }).click();
+  await expect(view.getByRole("heading", { name: "사진 2" })).toBeVisible();
+  expect(await view.locator(".album-page").evaluate((el) => el.getAnimations().length)).toBe(0);
 });
 test("skip, reduced motion, empty collection, photo retry and realtime stage interruption", async ({
   page,
@@ -191,6 +219,9 @@ test("phone profile keeps navigation reachable and falls back when the opening c
     await page.reload();
     await expect(view.getByRole("button", { name: /다음/ })).toBeVisible();
     await expect(view.locator(".album-hardback")).toHaveCount(0);
+    await view.getByRole("button", { name: /다음/ }).tap();
+    await expect(view.getByRole("heading", { name: "사진 1" })).toBeVisible();
+    expect(await view.locator(".album-page").evaluate((el) => el.getAnimations().length)).toBe(0);
   } finally {
     await context.close();
   }

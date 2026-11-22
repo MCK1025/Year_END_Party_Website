@@ -18,7 +18,7 @@ export function AfterParty() {
       <header className="page-heading">
         <h1>2026년, 한 걸음 더 가까워진 우리</h1>
       </header>
-      <WaitingStory />
+      <WaitingStory book />
     </div>
   );
 }

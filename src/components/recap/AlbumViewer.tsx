@@ -1,6 +1,8 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { motionMedia, motionPolicy, observeMotion } from "../../lib/motion";
 import { useBookView } from "../book/preferences";
+import { turnReadingPage } from "../book/turnReadingPage";
+import { usePageSwipe } from "../book/usePageSwipe";
 import { Button, Note } from "../ui";
 import { AlbumPhoto } from "./AlbumPhoto";
 import { BookOpening } from "./BookOpening";
@@ -52,7 +54,7 @@ export function AlbumViewer({
     () =>
       !!pages.length && !bookmark(storageKey) && motionPolicy(motionMedia()?.matches, still) === "ALLOWED",
   );
-  const [direction, setDirection] = useState<"next" | "previous" | null>(null);
+  const requestedTurn = useRef<{ id: string; forward: boolean } | null>(null);
   const index = Math.max(
     0,
     pages.findIndex((p) => p.id === selected),
@@ -61,7 +63,7 @@ export function AlbumViewer({
   const pageId = page?.id;
   const paper = useRef<HTMLDivElement>(null);
   const viewer = useRef<HTMLElement>(null);
-  const gesture = useRef<{ x: number; y: number; id: number } | null>(null);
+  const swipe = usePageSwipe(move);
   useEffect(() => {
     if (!preview) viewer.current?.scrollIntoView({ block: "start", behavior: "instant" });
   }, [preview]);
@@ -69,21 +71,12 @@ export function AlbumViewer({
     if (pageId) remember(storageKey, pageId);
   }, [storageKey, pageId]);
   useLayoutEffect(() => {
-    const media = motionMedia();
-    if (!pageId || !direction || motionPolicy(media?.matches, still) !== "ALLOWED") return;
-    const turn = paper.current?.animate?.(
-      [
-        { transform: direction === "next" ? "translateX(6%)" : "translateX(-6%)", opacity: 0.45 },
-        { transform: "none", opacity: 1 },
-      ],
-      { duration: 360, easing: "ease-out" },
-    );
-    const stop = observeMotion(media, () => turn?.cancel());
-    return () => {
-      stop();
-      turn?.cancel();
-    };
-  }, [direction, still, pageId]);
+    const request = requestedTurn.current;
+    requestedTurn.current = null;
+    if (request && request.id === pageId && paper.current) {
+      return turnReadingPage(paper.current, request.forward, still, 420);
+    }
+  }, [pageId, still]);
   useEffect(() => {
     if (!opening) return;
     const media = motionMedia();
@@ -102,7 +95,7 @@ export function AlbumViewer({
   function move(by: 1 | -1) {
     const next = pages[index + by];
     if (opening || !next) return;
-    setDirection(by > 0 ? "next" : "previous");
+    requestedTurn.current = { id: next.id, forward: by > 0 };
     setSelected(next.id);
   }
   const album = albumOf(page.moment);
@@ -126,27 +119,7 @@ export function AlbumViewer({
         <h1>1년의 장면들</h1>
         <span>MOMENT {String(page.number).padStart(2, "0")}</span>
       </header>
-      <div
-        className="album-stage"
-        onPointerDown={(e) => {
-          if (!e.isPrimary || e.button !== 0 || (e.target instanceof Element && e.target.closest("button"))) {
-            gesture.current = null;
-            return;
-          }
-          gesture.current = { x: e.clientX, y: e.clientY, id: e.pointerId };
-        }}
-        onPointerCancel={() => {
-          gesture.current = null;
-        }}
-        onPointerUp={(e) => {
-          const start = gesture.current;
-          gesture.current = null;
-          if (!start || start.id !== e.pointerId) return;
-          const dx = e.clientX - start.x,
-            dy = e.clientY - start.y;
-          if (Math.abs(dx) >= 55 && Math.abs(dx) > Math.abs(dy) * 1.6) move(dx < 0 ? 1 : -1);
-        }}
-      >
+      <div className="album-stage" {...swipe}>
         <div
           className="album-volume"
           onAnimationEnd={(e) => {
