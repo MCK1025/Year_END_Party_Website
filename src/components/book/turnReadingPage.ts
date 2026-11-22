@@ -1,13 +1,13 @@
 import { motionMedia, motionPolicy, observeMotion } from "../../lib/motion";
 import { traceMotion } from "../../lib/motionDebug";
 
-/** Turn the incoming, already authorized HTML, including its live images and canvas. */
+/** Fold the visible old sheet over the new HTML. With no captured sheet, unfold the live page. */
 export function turnReadingPage(
   paper: HTMLElement,
   forward: boolean,
   still: boolean,
   duration = 540,
-  underlay?: HTMLElement,
+  departingPage?: HTMLElement,
 ) {
   const trace = traceMotion("book");
   const media = motionMedia();
@@ -18,47 +18,52 @@ export function turnReadingPage(
     });
     return;
   }
-  const rect = paper.getBoundingClientRect();
+  if (departingPage) {
+    // The destination can restore a different scroll position on browser Back.
+    if (paper.classList.contains("book-surface"))
+      departingPage.style.top = `${Math.max(0, -paper.getBoundingClientRect().top)}px`;
+    departingPage.style.zIndex = "2";
+    paper.after(departingPage);
+  }
+  const face = departingPage ?? paper;
+  const rect = face.getBoundingClientRect();
   const middle = Math.max(0, (Math.max(0, rect.top) + Math.min(innerHeight, rect.bottom)) / 2 - rect.top);
-  const hinge = `${forward ? "100%" : "0%"} ${middle}px`;
-  // With a facing sheet, sweep the new page away from the reader so its top and bottom stay in the spread.
-  const angle = (forward ? 73 : -73) * (underlay ? -1 : 1);
-  const edge = forward ? -1 : 1;
+  const leftHinge = departingPage ? forward : !forward;
+  const hinge = `${leftHinge ? "0%" : "100%"} ${middle}px`;
+  const edge = leftHinge ? 1 : -1;
+  const angle = departingPage ? edge * 89 : -edge * 73;
+  const folded = {
+    transformOrigin: hinge,
+    transform: `perspective(1400px) rotateY(${angle}deg)`,
+    boxShadow: `inset ${edge * 20}px 0 30px -14px rgba(55,40,23,.24), ${edge * 6}px 2px 12px rgba(55,40,23,.15)`,
+  };
+  const flat = {
+    transformOrigin: hinge,
+    transform: "perspective(1400px) rotateY(0deg)",
+    boxShadow: "inset 0 0 0 0 rgba(55,40,23,0), 0 0 0 rgba(55,40,23,0)",
+  };
   let animation: Animation;
   try {
-    animation = paper.animate(
-      [
-        {
-          transformOrigin: hinge,
-          transform: `perspective(1400px) rotateY(${angle}deg)`,
-          boxShadow: `inset ${edge * 20}px 0 30px -14px rgba(55,40,23,.24), ${edge * 6}px 2px 12px rgba(55,40,23,.15)`,
-        },
-        {
-          transformOrigin: hinge,
-          transform: "perspective(1400px) rotateY(0deg)",
-          boxShadow: "inset 0 0 0 0 rgba(55,40,23,0), 0 0 0 rgba(55,40,23,0)",
-        },
-      ],
-      {
-        id: forward ? "browse-turn-next" : "browse-turn-previous",
-        duration,
-        easing: "cubic-bezier(.24,.62,.28,1)",
-      },
-    );
+    animation = face.animate(departingPage ? [flat, folded] : [folded, flat], {
+      id: forward ? "browse-turn-next" : "browse-turn-previous",
+      duration,
+      fill: departingPage ? "forwards" : "none",
+      easing: "cubic-bezier(.24,.62,.28,1)",
+    });
   } catch {
+    departingPage?.remove();
     trace("ANIMATION_START_FAILED", { mode: "none" });
     return;
   }
-  if (underlay) paper.before(underlay);
   trace("DOM_CONTENT_TURN", { mode: "dom", forward });
   const cancel = () => {
-    underlay?.remove();
+    departingPage?.remove();
     animation.cancel();
   };
   const stop = observeMotion(media, cancel);
   document.addEventListener("visibilitychange", cancel);
   const clean = () => {
-    underlay?.remove();
+    departingPage?.remove();
     stop();
     document.removeEventListener("visibilitychange", cancel);
   };

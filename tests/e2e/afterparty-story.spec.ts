@@ -12,12 +12,17 @@ test("turns the six illustrated scenes on the afterparty home itself", async ({ 
   async function frame(direction: "next" | "previous", oldTitle: string, newTitle: string) {
     await page.waitForFunction(
       (id) => {
-        const paper = document.querySelector(".work-story-spread > .work-story-sheet");
+        const paper = document.querySelector(".work-story-spread > .turn-window");
         const a = paper?.getAnimations().find((item) => item.id === id);
         if (!paper || !a) return false;
         a.pause();
-        a.currentTime = 85;
-        return new DOMMatrix(getComputedStyle(paper).transform).m13 !== 0;
+        a.currentTime = 240;
+        const style = getComputedStyle(paper);
+        return (
+          new DOMMatrix(style.transform).m13 !== 0 &&
+          Math.abs(parseFloat(style.transformOrigin) / paper.clientWidth - (id.endsWith("next") ? 0 : 1)) <
+            0.01
+        );
       },
       `browse-turn-${direction}`,
       { timeout: 7500 },
@@ -32,7 +37,7 @@ test("turns the six illustrated scenes on the afterparty home itself", async ({ 
       path: `artifacts/screens/afterparty-story/${browserName}-scene-${direction}.png`,
     });
     await story
-      .locator(".work-story-spread > .work-story-sheet")
+      .locator(".work-story-spread > .turn-window")
       .evaluate((el) => el.getAnimations()[0]?.finish());
     await expect(old).toHaveCount(0);
   }

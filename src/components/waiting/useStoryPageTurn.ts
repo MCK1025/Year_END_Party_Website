@@ -5,7 +5,7 @@ import { turnReadingPage } from "../book/turnReadingPage";
 
 export function useStoryPageTurn(index: number, enabled: boolean, still: boolean) {
   const sheet = useRef<HTMLDivElement>(null);
-  const pending = useRef<{ forward: boolean; underlay: HTMLElement | undefined } | null>(null);
+  const pending = useRef<{ forward: boolean; sheet: HTMLElement | undefined } | null>(null);
   const running = useRef<(() => void) | undefined>(undefined);
 
   const prepare = useCallback(
@@ -17,7 +17,7 @@ export function useStoryPageTurn(index: number, enabled: boolean, still: boolean
         return;
       const { width, height, left, top } = paper.getBoundingClientRect();
       const old = mirrorPaper(paper, { width, height, left, top, offset: 0 });
-      pending.current = { forward, underlay: old?.clip };
+      pending.current = { forward, sheet: old?.clip };
     },
     [enabled, still],
   );
@@ -27,7 +27,7 @@ export function useStoryPageTurn(index: number, enabled: boolean, still: boolean
     const turn = pending.current;
     pending.current = null;
     if (!turn || !sheet.current || !enabled) return;
-    running.current = turnReadingPage(sheet.current, turn.forward, still, 580, turn.underlay);
+    running.current = turnReadingPage(sheet.current, turn.forward, still, 580, turn.sheet);
     return () => {
       running.current?.();
       running.current = undefined;

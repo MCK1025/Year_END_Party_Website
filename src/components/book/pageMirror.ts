@@ -12,10 +12,10 @@ export function visiblePaper(paper: HTMLElement): PaperSlice {
     top,
   };
 }
-const unavailable =
-  'canvas:not(.work-story-light[data-story-overlay]),video,iframe,dialog[open],input[type="password"],[data-private],[aria-busy="true"]';
+const unavailable = 'video,iframe,dialog[open],input[type="password"],[data-private],[aria-busy="true"]';
+const otherCanvas = "canvas:not(.work-story-light[data-story-overlay])";
 const omit =
-  'script,style,link,dialog,template,input[type="hidden"],[hidden],canvas.work-story-light[data-story-overlay]';
+  'script,style,link,dialog,template,input[type="hidden"],[hidden],.turn-window[inert],canvas.work-story-light[data-story-overlay]';
 function paintControl(original: HTMLElement, copy: HTMLElement) {
   const style = getComputedStyle(original);
   for (const property of style) copy.style.setProperty(property, style.getPropertyValue(property));
@@ -73,8 +73,11 @@ function control(el: HTMLTextAreaElement | HTMLSelectElement | HTMLInputElement)
   return box;
 }
 // Only recreate the visible, already-authorized paper. Offscreen branches keep their layout footprint.
-export function mirrorPaper(paper: HTMLElement, slice: PaperSlice) {
-  if (!slice.width || !slice.height || paper.querySelector(unavailable)) return null;
+export function mirrorPaper(paper: HTMLElement, slice: PaperSlice, chapter = false) {
+  const canvasGuard = chapter
+    ? `${otherCanvas}:not(.tree-scene > .tree-canvas):not(.turn-window[inert] canvas)`
+    : otherCanvas;
+  if (!slice.width || !slice.height || paper.querySelector(`${unavailable},${canvasGuard}`)) return null;
   const limit = 480;
   let count = 0;
   let raster = document.fonts?.status === "loaded";
@@ -107,7 +110,12 @@ export function mirrorPaper(paper: HTMLElement, slice: PaperSlice) {
     )
       return control(node);
     if (node instanceof HTMLImageElement) {
-      if (!node.complete || !node.naturalWidth) throw new Error("image pending");
+      if (!node.complete || !node.naturalWidth) {
+        if (!chapter) throw new Error("image pending");
+        const place = document.createElement("span");
+        paintControl(node, place);
+        return place;
+      }
       raster = false;
       const canvas = document.createElement("canvas");
       canvas.width = Math.max(1, Math.round(Math.min(rect.width, 1400)));
@@ -118,10 +126,27 @@ export function mirrorPaper(paper: HTMLElement, slice: PaperSlice) {
       ctx.drawImage(node, 0, 0, canvas.width, canvas.height);
       return canvas;
     }
+    if (chapter && node.matches(".tree-scene")) {
+      // These two app-rendered SVGs share gradient IDs and must be copied together, including their defs.
+      const tree = document.createElement("div");
+      tree.className = "tree-scene";
+      for (const svg of node.querySelectorAll(":scope > svg.paper-fir, :scope > svg.paper-star"))
+        tree.append(svg.cloneNode(true));
+      const lights = node.querySelector<HTMLCanvasElement>(":scope > canvas.tree-canvas:not(.is-fallback)");
+      if (lights?.width && lights.height) {
+        const frozen = document.createElement("canvas");
+        frozen.className = "tree-canvas";
+        frozen.width = lights.width;
+        frozen.height = lights.height;
+        frozen.getContext("2d")?.drawImage(lights, 0, 0);
+        tree.append(frozen);
+      }
+      return tree;
+    }
     const isSvg = node.namespaceURI === "http://www.w3.org/2000/svg";
     if (
       !isSvg &&
-      !/^(SECTION|DIV|P|HEADER|FOOTER|H[1-6]|SPAN|FORM|LABEL|BUTTON|A|OL|UL|LI|BR|STRONG|EM|BLOCKQUOTE|ARTICLE|ASIDE|TIME|FIELDSET|LEGEND|B|HR|MAIN|DL|DD|DT|FIGURE|FIGCAPTION)$/.test(
+      !/^(SECTION|DIV|P|HEADER|FOOTER|NAV|H[1-6]|SPAN|FORM|LABEL|BUTTON|A|OL|UL|LI|BR|STRONG|EM|BLOCKQUOTE|ARTICLE|ASIDE|TIME|FIELDSET|LEGEND|B|HR|MAIN|DL|DD|DT|FIGURE|FIGCAPTION)$/.test(
         node.tagName,
       )
     )

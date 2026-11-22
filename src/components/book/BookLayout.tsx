@@ -4,6 +4,7 @@ import type { EventState } from "../../../supabase/functions/_shared/contracts";
 import { motionMedia, motionPolicy, safeRoute } from "../../lib/motion";
 import { traceMotion } from "../../lib/motionDebug";
 import { freezeTurn } from "./bookTurn";
+import { ChapterSurface } from "./ChapterSurface";
 import { useBookView } from "./preferences";
 import { turnReadingPage } from "./turnReadingPage";
 import { useLivePageTurn } from "./useLivePageTurn";
@@ -49,10 +50,12 @@ export function BookLayout({
   const scrolls = useRef(new Map<string, number>());
   const composing = useRef(false);
   const pendingIme = useRef<HTMLAnchorElement | null>(null);
+  const oldChapter = useRef<HTMLElement | undefined>(undefined);
   function prepare(to: string) {
     liveTurn.current?.cancel();
     turn.current?.end("ROUTE_SUPERSEDED");
-    if (browsing || !paper.current || to === pathname || !pages.some((p) => p.path === to)) return;
+    if (!paper.current || to === pathname || !pages.some((p) => p.path === to)) return;
+    if (browsing) return;
     const trace = traceMotion("book");
     const policy = motionPolicy(motionMedia()?.matches, still);
     trace("REQUEST", {
@@ -100,6 +103,8 @@ export function BookLayout({
   useLayoutEffect(() => () => turn.current?.end("COMPONENT_UNMOUNTED"), []);
   useLayoutEffect(() => {
     const prior = previous.current;
+    const snapshot = oldChapter.current;
+    oldChapter.current = undefined;
     previous.current = { pathname, key, scene, still, revision };
     const moved = prior.pathname !== pathname;
     if (moved || prior.scene !== scene) {
@@ -129,7 +134,7 @@ export function BookLayout({
         index >= 0 &&
         (action === "POP" || (action === "PUSH" && state?.bookFrom === prior.pathname))
       )
-        return turnReadingPage(paper.current, index > from, still);
+        return turnReadingPage(paper.current, index > from, still, 540, snapshot);
     }
     if (action === "POP" || !state?.bookFrom)
       traceMotion("book")(action === "POP" ? "NAVIGATION_POP" : "NAVIGATION_NOT_ELIGIBLE", { mode: "none" });
@@ -213,7 +218,15 @@ export function BookLayout({
               aria-label={pages[index]?.name ?? "행사"}
               tabIndex={-1}
             >
-              {children}
+              <ChapterSurface
+                enabled={browsing}
+                route={pathname}
+                still={still}
+                surface={paper}
+                snapshot={oldChapter}
+              >
+                {children}
+              </ChapterSurface>
             </section>
           </div>
           <footer className="book-pager">

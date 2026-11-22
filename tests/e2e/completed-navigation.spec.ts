@@ -26,47 +26,61 @@ test("turns the actual free-browsing page in both directions, including browser 
 }) => {
   await completedHome(page, "no-preference");
   const paper = page.locator(".book-frame > .book-surface");
-  const sample = async (direction: "next" | "previous") => {
-    const snapshot = await page.waitForFunction((dir) => {
-      const el = document.querySelector(".book-frame > .book-surface");
-      const turn = el?.getAnimations().find((a) => a.id === `browse-turn-${dir}`);
-      if (!el || !turn) return false;
-      turn.pause();
-      turn.currentTime = 85;
-      return getComputedStyle(el).transform;
-    }, direction);
-    expect(await snapshot.jsonValue()).toMatch(/^matrix3d/);
+  const sample = async (direction: "next" | "previous", oldText: string) => {
+    const snapshot = await page.waitForFunction(
+      (dir) => {
+        const el = document.querySelector(".book-frame > .turn-window");
+        const turn = el?.getAnimations().find((a) => a.id === `browse-turn-${dir}`);
+        if (!el || !turn) return false;
+        turn.pause();
+        turn.currentTime = 145;
+        const style = getComputedStyle(el);
+        return { transform: style.transform, hinge: parseFloat(style.transformOrigin) / el.clientWidth };
+      },
+      direction,
+      { timeout: 2000 },
+    );
+    const frame = await snapshot.jsonValue();
+    if (!frame) throw new Error("Missing chapter turn");
+    expect(frame.transform).toMatch(/^matrix3d/);
+    expect(frame.hinge).toBeCloseTo(direction === "next" ? 0 : 1);
+    const leaf = page.locator(".book-frame > .turn-window");
+    await expect(leaf).toContainText(oldText);
+    await expect(leaf).toBeInViewport();
+    expect(await leaf.evaluate((el) => el.getBoundingClientRect().width / el.clientWidth)).toBeLessThan(0.9);
   };
   await page.locator(".afterparty-link[href='#/tree']").click();
   await expect(page).toHaveURL(/#\/tree$/);
-  await sample("next");
+  await sample("next", "한 걸음 더 가까워진 우리");
   await page.screenshot({ path: `artifacts/screens/free-browse-turn/${browserName}-tree.png` });
   await page
     .locator(".book-pager")
     .getByRole("link", { name: /다음 장/ })
     .click();
   await expect(page).toHaveURL(/#\/cards$/);
-  await sample("next");
+  await sample("next", "이야기");
+  await page.screenshot({ path: `artifacts/screens/free-browse-turn/${browserName}-cards.png` });
   await page.goBack();
   await expect(page).toHaveURL(/#\/tree$/);
-  await sample("previous");
-  await paper.evaluate((el) => {
-    for (const a of el.getAnimations()) a.finish();
-  });
+  await sample("previous", "혜성식품 인물 카드");
+  await page.locator(".book-frame > .turn-window").evaluate((el) => el.getAnimations()[0]?.finish());
   await page.getByRole("link", { name: "자유 관람 홈으로" }).click();
   await expect(page).toHaveURL(/#\/afterparty$/);
-  await sample("previous");
+  await sample("previous", "마음이 모여");
   await page.screenshot({ path: `artifacts/screens/free-browse-turn/${browserName}-home.png` });
   await page.locator("details.book-settings summary").click();
   await page.getByLabel("페이지 효과 끄기").check();
+  await expect(page.locator(".book-frame > .turn-window")).toHaveCount(0);
   await expect.poll(() => paper.evaluate((el) => el.getAnimations().length)).toBe(0);
   await page.locator(".afterparty-link[href='#/cards']").click();
   await expect(page).toHaveURL(/#\/cards$/);
+  await expect(page.locator(".book-frame > .turn-window")).toHaveCount(0);
   expect(await paper.evaluate((el) => el.getAnimations().length)).toBe(0);
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.getByLabel("페이지 효과 끄기").uncheck();
   await page.getByRole("link", { name: "자유 관람 홈으로" }).click();
   await expect(page).toHaveURL(/#\/afterparty$/);
+  await expect(page.locator(".book-frame > .turn-window")).toHaveCount(0);
   expect(await paper.evaluate((el) => el.getAnimations().length)).toBe(0);
 });
 
