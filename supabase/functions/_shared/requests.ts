@@ -9,6 +9,7 @@ import {
   uuid,
 } from "./contracts.ts";
 import { forestKindSchema } from "./forest.ts";
+import { albumSchema } from "./recap.ts";
 
 const short = z.string().trim().min(1).max(100);
 export const commandSchema = z.object({
@@ -154,6 +155,8 @@ export const requestSchema = z.discriminatedUnion("action", [
   z.object({
     action: z.literal("recap"),
     payload: z.object({
+      album: albumSchema.optional(),
+      expected_version: z.uuid().nullable().optional(),
       id: uuid.optional(),
       caption: z.string().trim().min(1).max(500),
       asset_path: z.string().max(200).nullable(),

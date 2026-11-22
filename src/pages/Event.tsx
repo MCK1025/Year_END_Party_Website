@@ -47,14 +47,7 @@ export function Event() {
           </Panel>
         </>
       ) : state.phase === "RECAP" ? (
-        <>
-          <header className="page-heading">
-            <p className="overline">A year, in moments</p>
-            <h1>함께여서 남은 우리의 장면들.</h1>
-            <p className="muted">천천히 넘기며, 그날의 이야기를 나눠보세요.</p>
-          </header>
-          <RecapCards key={state.revision} />
-        </>
+        <RecapCards revision={state.revision} storageKey={`hyeseong:2026:recap:${data.self.id}`} />
       ) : (
         <EventView state={state} logoPath={data.settings.logo_path} />
       )}

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { albumSchema } from "./recap.ts";
 
 export const uuid = z.uuid();
 const short = z.string().trim().min(1).max(100);
@@ -93,6 +94,9 @@ export const settingsSchema = z.object({
   logo_path: z.string().nullable(),
 });
 export const recapSchema = z.object({
+  album: albumSchema.nullable().optional(),
+  album_version: z.uuid().optional(),
+  album_order: z.number().optional(),
   id: uuid,
   caption: z.string(),
   asset_path: z.string().nullable(),

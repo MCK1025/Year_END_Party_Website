@@ -8,7 +8,7 @@ export async function fixture(
   options: {
     extraQuestions?: number;
     choice?: boolean;
-    phase?: "PRE_SURVEY" | "WAITING" | "END" | "COMPLETED";
+    phase?: "PRE_SURVEY" | "WAITING" | "RECAP" | "END" | "COMPLETED";
     logoPath?: string;
   } = {},
 ) {

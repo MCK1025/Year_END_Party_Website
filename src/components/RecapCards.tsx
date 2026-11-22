@@ -2,40 +2,58 @@ import { useEffect, useState } from "react";
 import { z } from "zod";
 import { recapSchema } from "../../supabase/functions/_shared/contracts";
 import { api, message } from "../lib/api";
-import { PrivateImage } from "./PrivateImage";
-import { Note, Panel } from "./ui";
+import { AlbumViewer } from "./recap/AlbumViewer";
+import type { Moment } from "./recap/model";
+import { Button, Note } from "./ui";
 
-export function RecapCards() {
-  const [cards, setCards] = useState<z.infer<typeof recapSchema>[]>([]);
+export function RecapCards({
+  revision,
+  storageKey,
+}: {
+  readonly revision: number;
+  readonly storageKey: string;
+}) {
+  const [loaded, setLoaded] = useState<{ rows: Moment[]; revision: number } | null>(null);
   const [error, setError] = useState("");
+  const [attempt, retry] = useState(0);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Retry reloads the same published revision after a failed read.
   useEffect(() => {
     let live = true;
-    api({ action: "recaps", payload: {} }, z.array(recapSchema))
-      .then((rows) => {
-        if (live) setCards(rows);
-      })
-      .catch((error: unknown) => {
-        if (live) setError(message(error));
-      });
+    setError("");
+    api({ action: "recaps", payload: {} }, z.array(recapSchema)).then(
+      (rows) => {
+        if (live) setLoaded({ rows, revision });
+      },
+      (reason) => {
+        if (live) {
+          setLoaded(null);
+          setError(message(reason));
+        }
+      },
+    );
     return () => {
       live = false;
     };
-  }, []);
+  }, [revision, attempt]);
+  if (error)
+    return (
+      <div className="stack">
+        <Note error>{error}</Note>
+        <Button onClick={() => retry((v) => v + 1)}>회고 다시 불러오기</Button>
+      </div>
+    );
   return (
     <>
-      {error && <Note error>{error}</Note>}
-      {cards.length === 0 && !error && (
-        <Panel>
-          <p className="empty">첫 번째 장면을 준비하고 있습니다.</p>
-        </Panel>
+      {loaded?.revision !== revision && <Note>회고를 불러오는 중…</Note>}
+      {loaded && (
+        <div hidden={loaded.revision !== revision}>
+          {loaded.rows.length ? (
+            <AlbumViewer key={storageKey} rows={loaded.rows} storageKey={storageKey} />
+          ) : (
+            <Note>첫 번째 Moment를 준비하고 있습니다.</Note>
+          )}
+        </div>
       )}
-      {cards.map((card, i) => (
-        <Panel key={card.id}>
-          <p className="overline">MOMENT {String(i + 1).padStart(2, "0")}</p>
-          {card.asset_path && <PrivateImage path={card.asset_path} alt={card.caption} />}
-          <p className="story-text">{card.caption}</p>
-        </Panel>
-      ))}
     </>
   );
 }

@@ -1,0 +1,317 @@
+.recap-album {
+  --album-ink: var(--navy);
+  --album-rule: var(--brass);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: var(--s3);
+  height: min(780px, 94dvh);
+  padding: max(var(--s3), env(safe-area-inset-top)) var(--s2) max(var(--s3), env(safe-area-inset-bottom));
+  font-family: var(--body);
+  color: var(--ink);
+  isolation: isolate;
+}
+.album-heading,
+.album-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s2);
+}
+.album-heading {
+  border-bottom: 1px solid var(--line);
+  padding-bottom: var(--s2);
+}
+.album-heading span,
+.album-controls span {
+  font: 600 0.8rem / 1.4 var(--body);
+  color: var(--gold-ink);
+  font-variant-numeric: tabular-nums;
+}
+.album-stage {
+  min-height: 0;
+  perspective: 1100px;
+  touch-action: pan-y pinch-zoom;
+  position: relative;
+  overflow: clip;
+}
+.album-volume {
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+}
+.album-page {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--ivory);
+  border: 1px solid var(--line);
+}
+.album-picture {
+  flex: 1 1 0;
+  min-height: 0;
+  position: relative;
+  background: var(--paper);
+}
+.album-image-slot,
+.album-image-slot img,
+.album-placeholder {
+  width: 100%;
+  height: 100%;
+}
+.album-image-slot[hidden] {
+  display: none;
+}
+.album-image-slot img {
+  display: block;
+}
+.album-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s2);
+  padding: var(--s2);
+  text-align: center;
+  color: var(--muted);
+  font: normal 0.85rem / 1.45 var(--body);
+}
+.album-photo-mark {
+  font-size: 2rem;
+  color: var(--gold-ink);
+}
+.album-caption {
+  max-height: 44%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--s3) var(--s4);
+  border-top: 1px solid var(--line);
+}
+.album-caption:empty {
+  display: none;
+}
+.album-caption h2,
+.album-caption p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.album-caption h2 {
+  font: normal clamp(1.3rem, 5vw, 1.65rem) / 1.25 var(--writing, var(--display));
+}
+.album-caption p {
+  font: normal 1.15rem / 1.45 var(--writing, var(--display));
+}
+.album-caption time {
+  font-size: 0.78rem;
+  color: var(--gold-ink);
+}
+.album-controls {
+  min-height: 48px;
+}
+.album-end {
+  display: block;
+  text-align: center;
+  color: var(--muted);
+  font-weight: 400;
+}
+.album-controls .button {
+  min-height: 48px;
+  padding: var(--s2) var(--s3);
+}
+.recap-album[data-opening="true"] .album-controls {
+  justify-content: flex-end;
+}
+.recap-album[data-opening="true"] .album-volume {
+  animation: album-unfold 2750ms both;
+}
+.album-hardback {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  pointer-events: none;
+}
+.album-back-cover,
+.album-paper-block,
+.album-front-cover,
+.album-leaf,
+.album-spine {
+  position: absolute;
+  inset: 0;
+  transform-origin: left center;
+}
+.album-back-cover,
+.album-front-cover {
+  background: var(--navy);
+  border: 1px solid var(--navy-soft);
+  border-radius: 2px 6px 6px 2px;
+}
+.album-back-cover {
+  inset: -3px -5px -4px -4px;
+  transform: translateZ(-3px);
+}
+.album-paper-block {
+  inset: 2px -2px -2px 0;
+  background: repeating-linear-gradient(0deg, var(--line) 0 1px, var(--ivory) 1px 3px);
+  transform: translate(7px, 5px) translateZ(-1px);
+}
+.album-paper-block::after,
+.album-paper-block::before {
+  content: "";
+  position: absolute;
+  background: repeating-linear-gradient(90deg, var(--line) 0 1px, var(--ivory) 1px 3px);
+}
+.album-paper-block::after {
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 16px;
+  transform-origin: right center;
+  transform: rotateY(90deg);
+}
+.album-paper-block::before {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 16px;
+  transform-origin: bottom;
+  transform: rotateX(-90deg);
+  background: repeating-linear-gradient(0deg, var(--line) 0 1px, var(--ivory) 1px 3px);
+}
+.album-paper-block {
+  transform-style: preserve-3d;
+}
+.album-foil {
+  backface-visibility: hidden;
+}
+.album-spine {
+  width: 14px;
+  left: -12px;
+  right: auto;
+  background: linear-gradient(90deg, var(--navy), var(--navy-soft), var(--navy));
+  transform: rotateY(-28deg);
+  border-radius: 5px 0 0 5px;
+}
+.album-front-cover,
+.album-leaf {
+  animation: album-leaf-turn 1200ms cubic-bezier(0.45, 0.05, 0.25, 1) both;
+  backface-visibility: visible;
+}
+.album-front-cover {
+  --lift: 15px;
+  animation-delay: 320ms;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(90deg, var(--navy-soft), var(--navy) 6%, var(--navy-soft) 8%, var(--navy) 10%);
+  color: var(--ivory);
+}
+.album-foil {
+  position: absolute;
+  inset: var(--s6);
+  border: 1px solid var(--album-rule);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+  align-items: center;
+  justify-content: center;
+}
+.album-foil strong {
+  font: normal clamp(1.8rem, 7vw, 3.2rem) / 1.2 var(--writing, var(--display));
+}
+.album-foil span {
+  color: var(--brass);
+  font:
+    italic 1.4rem Georgia,
+    serif;
+}
+.album-leaf {
+  background: linear-gradient(90deg, var(--line), var(--ivory) 10%, var(--paper));
+  border: 1px solid var(--line);
+}
+.leaf-one {
+  --lift: 11px;
+  animation-delay: 760ms;
+}
+.leaf-two {
+  --lift: 7px;
+  animation-delay: 1010ms;
+}
+.leaf-three {
+  --lift: 3px;
+  animation-delay: 1260ms;
+}
+@keyframes album-leaf-turn {
+  0% {
+    transform: translateZ(var(--lift)) rotateY(0);
+  }
+  70% {
+    box-shadow: 8px 5px 10px #161c2924;
+  }
+  100% {
+    transform: translateZ(var(--lift)) rotateY(-174deg);
+  }
+}
+@keyframes album-unfold {
+  0% {
+    transform: translateY(4%) scale(0.68) rotateX(12deg) rotateY(-18deg) rotateZ(-5deg);
+  }
+  18%,
+  64% {
+    transform: scale(0.72) rotateX(8deg) rotateY(-13deg) rotateZ(-3deg);
+  }
+  100% {
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .recap-album *,
+  .recap-album[data-opening="true"] .album-volume {
+    animation: none;
+  }
+}
+.recap-admin-preview {
+  --writing: "Gamja Flower", var(--body);
+  width: min(100%, 420px);
+  margin-inline: auto;
+  background: var(--ivory);
+  border: 1px solid var(--line);
+}
+.recap-admin-preview .recap-album {
+  max-height: 720px;
+}
+.recap-admin-preview h1 {
+  font: 400 clamp(1.75rem, 8vw, 2rem) / 1.25 var(--writing);
+}
+.recap-admin-photo {
+  width: 100%;
+  height: 130px;
+  background: var(--paper);
+}
+.recap-admin-photo img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+}
+.recap-details-editor {
+  border-inline-start: 2px solid var(--line);
+  padding-inline-start: var(--s3);
+}
+.recap-editor [type="range"] {
+  width: 100%;
+}
+@media (max-height: 430px) {
+  .recap-album {
+    height: 96dvh;
+    gap: 4px;
+  }
+  .album-heading h1 {
+    font-size: 1.2rem;
+  }
+  .album-page {
+    flex-direction: row;
+  }
+  .album-caption {
+    width: 45%;
+    max-height: 100%;
+  }
+}

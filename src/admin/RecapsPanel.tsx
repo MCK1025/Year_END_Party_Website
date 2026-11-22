@@ -1,113 +1,88 @@
 import { useState } from "react";
-import { type Dashboard, okSchema } from "../../supabase/functions/_shared/contracts";
-import { PrivateImage } from "../components/PrivateImage";
-import { Button, Check, Confirm, Field, Note, Panel, TextArea } from "../components/ui";
-import { api, upload } from "../lib/api";
-import { useTask } from "../lib/useTask";
+import { useSearchParams } from "react-router-dom";
+import { AlbumViewer } from "../components/recap/AlbumViewer";
+import { orderedMoments } from "../components/recap/model";
+import { Button, Note, Panel, Select } from "../components/ui";
 import { useAdmin } from "./context";
+import { MomentEditor } from "./recap/MomentEditor";
 
-function RecapEditor({ card }: { readonly card?: Dashboard["recaps"][number] }) {
-  const { refresh } = useAdmin();
-  const task = useTask();
-  const [caption, setCaption] = useState(card?.caption ?? "");
-  const [published, setPublished] = useState(card?.published ?? true);
-  const [order, setOrder] = useState(card?.sort_order ?? 0);
-  const [path, setPath] = useState(card?.asset_path ?? null);
-  const [confirm, setConfirm] = useState(false);
+export function RecapsPanel() {
+  const { data, refresh } = useAdmin();
+  const [selected, setSelected] = useState("");
+  const [generation, reset] = useState(0);
+  const [dirty, setDirty] = useState(false);
+  const [params, setParams] = useSearchParams();
+  const preview = params.get("preview") === "album";
+  const [replay, setReplay] = useState(0);
+  const [notice, setNotice] = useState("");
+  const moments = orderedMoments(data.recaps);
+  const publicMoments = moments.filter((m) => m.published);
+  function showPreview(open: boolean) {
+    const next = new URLSearchParams(params);
+    if (open) next.set("preview", "album");
+    else next.delete("preview");
+    setParams(next, { replace: true, preventScrollReset: true });
+  }
+  function switchTo(id: string) {
+    if (dirty && !window.confirm("저장하지 않은 편집 내용을 닫을까요?")) return;
+    setDirty(false);
+    setNotice("");
+    setSelected(id);
+    reset((v) => v + 1);
+  }
   return (
-    <Panel title={card ? "기억의 장면 수정" : "새로운 장면"}>
-      <form
-        className="stack-sm"
-        onSubmit={(e) => {
-          e.preventDefault();
-          void task.run(async () => {
-            await api(
-              {
-                action: "recap",
-                payload: {
-                  ...(card ? { id: card.id } : {}),
-                  caption,
-                  asset_path: path,
-                  published,
-                  sort_order: order,
-                },
-              },
-              okSchema,
-            );
-            await refresh();
-            if (!card) {
-              setCaption("");
-              setPath(null);
-              setPublished(true);
-            }
-          });
-        }}
-      >
-        {path && <PrivateImage path={path} alt={caption || "업로드한 회고 사진"} />}
-        <Field
-          label="사진 (JPG·PNG·WebP, 8MB 이하)"
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          onChange={(e) => {
-            const f = e.target.files?.[0];
-            if (f)
-              void task.run(async () => setPath(await upload(f)), "사진을 올렸습니다. 장면을 저장해주세요.");
-          }}
-        />
-        <TextArea
-          label="이 장면에 남길 말"
-          value={caption}
-          onChange={(e) => setCaption(e.target.value)}
-          required
-        />
-        <Field
-          label="표시 순서"
-          type="number"
-          min={0}
-          max={100}
-          value={order}
-          onChange={(e) => setOrder(Number(e.target.value))}
-        />
-        <Check checked={published} onChange={setPublished}>
-          사진 게시 동의와 내용을 확인했습니다. 회고 단계에서 공개합니다.
-        </Check>
-        <div className="actions">
-          <Button type="submit" busy={task.busy}>
-            장면 저장
-          </Button>
-          {card && (
-            <Button variant="danger" onClick={() => setConfirm(true)}>
-              장면 삭제
+    <div className="stack">
+      <link rel="stylesheet" href={`${import.meta.env.BASE_URL}fonts/gamja-flower/font.css`} />
+      <Panel title="1년 회고 앨범">
+        <div className="stack-sm">
+          <Select label="편집할 Moment" value={selected} onChange={switchTo}>
+            <option value="">새 Moment 추가</option>
+            {moments.map((m, i) => (
+              <option key={m.id} value={m.id}>
+                {String(i + 1).padStart(2, "0")} · {m.caption}
+                {m.published ? "" : " (비공개)"}
+              </option>
+            ))}
+          </Select>
+          <div className="actions">
+            <Button
+              variant="secondary"
+              onClick={() => (preview ? setReplay((v) => v + 1) : showPreview(true))}
+            >
+              {preview ? "오프닝 다시 보기" : "저장된 전체 회고 미리보기"}
             </Button>
+            {preview && (
+              <Button variant="secondary" onClick={() => showPreview(false)}>
+                미리보기 닫기
+              </Button>
+            )}
+            {dirty && (
+              <Button variant="secondary" onClick={() => switchTo(selected)}>
+                편집 취소
+              </Button>
+            )}
+          </div>
+          {preview && (
+            <div className="recap-admin-preview">
+              <AlbumViewer key={replay} rows={publicMoments} />
+            </div>
           )}
         </div>
-        {task.notice && <Note error={task.failed}>{task.notice}</Note>}
-      </form>
-      {confirm && card && (
-        <Confirm
-          title="이 장면을 삭제할까요?"
-          onClose={() => setConfirm(false)}
-          action={() =>
-            task.run(async () => {
-              await api({ action: "delete_recap", payload: { id: card.id } }, okSchema);
-              await refresh();
-            })
-          }
-        >
-          직원 화면의 회고에서 제외합니다. 사진 원본은 행사 종료 후 파기 시 함께 삭제됩니다.
-        </Confirm>
-      )}
-    </Panel>
-  );
-}
-export function RecapsPanel() {
-  const { data } = useAdmin();
-  return (
-    <div className="grid-two">
-      <RecapEditor />
-      {data.recaps.map((r) => (
-        <RecapEditor key={r.id} card={r} />
-      ))}
+      </Panel>
+      {notice && <Note>{notice}</Note>}
+      <MomentEditor
+        key={`${selected}:${generation}`}
+        moment={moments.find((m) => m.id === selected)}
+        rows={moments}
+        markDirty={() => setDirty(true)}
+        saved={async (id) => {
+          await refresh();
+          setSelected(id ?? "");
+          reset((v) => v + 1);
+          setDirty(false);
+          setNotice("회고 앨범에 반영했습니다.");
+        }}
+      />
     </div>
   );
 }
