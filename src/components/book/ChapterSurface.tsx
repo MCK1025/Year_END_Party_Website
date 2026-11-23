@@ -22,8 +22,12 @@ export class ChapterSurface extends Component<Props> {
       surface.current &&
       !document.hidden &&
       motionPolicy(motionMedia()?.matches, still) === "ALLOWED"
-    )
+    ) {
+      // A second navigation can arrive while the live destination is still tilted.
+      for (const turn of surface.current.getAnimations?.() ?? [])
+        if (turn.id === "browse-turn-previous" || turn.id === "browse-turn-next") turn.cancel();
       return mirrorPaper(surface.current, visiblePaper(surface.current), true)?.clip ?? null;
+    }
     return null;
   }
 

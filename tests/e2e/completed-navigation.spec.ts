@@ -28,14 +28,16 @@ test("turns the actual free-browsing page in both directions, including browser 
   await completedHome(page, "no-preference");
   const paper = page.locator(".book-frame > .book-surface");
   const sample = async (direction: "next" | "previous", oldText: string) => {
-    const frame = await sampleFold(page, ".book-frame > .turn-window", direction);
-    expect(frame.hinge).toBeCloseTo(direction === "next" ? 0 : 1);
+    const moving = direction === "next" ? ".book-frame > .turn-window" : ".book-frame > .book-surface";
+    const frame = await sampleFold(page, moving, direction);
+    expect(frame.hinge).toBeCloseTo(0);
+    expect(frame.closing).toBe(direction === "previous");
     expect(frame.depth, "the free edge lifts toward the reader").toBeGreaterThan(0);
     expect(frame.projection, "the near edge grows in perspective").toBeLessThan(1);
     const leaf = page.locator(".book-frame > .turn-window");
     await expect(leaf).toContainText(oldText);
     await expect(leaf).toBeInViewport();
-    expect(await leaf.evaluate((el) => el.getBoundingClientRect().width / el.clientWidth)).toBeLessThan(0.9);
+    if (direction === "previous") await expect(leaf).toHaveCSS("transform", "none");
   };
   await page.locator(".afterparty-link[href='#/tree']").click();
   await expect(page).toHaveURL(/#\/tree$/);
@@ -54,7 +56,13 @@ test("turns the actual free-browsing page in both directions, including browser 
   await expect(page).toHaveURL(/#\/tree$/);
   await expect(paper).toHaveAttribute("aria-label", "이야기 트리");
   await sample("previous", "혜성식품 인물 카드");
-  await page.locator(".book-frame > .turn-window").evaluate((el) => el.getAnimations()[0]?.finish());
+  await page.screenshot({ path: `artifacts/screens/free-browse-turn/${browserName}-return-tree.png` });
+  await paper.evaluate((el) =>
+    el
+      .getAnimations()
+      .find((a) => a.id === "browse-turn-previous")
+      ?.finish(),
+  );
   await page.getByRole("link", { name: "자유 관람 홈으로" }).click();
   await expect(page).toHaveURL(/#\/afterparty$/);
   await expect(paper).toHaveAttribute("aria-label", "자유 관람 홈");
@@ -76,9 +84,7 @@ test("turns the actual free-browsing page in both directions, including browser 
   expect(await paper.evaluate((el) => el.getAnimations().length)).toBe(0);
 });
 
-test("the waiting room and free browsing use the same outward fold, even without a snapshot", async ({
-  page,
-}) => {
+test("the waiting room and free browsing open and cover from the same binding", async ({ page }) => {
   await fixture(page, undefined, { phase: "WAITING" });
   // Compare the waiting room's HTML turn even on runners which support WebGL.
   await page.route(/assets\/rasterPaper-[^/]+\.js/, (route) => route.abort());
@@ -105,6 +111,14 @@ test("the waiting room and free browsing use the same outward fold, even without
   };
   const reference = await timing("paper-curl");
   expect(reference?.origin).toBe(0);
+  await expect(page.locator(".curl-stage")).toHaveCount(0);
+  await page
+    .getByRole("navigation", { name: "내 행사 메뉴" })
+    .getByRole("link", { name: "나의 이야기" })
+    .click();
+  await expect(page).toHaveURL(/#\/survey$/);
+  const returnToSurvey = await timing("paper-curl", true);
+  expect(returnToSurvey).toEqual(reference);
   await page.goto("about:blank");
   await completedHome(page, "no-preference");
   const tree = page.locator(".afterparty-link[href='#/tree']");
@@ -113,12 +127,31 @@ test("the waiting room and free browsing use the same outward fold, even without
   expect(await timing("browse-turn-next")).toEqual(reference);
   await page.getByRole("link", { name: "자유 관람 홈으로" }).click();
   await expect(page).toHaveURL(/#\/afterparty$/);
+  expect(await timing("browse-turn-previous", true)).toEqual(returnToSurvey);
   await expect(page.locator(".book-frame > .turn-window")).toHaveCount(0);
   await page.locator(".book-frame > .book-surface h1").evaluate((el) => el.setAttribute("data-private", ""));
   await tree.click();
   await expect(page).toHaveURL(/#\/tree$/);
   expect(await timing("browse-turn-next", true)).toEqual(reference);
   await expect(page.locator(".book-frame > .turn-window")).toHaveCount(0);
+});
+
+test("changing chapters during a return keeps the next sheet at its full width", async ({ page }) => {
+  await completedHome(page, "no-preference");
+  const menu = page.getByRole("navigation", { name: "내 행사 메뉴" });
+  const paper = page.locator(".book-frame > .book-surface");
+  const snapshot = page.locator(".book-frame > .turn-window");
+  await menu.getByRole("link", { name: "인물 카드" }).click();
+  await paper.getByRole("heading", { name: "혜성식품 인물 카드" }).waitFor();
+  await menu.getByRole("link", { name: "자유 관람 홈" }).click();
+  await sampleFold(page, ".book-frame > .book-surface", "previous");
+  await menu.getByRole("link", { name: "이야기 트리" }).click();
+  await expect(paper).toHaveAttribute("aria-label", "이야기 트리");
+  await sampleFold(page, ".book-frame > .turn-window", "next");
+  await expect(snapshot).toHaveCount(1);
+  await expect(snapshot).toContainText("한 걸음 더 가까워진 우리");
+  const liveWidth = await paper.evaluate((el) => el.clientWidth);
+  expect(await snapshot.evaluate((el) => el.clientWidth)).toBe(liveWidth);
 });
 
 test("a consecutive click on a different free-browsing destination must not be discarded", async ({

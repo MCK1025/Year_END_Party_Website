@@ -16,12 +16,20 @@ export async function sampleFold(page: Page, selector: string, direction: "next"
     const leaf = turn.effect.target;
     turn.pause();
     await turn.ready;
-    turn.currentTime = Number(turn.effect.getTiming().duration) * 0.6;
+    const duration = Number(turn.effect.getTiming().duration);
+    turn.currentTime = duration * 0.3;
+    const earlyAlignment = new DOMMatrix(getComputedStyle(leaf).transform).m11;
+    turn.currentTime = duration * (turn.id.endsWith("previous") ? 0.4 : 0.6);
     await new Promise<void>((done) => requestAnimationFrame(() => requestAnimationFrame(() => done())));
     const style = getComputedStyle(leaf);
     const hinge = parseFloat(style.transformOrigin);
-    const edgeX = turn.id.endsWith("next") ? leaf.clientWidth : 0;
-    const tip = new DOMPoint(edgeX - hinge, 0).matrixTransform(new DOMMatrix(style.transform));
-    return { hinge: hinge / leaf.clientWidth, depth: tip.z, projection: tip.w };
+    const matrix = new DOMMatrix(style.transform);
+    const tip = new DOMPoint(leaf.clientWidth - hinge, 0).matrixTransform(matrix);
+    return {
+      hinge: hinge / leaf.clientWidth,
+      depth: tip.z,
+      projection: tip.w,
+      closing: matrix.m11 > earlyAlignment,
+    };
   });
 }

@@ -11,21 +11,23 @@ test("turns the six illustrated scenes on the afterparty home itself", async ({ 
   const previous = story.getByRole("button", { name: "이전 장면" });
   await story.scrollIntoViewIfNeeded();
   async function frame(direction: "next" | "previous", oldTitle: string, newTitle: string) {
-    const geometry = await sampleFold(page, ".work-story-spread > .turn-window", direction);
-    expect(geometry.hinge).toBeCloseTo(direction === "next" ? 0 : 1);
+    const moving =
+      direction === "next" ? ".work-story-spread > .turn-window" : ".work-story-spread > .work-story-sheet";
+    const geometry = await sampleFold(page, moving, direction);
+    expect(geometry.hinge).toBeCloseTo(0);
+    expect(geometry.closing).toBe(direction === "previous");
     expect(geometry.depth, "the illustrated page lifts toward the reader").toBeGreaterThan(0);
     await expect(story.getByRole("heading", { name: newTitle, exact: true })).toBeVisible();
     const old = story.locator(".turn-window");
     await expect(old).toHaveAttribute("aria-hidden", "true");
     await expect(old).toContainText(oldTitle);
+    if (direction === "previous") await expect(old).toHaveCSS("transform", "none");
     await expect(old.locator("canvas")).not.toHaveCount(0);
     await expect(next).toBeEnabled();
     await story.screenshot({
       path: `artifacts/screens/afterparty-story/${browserName}-scene-${direction}.png`,
     });
-    await story
-      .locator(".work-story-spread > .turn-window")
-      .evaluate((el) => el.getAnimations()[0]?.finish());
+    await story.locator(moving).evaluate((el) => el.getAnimations()[0]?.finish());
     await expect(old).toHaveCount(0);
   }
   // The first change is the existing automatic advance, without leaving this route.
