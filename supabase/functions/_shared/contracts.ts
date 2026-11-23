@@ -90,6 +90,7 @@ export const settingsSchema = z.object({
   nomination_open: z.boolean(),
   started_at: z.string().nullable().default(null),
   forest_edit_open: z.boolean().optional(),
+  forest_multiple: z.boolean().default(false),
   welcome: z.string(),
   logo_path: z.string().nullable(),
 });

@@ -14,6 +14,8 @@ export function SettingsPanel() {
   const started = !!initial.started_at || data.state.editing_locked;
   const task = useTask();
   const saveTask = useTask();
+  const storyTask = useTask();
+  const [pendingMultiple, setPendingMultiple] = useState<boolean | null>(null);
   const koreanStart = initial.event_start_at
     ? new Date(Date.parse(initial.event_start_at) + 9 * 3600000).toISOString()
     : "";
@@ -109,6 +111,30 @@ export function SettingsPanel() {
           </form>
         </Panel>
         <div className="stack">
+          <Panel title="이야기 트리">
+            <Check
+              checked={pendingMultiple ?? initial.forest_multiple}
+              disabled={storyTask.busy}
+              onChange={(multiple) =>
+                void storyTask.run(async () => {
+                  setPendingMultiple(multiple);
+                  try {
+                    await api({ action: "forest_policy", payload: { multiple } }, okSchema);
+                    await refresh();
+                  } finally {
+                    setPendingMultiple(null);
+                  }
+                }, "이야기 트리 설정을 저장했습니다.")
+              }
+            >
+              이야기 트리 여러 메시지 작성하기
+            </Check>
+            <p className="small">
+              기본은 직원당 한 개입니다. 체크하면 작성 기간에 여러 개를 남길 수 있습니다. 변경 즉시
+              적용됩니다.
+            </p>
+            {storyTask.notice && <Note error={storyTask.failed}>{storyTask.notice}</Note>}
+          </Panel>
           <Panel title="우리 회사 로고">
             <CompanyLogo path={data.settings.logo_path} />
             <Field

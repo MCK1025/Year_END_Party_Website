@@ -1,12 +1,13 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { okSchema } from "../../supabase/functions/_shared/contracts";
+import { forestListSchema } from "../../supabase/functions/_shared/forest";
 import { admin, boot, call, command, dashboard, employee, eventDate, signAdmin, sql } from "./helpers";
 
 describe.sequential("own-only forest and reviewed Christmas publication", () => {
   beforeAll(async () => {
     await signAdmin();
     await sql`update public.event_public_state set phase='WAITING',payload='{}',paused=false,tree_open=false,revision=revision+1 where id`;
-    await sql`update private.settings set started_at=null,enabled=true,survey_open=true,nomination_open=true`;
+    await sql`update private.settings set started_at=null,enabled=true,survey_open=true,nomination_open=true,forest_multiple=false`;
     await sql`delete from public.forest_posts`;
     await sql`delete from private.forest_limits`;
     await command("waiting");
@@ -14,6 +15,59 @@ describe.sequential("own-only forest and reviewed Christmas publication", () => 
   });
   afterAll(async () => {
     await sql.end();
+  });
+  it("one story per employee across simultaneous sessions unless the organizer allows multiple", async () => {
+    const original = (await dashboard()).settings;
+    expect(original.forest_multiple).toBe(false);
+    const [first, second, other] = await Promise.all([employee(4), employee(4), employee(3)]);
+    const marker = `동시 작성 시험 ${crypto.randomUUID()}`;
+    const post = (c: typeof first) =>
+      c.functions.invoke("portal", {
+        body: { action: "forest_post", payload: { kind: "wish", body: marker } },
+      });
+    const change = (multiple: boolean) =>
+      call(admin, { action: "forest_policy", payload: { multiple } }, okSchema);
+    const mine = () => call(first, { action: "forest_mine", payload: {} }, forestListSchema);
+    try {
+      await sql`update private.settings set started_at=null,enabled=true where id`;
+      await change(false);
+      const setting = await boot(first);
+      expect(setting.settings.forest_multiple).toBe(false);
+      expect(
+        (
+          await first.functions.invoke("portal", {
+            body: { action: "forest_policy", payload: { multiple: true } },
+          })
+        ).error?.context?.status,
+      ).toBe(403);
+      const race = await Promise.all([post(first), post(second)]);
+      expect(race.map((r) => r.error?.context?.status ?? 200).sort()).toEqual([200, 409]);
+      expect((await post(other)).error).toBeNull();
+      await change(true);
+      expect((await boot(second)).settings.forest_multiple).toBe(true);
+      expect((await dashboard()).settings.forest_multiple).toBe(true);
+      expect((await post(second)).error).toBeNull();
+      await change(false);
+      const posts = await mine();
+      expect(posts).toHaveLength(2);
+      expect((await post(first)).error?.context?.status).toBe(409);
+      for (const item of posts) {
+        await call(
+          second,
+          { action: "forest_edit", payload: { id: item.id, body: marker, kind: "thanks" } },
+          okSchema,
+        );
+        await call(first, { action: "forest_delete", payload: { id: item.id } }, okSchema);
+      }
+      expect((await post(second)).error).toBeNull();
+      await sql`update private.settings set started_at=now() where id`;
+      await change(true);
+      expect((await post(first)).error?.context?.status).toBe(403);
+    } finally {
+      await sql`delete from public.forest_posts where body=${marker}`;
+      await sql`update private.settings set started_at=${original.started_at},enabled=${original.enabled},forest_edit_open=${original.forest_edit_open ?? false},forest_multiple=${original.forest_multiple} where id`;
+      await Promise.all([first, second, other].map((c) => c.auth.signOut()));
+    }
   });
   it("rejects a recommendation reason shorter than ten characters at Edge and SQL boundaries", async () => {
     const c = await employee(0);

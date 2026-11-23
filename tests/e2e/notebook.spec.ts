@@ -83,7 +83,7 @@ test("one active employee page preserves writing across chapters, history, motio
 test("font asset renders Korean, private forest edits survive navigation, hints and reduced motion remain available", async ({
   page,
 }) => {
-  await fixture(page);
+  await fixture(page, undefined, { forestMultiple: true });
   await page.goto("/#/forest");
   const body = page.getByLabel("혜성식품에게 전하고 싶은 말");
   await body.fill("보내기 전의 마음");

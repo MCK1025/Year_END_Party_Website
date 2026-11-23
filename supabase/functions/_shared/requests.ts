@@ -110,6 +110,7 @@ export const requestSchema = z.discriminatedUnion("action", [
     payload: z.object({ id: z.number().int().positive().safe() }),
   }),
   z.object({ action: z.literal("employee"), payload: personSchema }),
+  z.object({ action: z.literal("forest_policy"), payload: z.object({ multiple: z.boolean() }).strict() }),
   z.object({
     action: z.literal("settings"),
     payload: z.object({

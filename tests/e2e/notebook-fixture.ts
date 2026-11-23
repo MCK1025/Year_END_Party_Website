@@ -9,6 +9,7 @@ export async function fixture(
     extraQuestions?: number;
     choice?: boolean;
     treeOpen?: boolean;
+    forestMultiple?: boolean;
     phase?: "PRE_SURVEY" | "WAITING" | "RECAP" | "END" | "COMPLETED";
     logoPath?: string;
   } = {},
@@ -56,6 +57,7 @@ export async function fixture(
               deletion_date: null,
               survey_open: true,
               nomination_open: true,
+              forest_multiple: options.forestMultiple ?? false,
               welcome: "함께하는 겨울",
               logo_path: options.logoPath ?? null,
             },

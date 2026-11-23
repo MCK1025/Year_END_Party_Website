@@ -15,10 +15,22 @@ function EmployeeForest() {
   const { data, responseWindow } = useGuest();
   const started = data.state.editing_locked || !!data.settings.started_at;
   return (
-    <ForestBoard admin={false} locked={started && !(data.settings.forest_edit_open && responseWindow)} />
+    <ForestBoard
+      admin={false}
+      locked={started && !(data.settings.forest_edit_open && responseWindow)}
+      multiple={data.settings.forest_multiple}
+    />
   );
 }
-function ForestBoard({ admin, locked }: { readonly admin: boolean; readonly locked: boolean }) {
+function ForestBoard({
+  admin,
+  locked,
+  multiple = false,
+}: {
+  readonly admin: boolean;
+  readonly locked: boolean;
+  readonly multiple?: boolean;
+}) {
   const [posts, setPosts] = useState<ForestPost[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -73,9 +85,13 @@ function ForestBoard({ admin, locked }: { readonly admin: boolean; readonly lock
           <p className="small">본문에는 본인이나 동료를 알아볼 만한 정보를 적지 말아주세요.</p>
           {locked ? (
             <Note>행사가 시작되어 작성·수정·삭제가 마감되었습니다. 보낸 글은 계속 확인 가능합니다.</Note>
-          ) : (
-            <ForestForm locked={locked} saved={refresh} />
-          )}
+          ) : !multiple && posts.length > 0 ? (
+            <Note>
+              이미 마음을 남기셨습니다. 아래 ‘내가 보낸 마음’에서 글을 수정하거나 삭제할 수 있습니다.
+            </Note>
+          ) : multiple || (!loading && !error) ? (
+            <ForestForm locked={locked} multiple={multiple} saved={refresh} />
+          ) : null}
         </Panel>
       )}
       {admin && (
@@ -103,7 +119,9 @@ function ForestBoard({ admin, locked }: { readonly admin: boolean; readonly lock
           <p className="empty">{admin ? "아직 도착한 마음이 없습니다." : "아직 보낸 마음이 없습니다."}</p>
         </Panel>
       ) : null}
-      {!admin && posts.length > 0 && <Note>이미 마음을 남기셨습니다. 아래에서 보낸 글을 확인해보세요.</Note>}
+      {!admin && (multiple || locked) && posts.length > 0 && (
+        <Note>이미 마음을 남기셨습니다. 아래에서 보낸 글을 확인해보세요.</Note>
+      )}
       {posts.map((post) => (
         <Panel key={post.id}>
           <p className="overline">
@@ -173,7 +191,7 @@ function ForestBoard({ admin, locked }: { readonly admin: boolean; readonly lock
             }, "글을 삭제했습니다.")
           }
         >
-          <p>삭제한 글은 복구되지 않습니다. 새 글 작성 횟수는 복원되지 않습니다.</p>
+          <p>삭제한 글은 복구되지 않으며, 오늘의 작성 횟수에 포함됩니다.</p>
         </Confirm>
       )}
     </div>

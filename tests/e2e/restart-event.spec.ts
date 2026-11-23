@@ -19,6 +19,7 @@ async function completedAdmin(page: Page, rejectRestart = false) {
       deletion_date: null,
       survey_open: false,
       nomination_open: false,
+      forest_multiple: false,
       welcome: "가상 행사를 기다립니다.",
       ending: "함께해 주셔서 고맙습니다.",
       logo_path: null,

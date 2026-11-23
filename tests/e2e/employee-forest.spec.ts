@@ -26,7 +26,7 @@ test.beforeAll(async () => {
   await sql`delete from public.forest_posts`;
   await sql`delete from private.forest_limits`;
   await sql`delete from private.employees where employee_no='TEST-BROWSER-NEW'`;
-  await sql`update private.settings set started_at=null,enabled=true,survey_open=true where id`;
+  await sql`update private.settings set started_at=null,enabled=true,survey_open=true,forest_multiple=false where id`;
   await sql`update public.event_public_state set phase='WAITING',payload='{}',revision=revision+1 where id`;
 });
 test.afterAll(async () => {
@@ -56,8 +56,34 @@ test("birthday-only login, survey registration and anonymous message persist acr
     .fill("가상 이야기 트리 검증: 함께해 주셔서 고맙습니다.");
   await capture(page, "forest-compose");
   await page.getByRole("button", { name: "익명으로 마음 남기기" }).click();
-  await expect(page.getByText("이름 없이, 마음이 도착했습니다.")).toBeVisible();
+  const compose = page.getByRole("button", { name: "익명으로 마음 남기기" });
+  await expect(page.getByRole("button", { name: "내 글 수정하기" })).toHaveCount(1);
+  await expect(compose).toHaveCount(0);
   await capture(page, "forest-posted");
+  const organizer = await browser.newPage({ viewport: { width: 375, height: 900 } });
+  await organizer.goto("/#/admin?tab=설정·내보내기");
+  await organizer.getByLabel("관리자 이메일").fill(env.ADMIN_EMAIL);
+  await organizer.getByLabel("비밀번호", { exact: true }).fill(env.ADMIN_PASSWORD);
+  await organizer.getByRole("button", { name: "운영 화면으로" }).click();
+  const multiple = organizer.getByRole("checkbox", { name: "이야기 트리 여러 메시지 작성하기" });
+  await expect(multiple).not.toBeChecked();
+  await multiple.check();
+  await expect(organizer.getByText("이야기 트리 설정을 저장했습니다.")).toBeVisible();
+  await organizer.reload();
+  await expect(multiple).toBeChecked();
+  for (const width of [375, 768, 1280]) {
+    await organizer.setViewportSize({ width, height: 900 });
+    await multiple.scrollIntoViewIfNeeded();
+    await organizer.screenshot({ path: `artifacts/screens/employee-forest/message-setting-${width}.png` });
+  }
+  await expect(compose).toBeVisible({ timeout: 10000 });
+  await page.getByLabel("혜성식품에게 전하고 싶은 말").fill("두 번째 마음도 잘 전해지길 바랍니다.");
+  await compose.click();
+  await expect(page.getByRole("button", { name: "내 글 수정하기" })).toHaveCount(2);
+  await multiple.uncheck();
+  await expect(compose).toHaveCount(0, { timeout: 10000 });
+  await expect(page.getByRole("button", { name: "내 글 삭제하기" })).toHaveCount(2);
+  await organizer.close();
   const other = await browser.newContext();
   const second = await other.newPage();
   await openLogin(second);

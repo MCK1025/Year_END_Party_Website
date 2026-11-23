@@ -33,7 +33,7 @@ test("a postponed event lets employees create and manage stories, then closes al
   try {
     await sql`delete from public.forest_posts`;
     await sql`delete from private.forest_limits`;
-    await sql`update private.settings set started_at=null,enabled=true,survey_open=false,nomination_open=false,
+    await sql`update private.settings set started_at=null,enabled=true,survey_open=false,nomination_open=false,forest_multiple=true,
       event_start_at=now()-interval '1 hour' where id`;
     const first = "가상 이야기: 함께 도와주셔서 감사합니다.";
     const second = "가상 이야기: 다음에도 따뜻한 송년회를 부탁드립니다.";
@@ -158,6 +158,7 @@ test("a postponed event lets employees create and manage stories, then closes al
       { action: "settings", payload: { ...original, survey_open: false, nomination_open: false } },
       okSchema,
     );
+    await call(admin, { action: "forest_policy", payload: { multiple: original.forest_multiple } }, okSchema);
     await sql.end();
   }
 });

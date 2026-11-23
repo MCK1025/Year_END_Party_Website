@@ -6,12 +6,13 @@ import { admin, boot, call, dashboard, employee, signAdmin, sql } from "./helper
 describe.sequential("own story editing before a rescheduled start", () => {
   beforeAll(signAdmin);
   beforeEach(async () => {
-    await sql`update private.settings set started_at=null,enabled=true,survey_open=false,
+    await sql`update private.settings set started_at=null,enabled=true,survey_open=false,forest_multiple=true,
       nomination_open=false,event_start_at=now()-interval '1 hour' where id`;
     await sql`update public.event_public_state set phase='WAITING',tree_open=false,payload='{}',revision=revision+1 where id`;
     await sql`delete from private.forest_limits`;
   });
   afterAll(async () => {
+    await sql`update private.settings set forest_multiple=false where id`;
     await sql.end();
   });
 

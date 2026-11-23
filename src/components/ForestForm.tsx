@@ -1,6 +1,6 @@
 import { okSchema } from "../../supabase/functions/_shared/contracts";
 import { type ForestPost, forestKindSchema, forestKinds } from "../../supabase/functions/_shared/forest";
-import { api } from "../lib/api";
+import { ApiError, api } from "../lib/api";
 import { useTask } from "../lib/useTask";
 import { useBookDraft } from "./book/drafts";
 import { Button, Note, Select, TextArea } from "./ui";
@@ -8,11 +8,13 @@ import { Button, Note, Select, TextArea } from "./ui";
 export function ForestForm({
   post,
   locked,
+  multiple = false,
   saved,
   cancel,
 }: {
   readonly post?: ForestPost;
   readonly locked: boolean;
+  readonly multiple?: boolean;
   readonly saved: () => Promise<void>;
   readonly cancel?: () => void;
 }) {
@@ -26,12 +28,17 @@ export function ForestForm({
         e.preventDefault();
         void task.run(
           async () => {
-            await api(
-              post
-                ? { action: "forest_edit", payload: { id: post.id, kind, body } }
-                : { action: "forest_post", payload: { kind, body } },
-              okSchema,
-            );
+            try {
+              await api(
+                post
+                  ? { action: "forest_edit", payload: { id: post.id, kind, body } }
+                  : { action: "forest_post", payload: { kind, body } },
+                okSchema,
+              );
+            } catch (error) {
+              if (!post && error instanceof ApiError && error.status === 409) await saved();
+              throw error;
+            }
             await saved();
             setBody("");
             forgetBody();
@@ -63,7 +70,11 @@ export function ForestForm({
       />
       <p className="small">
         {body.length} / 2,000자 ·{" "}
-        {post ? "행사 시작 전까지 수정 가능합니다." : "새 글은 하루 10회까지 남길 수 있어요."}
+        {post
+          ? "행사 시작 전까지 수정 가능합니다."
+          : multiple
+            ? "새 글은 하루 10회까지 남길 수 있어요."
+            : "한 사람당 한 개의 마음을 남길 수 있어요."}
       </p>
       <div className="actions">
         <Button type="submit" busy={task.busy} disabled={locked || !body.trim()}>

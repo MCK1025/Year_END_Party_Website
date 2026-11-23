@@ -95,6 +95,7 @@ export function Participant() {
               data.settings.survey_open,
               data.settings.nomination_open,
               data.settings.forest_edit_open,
+              data.settings.forest_multiple,
               treeOpen,
               data.state.payload,
             ])}
