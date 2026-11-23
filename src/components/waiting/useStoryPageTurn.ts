@@ -1,7 +1,7 @@
 import { useCallback, useLayoutEffect, useRef } from "react";
 import { motionMedia, motionPolicy } from "../../lib/motion";
 import { mirrorPaper } from "../book/pageMirror";
-import { turnReadingPage } from "../book/turnReadingPage";
+import { settleReadingTurns, turnReadingPage } from "../book/turnReadingPage";
 
 export function useStoryPageTurn(index: number, enabled: boolean, still: boolean) {
   const sheet = useRef<HTMLDivElement>(null);
@@ -15,6 +15,8 @@ export function useStoryPageTurn(index: number, enabled: boolean, still: boolean
       const paper = sheet.current;
       if (!enabled || !paper || document.hidden || motionPolicy(motionMedia()?.matches, still) !== "ALLOWED")
         return;
+      const chapter = paper.closest<HTMLElement>(".book-surface");
+      if (chapter) settleReadingTurns(chapter);
       const { width, height, left, top } = paper.getBoundingClientRect();
       const old = mirrorPaper(paper, { width, height, left, top, offset: 0 });
       pending.current = { forward, sheet: old?.clip };

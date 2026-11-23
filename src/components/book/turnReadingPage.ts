@@ -2,6 +2,12 @@ import { motionMedia, motionPolicy, observeMotion } from "../../lib/motion";
 import { traceMotion } from "../../lib/motionDebug";
 import { notebookFold } from "./notebookFold";
 
+/** Restore flat geometry before measuring a page that contains, or sits inside, a moving sheet. */
+export function settleReadingTurns(surface: HTMLElement, subtree = false) {
+  for (const turn of surface.getAnimations?.({ subtree }) ?? [])
+    if (turn.id === "browse-turn-previous" || turn.id === "browse-turn-next") turn.cancel();
+}
+
 /** Open the outgoing sheet on Next. On Back, lay the destination down over the stationary old page. */
 export function turnReadingPage(
   paper: HTMLElement,

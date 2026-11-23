@@ -59,6 +59,42 @@ test("turns the six illustrated scenes on the afterparty home itself", async ({ 
   await expect(page).toHaveURL(/#\/afterparty$/);
 });
 
+test("a chapter opened during a scene return carries the full illustration", async ({ page }) => {
+  await fixture(page, undefined, { phase: "COMPLETED" });
+  await page.goto("/#/afterparty");
+  const story = page.getByRole("region", { name: "혜성식품 업무 이야기" });
+  await story.getByRole("button", { name: "이야기 일시 정지" }).click();
+  await story.getByRole("button", { name: "다음 장면" }).click();
+  await expect(story.locator(".turn-window")).toHaveCount(0);
+  await story.getByRole("button", { name: "이전 장면" }).click();
+  await sampleFold(page, ".work-story-spread > .work-story-sheet", "previous");
+  await page
+    .getByRole("navigation", { name: "자유 관람 콘텐츠" })
+    .getByRole("link", { name: "이야기 트리" })
+    .click();
+  await sampleFold(page, ".book-frame > .turn-window", "next");
+  const captured = page.locator(".book-frame > .turn-window .work-story-sheet");
+  await expect(captured).toHaveCSS("transform", "none");
+  await expect(captured.locator("canvas")).not.toHaveCount(0);
+});
+
+test("a scene changed during the return home uses the flat page width", async ({ page }) => {
+  await page.setViewportSize({ width: 1200, height: 1150 });
+  await fixture(page, undefined, { phase: "COMPLETED" });
+  await page.goto("/#/afterparty");
+  const menu = page.getByRole("navigation", { name: "내 행사 메뉴" });
+  await menu.getByRole("link", { name: "인물 카드" }).click();
+  await page.getByRole("link", { name: "자유 관람 홈으로" }).click();
+  await sampleFold(page, ".book-frame > .book-surface", "previous");
+  const story = page.getByRole("region", { name: "혜성식품 업무 이야기" });
+  await story.getByRole("button", { name: "이전 장면" }).click();
+  await sampleFold(page, ".work-story-spread > .work-story-sheet", "previous");
+  const spread = story.locator(".work-story-spread");
+  const frozen = spread.locator(":scope > .turn-window");
+  expect(await frozen.evaluate((el) => el.clientWidth)).toBe(await spread.evaluate((el) => el.clientWidth));
+  await expect(page.locator(".book-frame > .turn-window")).toHaveCount(0);
+});
+
 test("completed home keeps compact icon links side by side above the familiar story", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await fixture(page, undefined, { phase: "COMPLETED" });
