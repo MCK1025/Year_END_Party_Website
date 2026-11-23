@@ -7,6 +7,8 @@ async function completedHome(page: Page, reducedMotion: "reduce" | "no-preferenc
   await fixture(page, { revision: 1, paused: false }, { phase: "COMPLETED", treeOpen: true });
   await page.route("**/functions/v1/portal", (route) => {
     switch (route.request().postDataJSON().action) {
+      case "recaps":
+        return route.fulfill({ json: [] });
       case "taste_cards":
         return route.fulfill({ json: { revision: 1, cards: [] } });
       case "forest_tree":
@@ -19,6 +21,7 @@ async function completedHome(page: Page, reducedMotion: "reduce" | "no-preferenc
   });
   await page.goto("/#/event");
   await expect(page).toHaveURL(/#\/afterparty$/);
+  await expect(page.getByText("공개된 회고 장면이 아직 없습니다.")).toBeVisible();
 }
 
 test("turns the actual free-browsing page in both directions, including browser back", async ({

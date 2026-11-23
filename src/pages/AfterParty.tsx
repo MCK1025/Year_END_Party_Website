@@ -1,8 +1,10 @@
 import { CardsIcon, TreeEvergreenIcon } from "@phosphor-icons/react";
 import { Link } from "react-router-dom";
-import { WaitingStory } from "../components/waiting/WaitingStory";
+import { RecapCards } from "../components/RecapCards";
+import { useGuest } from "./Participant";
 
 export function AfterParty() {
+  const { data } = useGuest();
   return (
     <div className="stack">
       <nav className="afterparty-links" aria-label="자유 관람 콘텐츠">
@@ -18,7 +20,13 @@ export function AfterParty() {
       <header className="page-heading">
         <h1>2026년, 한 걸음 더 가까워진 우리</h1>
       </header>
-      <WaitingStory book />
+      {data.state.phase === "COMPLETED" && (
+        <RecapCards
+          revision={data.state.revision}
+          storageKey={`hyeseong:2026:recap:afterparty:${data.self.id}`}
+          embedded
+        />
+      )}
     </div>
   );
 }

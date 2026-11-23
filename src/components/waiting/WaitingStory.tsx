@@ -1,11 +1,12 @@
 import { type CSSProperties, useCallback, useEffect, useRef, useState } from "react";
+import { usePlaybackEnvironment } from "../../lib/usePlaybackEnvironment";
 import { useBookView } from "../book/preferences";
 import { usePageSwipe } from "../book/usePageSwipe";
+import { usePaperPageTurn } from "../book/usePaperPageTurn";
 import { FrameReadout } from "./FrameReadout";
 import { StoryLight } from "./StoryLight";
 import { imageUrl, scenes, storyAsset, unitPoint } from "./story";
-import { useStoryPageTurn } from "./useStoryPageTurn";
-import { useStoryEnvironment, useStoryPlayback } from "./useStoryPlayback";
+import { useStoryPlayback } from "./useStoryPlayback";
 import "./waiting.css";
 
 export function WaitingStory({
@@ -31,12 +32,12 @@ export function WaitingStory({
   const url = errors[primary] ? storyAsset(`scene-${index + 1}.jpg`) : primary;
   const loaded = ready === url;
   const { still } = useBookView();
-  const { visible, reduced } = useStoryEnvironment(plate);
+  const { visible, reduced } = usePlaybackEnvironment(plate);
   const motionOff = reduced || still || typeof Element.prototype.animate !== "function";
   const staticView = motionOff || (manualPage && (paused || eventPaused) && seek === null);
   const playing =
     !staticView && !paused && !eventPaused && visible && seek === null && (loaded || !!errors[url]);
-  const { sheet, prepare } = useStoryPageTurn(index, book, still);
+  const { sheet, prepare } = usePaperPageTurn(index, book, still);
   const move = useCallback(
     (delta: 1 | -1) => {
       prepare(delta > 0);

@@ -134,7 +134,7 @@ export function BookLayout({
         index >= 0 &&
         (action === "POP" || (action === "PUSH" && state?.bookFrom === prior.pathname))
       )
-        return turnReadingPage(paper.current, index > from, still, { sheet: snapshot });
+        return turnReadingPage(paper.current, index > from, still, snapshot);
     }
     if (action === "POP" || !state?.bookFrom)
       traceMotion("book")(action === "POP" ? "NAVIGATION_POP" : "NAVIGATION_NOT_ELIGIBLE", { mode: "none" });

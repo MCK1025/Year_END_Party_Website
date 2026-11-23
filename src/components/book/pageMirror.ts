@@ -118,8 +118,11 @@ export function mirrorPaper(paper: HTMLElement, slice: PaperSlice, chapter = fal
       }
       raster = false;
       const canvas = document.createElement("canvas");
-      canvas.width = Math.max(1, Math.round(Math.min(rect.width, 1400)));
-      canvas.height = Math.max(1, Math.round(Math.min(rect.height, 1000)));
+      // Keep the intrinsic aspect ratio so the mirrored object-fit and object-position
+      // select the same crop as the live photo.
+      const scale = Math.min(1, 1400 / node.naturalWidth, 1000 / node.naturalHeight);
+      canvas.width = Math.max(1, Math.round(node.naturalWidth * scale));
+      canvas.height = Math.max(1, Math.round(node.naturalHeight * scale));
       paintControl(node, canvas);
       const ctx = canvas.getContext("2d");
       if (!ctx) throw new Error("image unavailable");
@@ -146,7 +149,7 @@ export function mirrorPaper(paper: HTMLElement, slice: PaperSlice, chapter = fal
     const isSvg = node.namespaceURI === "http://www.w3.org/2000/svg";
     if (
       !isSvg &&
-      !/^(SECTION|DIV|P|HEADER|FOOTER|NAV|H[1-6]|SPAN|FORM|LABEL|BUTTON|A|OL|UL|LI|BR|STRONG|EM|BLOCKQUOTE|ARTICLE|ASIDE|TIME|FIELDSET|LEGEND|B|HR|MAIN|DL|DD|DT|FIGURE|FIGCAPTION)$/.test(
+      !/^(SECTION|DIV|P|HEADER|FOOTER|NAV|H[1-6]|SPAN|SMALL|FORM|LABEL|BUTTON|A|OL|UL|LI|BR|STRONG|EM|BLOCKQUOTE|ARTICLE|ASIDE|TIME|FIELDSET|LEGEND|B|HR|MAIN|DL|DD|DT|FIGURE|FIGCAPTION)$/.test(
         node.tagName,
       )
     )
@@ -178,6 +181,14 @@ export function mirrorPaper(paper: HTMLElement, slice: PaperSlice, chapter = fal
     for (const child of node.childNodes) {
       const c = copy(child);
       if (c) result.append(c);
+    }
+    if (node instanceof HTMLElement && node.matches(".album-caption") && node.scrollTop) {
+      // Detached elements cannot restore scrollTop. Keep the visible lines in place
+      // while the snapshot is attached and transformed.
+      const lines = document.createElement("div");
+      lines.append(...result.childNodes);
+      lines.style.transform = `translateY(${-node.scrollTop}px)`;
+      result.append(lines);
     }
     return result;
   }

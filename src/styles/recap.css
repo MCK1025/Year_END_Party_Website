@@ -17,9 +17,25 @@
   justify-content: space-between;
   gap: var(--s2);
 }
+.recap-album-embedded {
+  height: clamp(320px, 105vw, 540px);
+  padding-inline: 0;
+}
 .album-heading {
   border-bottom: 1px solid var(--line);
   padding-bottom: var(--s2);
+}
+.album-heading-tools {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: var(--s2);
+}
+.album-heading-tools .button {
+  min-height: 44px;
+  padding: var(--s2);
+  white-space: nowrap;
 }
 .album-heading span,
 .album-controls span {
@@ -38,6 +54,10 @@
   height: 100%;
   position: relative;
   transform-style: preserve-3d;
+}
+.recap-album[data-opening="false"] .album-volume {
+  isolation: isolate;
+  transform-style: flat;
 }
 .album-page {
   height: 100%;
@@ -304,7 +324,7 @@
     height: 96dvh;
     gap: 4px;
   }
-  .album-heading h1 {
+  .album-heading :is(h1, h2) {
     font-size: 1.2rem;
   }
   .album-page {

@@ -4,6 +4,7 @@ import { z } from "zod";
 import { okSchema, recapSchema } from "../../supabase/functions/_shared/contracts";
 import { admin, call, dashboard, employee, env, signAdmin } from "../integration/helpers";
 import { localDatabase } from "./local-db";
+import { sampleFold } from "./sample-fold";
 
 async function openEditor(page: Page, query = "") {
   await page.goto(`/#/admin?tab=${encodeURIComponent("1년 회고")}${query}`);
@@ -105,6 +106,8 @@ test("saves independent cover and ordered photos, reloads them, gates private me
     await fresh.getByRole("checkbox").check();
     await fresh.getByRole("button", { name: "Moment 저장", exact: true }).click();
     await expect.poll(async () => (await read()).some((r) => r.id === moment.id)).toBe(true);
+    await sql`update public.event_public_state set phase='COMPLETED',revision=revision+1 where id`;
+    expect((await read()).some((r) => r.id === moment.id)).toBe(true);
     for (const path of uploads)
       expect((await guest.storage.from("event-media").createSignedUrl(path, 60)).error).toBeNull();
     const stale = await admin.functions.invoke("portal", {
@@ -116,9 +119,12 @@ test("saves independent cover and ordered photos, reloads them, gates private me
     await view.getByRole("button", { name: "오프닝 건너뛰기" }).click();
     await expect(view.locator(".album-image-slot:not([hidden]) img")).toHaveCSS("object-fit", "cover");
     await view.getByRole("button", { name: /다음/ }).click();
-    await expect(view.locator(".album-page")).toHaveCSS("transform", /^matrix3d/);
+    expect((await sampleFold(fresh, ".album-volume > .turn-window", "next")).hinge).toBeCloseTo(0);
     await expect(view.getByRole("heading", { name: "가로형 테스트" })).toBeVisible();
-    await expect(view.locator(".album-image-slot:not([hidden]) img")).toHaveCSS("object-fit", "contain");
+    await expect(view.locator(".album-volume > .album-page .album-image-slot:not([hidden]) img")).toHaveCSS(
+      "object-fit",
+      "contain",
+    );
     await fresh.getByRole("button", { name: "미리보기 닫기" }).click();
     await fresh.getByRole("button", { name: "저장된 전체 회고 미리보기" }).click();
     await expect(view.locator(".album-hardback")).toBeVisible();
@@ -130,7 +136,9 @@ test("saves independent cover and ordered photos, reloads them, gates private me
     await secondDetail.locator("summary").click();
     await secondDetail.getByRole("button", { name: "등록된 사진 선택" }).click();
     await secondDetail.getByLabel("상세 2 사진 선택").selectOption(uploads[0] ?? "");
+    await expect(fresh.getByRole("button", { name: "편집 취소" })).toBeVisible();
     await fresh.getByRole("button", { name: "Moment 저장", exact: true }).click();
+    await expect(fresh.getByRole("button", { name: "편집 취소" })).toHaveCount(0);
     await expect
       .poll(
         async () => (await dashboard()).recaps.find((r) => r.id === moment.id)?.album?.slides[1]?.asset_path,

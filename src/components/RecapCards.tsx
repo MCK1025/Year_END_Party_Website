@@ -9,9 +9,11 @@ import { Button, Note } from "./ui";
 export function RecapCards({
   revision,
   storageKey,
+  embedded = false,
 }: {
   readonly revision: number;
   readonly storageKey: string;
+  readonly embedded?: boolean;
 }) {
   const [loaded, setLoaded] = useState<{ rows: Moment[]; revision: number } | null>(null);
   const [error, setError] = useState("");
@@ -48,9 +50,11 @@ export function RecapCards({
       {loaded && (
         <div hidden={loaded.revision !== revision}>
           {loaded.rows.length ? (
-            <AlbumViewer key={storageKey} rows={loaded.rows} storageKey={storageKey} />
+            <AlbumViewer key={storageKey} rows={loaded.rows} storageKey={storageKey} embedded={embedded} />
           ) : (
-            <Note>첫 번째 Moment를 준비하고 있습니다.</Note>
+            <Note>
+              {embedded ? "공개된 회고 장면이 아직 없습니다." : "첫 번째 Moment를 준비하고 있습니다."}
+            </Note>
           )}
         </div>
       )}

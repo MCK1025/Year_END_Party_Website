@@ -1,9 +1,10 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motionMedia, motionPolicy, observeMotion } from "../../lib/motion";
 import { useBookView } from "../book/preferences";
-import { turnReadingPage } from "../book/turnReadingPage";
 import { usePageSwipe } from "../book/usePageSwipe";
+import { usePaperPageTurn } from "../book/usePaperPageTurn";
 import { Button, Note } from "../ui";
+import { AlbumAutoplay } from "./AlbumAutoplay";
 import { AlbumPhoto } from "./AlbumPhoto";
 import { BookOpening } from "./BookOpening";
 import { type AlbumPage, albumOf, albumPages, type Moment } from "./model";
@@ -42,41 +43,47 @@ export function AlbumViewer({
   rows,
   storageKey,
   preview = false,
+  embedded = false,
 }: {
   readonly rows: readonly Moment[];
   readonly storageKey?: string;
   readonly preview?: boolean;
+  readonly embedded?: boolean;
 }) {
   const pages = useMemo(() => albumPages(rows), [rows]);
   const { still } = useBookView();
-  const [selected, setSelected] = useState(() => bookmark(storageKey));
+  const [selection, setSelection] = useState(() => ({ id: bookmark(storageKey), automatic: false }));
+  const [readingWithKeyboard, setReadingWithKeyboard] = useState(false);
   const [opening, setOpening] = useState(
     () =>
       !!pages.length && !bookmark(storageKey) && motionPolicy(motionMedia()?.matches, still) === "ALLOWED",
   );
-  const requestedTurn = useRef<{ id: string; forward: boolean } | null>(null);
   const index = Math.max(
     0,
-    pages.findIndex((p) => p.id === selected),
+    pages.findIndex((p) => p.id === selection.id),
   );
   const page = pages[index];
   const pageId = page?.id;
-  const paper = useRef<HTMLDivElement>(null);
+  const { sheet: paper, prepare } = usePaperPageTurn(pageId, !opening, still, rows);
   const viewer = useRef<HTMLElement>(null);
+  const goToPage = useCallback(
+    (id: string, forward: boolean, automatic = false) => {
+      prepare(forward);
+      setSelection({ id, automatic });
+    },
+    [prepare],
+  );
+  const nextAutomatic = pages[index + 1] ?? pages[0];
+  const advance = useCallback(() => {
+    if (nextAutomatic) goToPage(nextAutomatic.id, true, true);
+  }, [nextAutomatic, goToPage]);
   const swipe = usePageSwipe(move);
   useEffect(() => {
-    if (!preview) viewer.current?.scrollIntoView({ block: "start", behavior: "instant" });
-  }, [preview]);
+    if (!preview && !embedded) viewer.current?.scrollIntoView({ block: "start", behavior: "instant" });
+  }, [preview, embedded]);
   useEffect(() => {
     if (pageId) remember(storageKey, pageId);
   }, [storageKey, pageId]);
-  useLayoutEffect(() => {
-    const request = requestedTurn.current;
-    requestedTurn.current = null;
-    if (request && request.id === pageId && paper.current) {
-      return turnReadingPage(paper.current, request.forward, still, { duration: 420 });
-    }
-  }, [pageId, still]);
   useEffect(() => {
     if (!opening) return;
     const media = motionMedia();
@@ -95,8 +102,7 @@ export function AlbumViewer({
   function move(by: 1 | -1) {
     const next = pages[index + by];
     if (opening || !next) return;
-    requestedTurn.current = { id: next.id, forward: by > 0 };
-    setSelected(next.id);
+    goToPage(next.id, by > 0);
   }
   const album = albumOf(page.moment);
   const adjacent = [
@@ -109,15 +115,35 @@ export function AlbumViewer({
   ];
   return (
     <section
-      className="recap-album"
+      className={embedded ? "recap-album recap-album-embedded" : "recap-album"}
       ref={viewer}
       aria-label="1년 회고"
+      onFocusCapture={(event) => {
+        if (embedded)
+          setReadingWithKeyboard(
+            event.target.matches(".album-caption:focus-visible, .album-controls button:focus-visible"),
+          );
+      }}
+      onBlurCapture={() => {
+        if (embedded) setReadingWithKeyboard(false);
+      }}
       data-opening={opening}
       data-still={still}
     >
       <header className="album-heading">
-        <h1>1년의 장면들</h1>
-        <span>MOMENT {String(page.number).padStart(2, "0")}</span>
+        {embedded ? <h2>1년의 장면들</h2> : <h1>1년의 장면들</h1>}
+        <div className="album-heading-tools">
+          <span>MOMENT {String(page.number).padStart(2, "0")}</span>
+          {embedded && storageKey && !opening && pages.length > 1 && (
+            <AlbumAutoplay
+              viewer={viewer}
+              still={still}
+              reading={readingWithKeyboard}
+              storageKey={storageKey}
+              advance={advance}
+            />
+          )}
+        </div>
       </header>
       <div className="album-stage" {...swipe}>
         <div
@@ -168,7 +194,7 @@ export function AlbumViewer({
             <Button variant="secondary" disabled={index === 0} onClick={() => move(-1)}>
               ← 이전
             </Button>
-            <span aria-live="polite" aria-atomic="true">
+            <span aria-live={selection.automatic ? "off" : "polite"} aria-atomic="true">
               {index + 1} / {pages.length}
               {index === pages.length - 1 && <small className="album-end">마지막 장</small>}
             </span>
