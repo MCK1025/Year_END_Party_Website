@@ -74,7 +74,7 @@ export function AlbumViewer({
     const request = requestedTurn.current;
     requestedTurn.current = null;
     if (request && request.id === pageId && paper.current) {
-      return turnReadingPage(paper.current, request.forward, still, 420);
+      return turnReadingPage(paper.current, request.forward, still, { duration: 420 });
     }
   }, [pageId, still]);
   useEffect(() => {

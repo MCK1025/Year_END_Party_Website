@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { fixture } from "./notebook-fixture";
+import { sampleFold } from "./sample-fold";
 
 test("turns the six illustrated scenes on the afterparty home itself", async ({ page, browserName }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
@@ -10,23 +11,9 @@ test("turns the six illustrated scenes on the afterparty home itself", async ({ 
   const previous = story.getByRole("button", { name: "이전 장면" });
   await story.scrollIntoViewIfNeeded();
   async function frame(direction: "next" | "previous", oldTitle: string, newTitle: string) {
-    await page.waitForFunction(
-      (id) => {
-        const paper = document.querySelector(".work-story-spread > .turn-window");
-        const a = paper?.getAnimations().find((item) => item.id === id);
-        if (!paper || !a) return false;
-        a.pause();
-        a.currentTime = 240;
-        const style = getComputedStyle(paper);
-        return (
-          new DOMMatrix(style.transform).m13 !== 0 &&
-          Math.abs(parseFloat(style.transformOrigin) / paper.clientWidth - (id.endsWith("next") ? 0 : 1)) <
-            0.01
-        );
-      },
-      `browse-turn-${direction}`,
-      { timeout: 7500 },
-    );
+    const geometry = await sampleFold(page, ".work-story-spread > .turn-window", direction);
+    expect(geometry.hinge).toBeCloseTo(direction === "next" ? 0 : 1);
+    expect(geometry.depth, "the illustrated page lifts toward the reader").toBeGreaterThan(0);
     await expect(story.getByRole("heading", { name: newTitle, exact: true })).toBeVisible();
     const old = story.locator(".turn-window");
     await expect(old).toHaveAttribute("aria-hidden", "true");

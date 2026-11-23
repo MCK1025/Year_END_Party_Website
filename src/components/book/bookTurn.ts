@@ -1,6 +1,7 @@
 import type { GraphicsSession } from "../../graphics/types";
 import { motionMedia, observeMotion } from "../../lib/motion";
 import { debuggingMotion, geometry, type MotionTrace } from "../../lib/motionDebug";
+import { notebookFold } from "./notebookFold";
 import { mirrorPaper, visiblePaper } from "./pageMirror";
 
 export function freezeTurn(
@@ -93,7 +94,7 @@ export function freezeTurn(
   timer = window.setTimeout(() => end("TARGET_NOT_READY"), 1600);
   function progress() {
     const time = typeof clock?.currentTime === "number" ? clock.currentTime : 0;
-    const t = Math.max(0, Math.min(1, time / 640));
+    const t = Math.max(0, Math.min(1, time / notebookFold.duration));
     const p = t * t * (3 - 2 * t);
     return forward ? p : 1 - p;
   }
@@ -106,15 +107,15 @@ export function freezeTurn(
     const frames =
       mode === "dom"
         ? [
-            { transform: `perspective(1500px) rotateY(${forward ? 0 : -96}deg)` },
-            { transform: `perspective(1500px) rotateY(${forward ? -96 : 0}deg)` },
+            { transform: forward ? notebookFold.flat : notebookFold.leftHinge },
+            { transform: forward ? notebookFold.leftHinge : notebookFold.flat },
           ]
         : [{ offset: 0 }, { offset: 1 }];
     try {
       clock = face.clip.animate(frames, {
         id: "paper-curl",
-        duration: 640,
-        easing: mode === "dom" ? "ease-in-out" : "linear",
+        duration: notebookFold.duration,
+        easing: mode === "dom" ? notebookFold.easing : "linear",
         fill: "both",
       });
       void clock.finished.then(
@@ -174,7 +175,7 @@ export function freezeTurn(
       }
       face = target;
       stage.append(target.clip);
-      face.clip.style.transform = "perspective(1500px) rotateY(-96deg)";
+      face.clip.style.transform = notebookFold.leftHinge;
     }
     if (typeof face.clip.animate !== "function") {
       end("WAAPI_UNAVAILABLE");

@@ -27,7 +27,7 @@ export function useStoryPageTurn(index: number, enabled: boolean, still: boolean
     const turn = pending.current;
     pending.current = null;
     if (!turn || !sheet.current || !enabled) return;
-    running.current = turnReadingPage(sheet.current, turn.forward, still, 580, turn.sheet);
+    running.current = turnReadingPage(sheet.current, turn.forward, still, { sheet: turn.sheet });
     return () => {
       running.current?.();
       running.current = undefined;
